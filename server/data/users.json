@@ -1,0 +1,26 @@
+[
+  {
+    "id": "user_1_mvguw508",
+    "name": "Akan User",
+    "email": "akan_student@test.com",
+    "password": "$2b$12$hXSmoJ6vs0y6mpeFha6yn.kQtY6ww8/4/s.3JHm8HesXuBIXT7kAa"
+  },
+  {
+    "id": "user_2_mvgvuu6c",
+    "name": "Akanksha Maurya",
+    "email": "akankshama97@gmail.com",
+    "password": "$2b$12$8r3gHkz3.ZEjOrwhKYX5QeVEhsVTJdjCjHw2GU2WjtI5SjeIUotyW"
+  },
+  {
+    "id": "user_3_mvgvxudg",
+    "name": "New Student",
+    "email": "new_student@test.com",
+    "password": "$2b$12$fn.D84hAlohFK.hP19PXaOL/aCJBHvxY6fPHdoyz7tM/slqGt6avy"
+  },
+  {
+    "id": "user_4_mvgwg2t5",
+    "name": "Omni Student",
+    "email": "user_1792513818372@omnistudy.ai",
+    "password": "$2b$12$XgPqoAMqzPEnbg7MPYELo.6rYRW0lw37/dp8dYwzufKllBz2dO74."
+  }
+]

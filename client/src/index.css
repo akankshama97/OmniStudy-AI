@@ -1,0 +1,429 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Light Mode Color Tokens (WCAG AA Compliant >= 4.5:1) ── */
+:root {
+  --bg-main: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-secondary: #F1F5F9;
+  --border-color: #E2E8F0;
+  --border-hover: #CBD5E1;
+  
+  --text-primary: #0F172A;     /* Contrast 15.4:1 on #FFF */
+  --text-secondary: #334155;   /* Contrast 7.6:1 on #FFF */
+  --text-muted: #64748B;       /* Contrast 4.6:1 on #FFF (WCAG AA pass) */
+  
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
+  --accent-light: #EFF6FF;
+  
+  --card-bg: rgba(255, 255, 255, 0.98);
+  --input-bg: #FFFFFF;
+  --input-border: #CBD5E1;
+  
+  /* Handwritten Copy Pen Colours (Light Paper) */
+  --pen-blue: #1E3A8A;         /* Primary notes & text */
+  --pen-red: #B91C1C;          /* Definitions & critical terms */
+  --pen-green: #15803D;        /* Solved examples & numericals */
+  --pen-orange: #C2410C;       /* Teacher tips, tricks & alerts */
+  
+  --paper-bg: #FDFBF7;
+  --paper-line: #E2E8F0;
+  --paper-margin: #EF4444;
+  
+  --scrollbar-track: #F8FAFC;
+  --scrollbar-thumb: #CBD5E1;
+  --scrollbar-thumb-hover: #94A3B8;
+}
+
+/* ── Dark Mode Color Tokens (WCAG AA Compliant >= 4.5:1) ── */
+.dark, html.dark {
+  --bg-main: #0B0F17;
+  --bg-surface: #131B2E;
+  --bg-surface-secondary: #1B2640;
+  --border-color: #23314F;
+  --border-hover: #334468;
+  
+  --text-primary: #F8FAFC;     /* Contrast 16.5:1 on #0B0F17 */
+  --text-secondary: #E2E8F0;   /* Contrast 13.5:1 on #0B0F17 */
+  --text-muted: #94A3B8;       /* Contrast 5.8:1 on #0B0F17 */
+  
+  --accent: #3B82F6;
+  --accent-hover: #60A5FA;
+  --accent-light: rgba(59, 130, 246, 0.15);
+  
+  --card-bg: rgba(19, 27, 46, 0.98);
+  --input-bg: #0F1626;
+  --input-border: #2A3B5E;
+  
+  /* Handwritten Copy Pen Colours (Dark/OLED Paper) */
+  --pen-blue: #93C5FD;         /* High readability blue ink */
+  --pen-red: #FCA5A5;          /* High contrast red ink for definitions */
+  --pen-green: #86EFAC;        /* Fresh green ink for examples */
+  --pen-orange: #FDBA74;       /* Clear orange ink for teacher alerts */
+  
+  --paper-bg: #090E1A;
+  --paper-line: #1E293B;
+  --paper-margin: #F43F5E;
+  
+  --scrollbar-track: #0B0F17;
+  --scrollbar-thumb: #23314F;
+  --scrollbar-thumb-hover: #3E527D;
+}
+
+@layer base {
+  * {
+    @apply transition-colors duration-150;
+    box-sizing: border-box;
+  }
+  
+  body {
+    @apply antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-main);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    color: var(--text-primary);
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 6px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+}
+
+@layer utilities {
+
+  /* ── 4 Handwritten Copy Pen Classes ── */
+  .pen-blue   { color: var(--pen-blue); }
+  .pen-red    { color: var(--pen-red); }
+  .pen-green  { color: var(--pen-green); }
+  .pen-orange { color: var(--pen-orange); }
+
+  /* ── Realistic Notebook Paper Textures ── */
+  
+  /* 1. Classic Lined College Ruled Paper */
+  .ruled-paper {
+    background-color: var(--paper-bg);
+    background-image:
+      linear-gradient(90deg, transparent 54px, var(--paper-margin) 54px, var(--paper-margin) 56px, transparent 56px),
+      linear-gradient(var(--paper-line) 1.2px, transparent 0);
+    background-size: 100% 100%, 100% 2.2rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border-color);
+  }
+
+  .dark-ruled-paper {
+    background-color: var(--paper-bg);
+    background-image:
+      linear-gradient(90deg, transparent 54px, var(--paper-margin) 54px, var(--paper-margin) 56px, transparent 56px),
+      linear-gradient(var(--paper-line) 1.2px, transparent 0);
+    background-size: 100% 100%, 100% 2.2rem;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-color);
+  }
+
+  /* 2. Engineering Graph / Grid Paper */
+  .grid-paper {
+    background-color: #F8FAFC;
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.2) 1px, transparent 1px);
+    background-size: 20px 20px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+  }
+
+  .dark-grid-paper {
+    background-color: #080D18;
+    background-image:
+      linear-gradient(rgba(51, 65, 85, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(51, 65, 85, 0.3) 1px, transparent 1px);
+    background-size: 20px 20px;
+    box-shadow: 0 10px 30px -5px rgba(0,0,0,0.5);
+  }
+
+  /* 3. Vintage Parchment */
+  .parchment-paper {
+    background-color: #FBF5E8;
+    background-image:
+      linear-gradient(90deg, transparent 54px, #D97706 54px, #D97706 56px, transparent 56px),
+      linear-gradient(#E5D9C5 1.2px, transparent 0);
+    background-size: 100% 100%, 100% 2.2rem;
+    box-shadow: 0 10px 25px -5px rgba(180, 83, 9, 0.12);
+  }
+
+  /* Spiral Binder Holes on Left */
+  .spiral-binder {
+    background-image: radial-gradient(#64748B 35%, transparent 40%);
+    background-size: 100% 2.2rem;
+    background-position: 0 0.5rem;
+  }
+
+  /* Handwritten fonts */
+  .handwritten-font  { font-family: 'Kalam', cursive; }
+  .handwritten-title { font-family: 'Caveat', cursive; }
+  .handwritten-clean { font-family: 'Patrick Hand', cursive; }
+
+  /* Formula boxes */
+  .formula-card-light {
+    background: #F0FDFA;
+    border: 2px dashed #0D9488;
+    color: #0F172A;
+  }
+  .formula-card-dark {
+    background: rgba(4, 47, 46, 0.7);
+    border: 2px dashed #2DD4BF;
+    color: #F8FAFC;
+  }
+
+  /* High contrast student copy headings */
+  .topic-underline {
+    border-bottom: 2.5px solid #2563EB;
+    padding-bottom: 2px;
+    display: inline-block;
+  }
+  .dark .topic-underline {
+    border-bottom: 2.5px solid #60A5FA;
+  }
+
+  /* Shimmer animations */
+  .shimmer-bar {
+    background: linear-gradient(90deg, #2563EB 0%, #60A5FA 50%, #2563EB 100%);
+    background-size: 200% 100%;
+    animation: shimmerMove 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmerMove {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── PRINT-READY A4 PDF OPTIMIZATIONS (Continuous flow, no empty pages) ── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 10mm 14mm 10mm;
+    @bottom-center {
+      content: "⚡ OmniStudy AI — Verified Handwritten Notes | Developed by: Akanksha Maurya";
+      font-size: 8.5pt;
+      font-weight: 800;
+      color: #0F172A;
+    }
+  }
+  
+  body, html {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+  }
+  
+  /* Hide non-printable navigation, toolbar, buttons */
+  header, nav, footer, .no-print, button, input {
+    display: none !important;
+  }
+
+  /* First Page Decorative Cover Header: Glued to content on Page 1 & Identical in PDF */
+  .topper-cover-header {
+    border: 2px solid #0F172A !important;
+    background: #F8FAFC !important;
+    color: #0F172A !important;
+    margin-bottom: 10pt !important;
+    padding: 10pt 14pt !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .topper-cover-header * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Critical: Never leave pages empty! Topics flow naturally right after one another */
+  .concept-block {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
+    margin-top: 6pt !important;
+    margin-bottom: 12pt !important;
+    padding: 10pt 12pt !important;
+    border: 1.5px solid #CBD5E1 !important;
+    border-radius: 8pt !important;
+  }
+
+  /* Zero dead-space between consecutive topics */
+  .space-y-8 > :not([hidden]) ~ :not([hidden]),
+  .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 8pt !important;
+  }
+
+  /* Keep headings attached to content so they are never orphaned at the bottom */
+  h1, h2, h3, h4, .concept-header, .topic-heading {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Keep small atomic sub-boxes unbroken */
+  .formula-box,
+  .diagram-container,
+  .table-container,
+  .solved-example-box,
+  .pyq-item,
+  .teacher-tip-box,
+  .common-mistake-box,
+  svg {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-bottom: 8pt !important;
+  }
+
+  .ruled-paper, .dark-ruled-paper, .grid-paper {
+    background-image: none !important;
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .pen-blue   { color: #1E3A8A !important; }
+  .pen-red    { color: #B91C1C !important; }
+  .pen-green  { color: #15803D !important; }
+  .pen-orange { color: #C2410C !important; }
+
+  /* High contrast solid dark footer for PDF & Print */
+  .print-signature-footer {
+    display: flex !important;
+    background: #0F172A !important;
+    color: #FFFFFF !important;
+    border: 2px solid #0F172A !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    margin-top: 16pt !important;
+    padding: 10pt 14pt !important;
+    border-radius: 8pt !important;
+  }
+}
+
+/* ── Clean PDF Export Mode (Zero dark backgrounds, 100% clean white paper & dark ink) ── */
+.pdf-export-mode {
+  background-image: none !important;
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  box-shadow: none !important;
+  border-color: #CBD5E1 !important;
+}
+
+.pdf-export-mode .topper-cover-header {
+  background-color: #F8FAFC !important;
+  background: #F8FAFC !important;
+  border: 2px solid #0F172A !important;
+  box-shadow: none !important;
+  color: #0F172A !important;
+}
+
+.pdf-export-mode .concept-block {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  box-shadow: none !important;
+  color: #0F172A !important;
+}
+
+/* Force light background on all dark-mode container classes */
+.pdf-export-mode .bg-\[\#131B2E\],
+.pdf-export-mode .bg-\[\#0B0F17\],
+.pdf-export-mode .bg-\[\#0F1626\],
+.pdf-export-mode .bg-slate-900,
+.pdf-export-mode .bg-slate-950,
+.pdf-export-mode [class*="dark:bg-"] {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+}
+
+/* Ensure headings and body text are crisp dark ink in PDF */
+.pdf-export-mode h1,
+.pdf-export-mode h2,
+.pdf-export-mode h3,
+.pdf-export-mode h4,
+.pdf-export-mode p,
+.pdf-export-mode span,
+.pdf-export-mode li,
+.pdf-export-mode div {
+  color: #0F172A;
+}
+
+/* Formula cards in PDF: crisp light cyan */
+.pdf-export-mode .formula-box,
+.pdf-export-mode .formula-card-dark,
+.pdf-export-mode .formula-card-light {
+  background-color: #F0FDFA !important;
+  background: #F0FDFA !important;
+  border: 1.5px dashed #0D9488 !important;
+  color: #0F172A !important;
+}
+
+/* Solved example cards in PDF: crisp light emerald */
+.pdf-export-mode .solved-example-box {
+  background-color: #F0FDF4 !important;
+  background: #F0FDF4 !important;
+  border: 1.5px solid #86EFAC !important;
+  color: #14532D !important;
+}
+
+/* Teacher tip box in PDF: crisp light orange */
+.pdf-export-mode .teacher-tip-box {
+  background-color: #FFF7ED !important;
+  background: #FFF7ED !important;
+  border: 1.5px solid #FDBA74 !important;
+  color: #9A3412 !important;
+}
+
+/* Common mistake box in PDF: crisp light rose */
+.pdf-export-mode .common-mistake-box {
+  background-color: #FFF1F2 !important;
+  background: #FFF1F2 !important;
+  border: 1.5px solid #FDA4AF !important;
+  color: #9F1239 !important;
+}
+
+/* Pen ink colors */
+.pdf-export-mode .pen-blue   { color: #1E3A8A !important; }
+.pdf-export-mode .pen-red    { color: #B91C1C !important; }
+.pdf-export-mode .pen-green  { color: #15803D !important; }
+.pdf-export-mode .pen-orange { color: #C2410C !important; }
+
+/* Keep signature footer dark with crisp white text */
+.pdf-export-mode .print-signature-footer {
+  display: flex !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  color: #FFFFFF !important;
+  border: 2px solid #0F172A !important;
+  border-radius: 8pt !important;
+}
+.pdf-export-mode .print-signature-footer * {
+  color: #FFFFFF !important;
+}
+
+.pdf-export-mode * {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}

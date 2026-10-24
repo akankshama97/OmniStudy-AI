@@ -1,0 +1,16 @@
+{
+  "name": "omnistudy-ai",
+  "version": "1.0.0",
+  "description": "AI-powered YouTube Video to Handwritten PDF Notes Generator and Multilingual Doubt Solver (MERN Stack)",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "OmniStudy AI - YouTube Lecture to Notes",
+  "version": "1.0.0",
+  "description": "Convert any YouTube lecture into comprehensive handwritten notebook notes, LaTeX formulas, blackboard diagrams, and exam PYQs in 1 click.",
+  "permissions": ["activeTab", "clipboardWrite", "storage"],
+  "host_permissions": ["*://*.youtube.com/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "OmniStudy AI - Create Notes"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/watch*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
