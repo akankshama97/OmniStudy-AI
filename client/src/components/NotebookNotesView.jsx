@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
   Download, BookOpen, Calculator, HelpCircle, CheckCircle, MessageSquareText,
-  FileText, Copy, Check, Printer, Volume2, VolumeX, Play, Pause, RotateCcw,
+  FileText, Copy, Check, Volume2, VolumeX, Play, Pause, RotateCcw,
   Sparkles, Layers, Award, BrainCircuit, ExternalLink, ChevronDown, ChevronUp,
   Palette, Eye, CheckCircle2, Bookmark, Languages, FileDown, Clock, AlertTriangle, Lightbulb,
   XCircle, Target, BarChart3, Filter, Search, Flame, Shield, Trophy, Zap, Sliders,
@@ -1156,14 +1156,14 @@ export default function NotebookNotesView({
             </button>
           </div>
 
-          {/* Export & Download Options (PDF, DOC, Print) */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Export & Share Options (PDF, DOC, Share) */}
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
             {/* PDF Download Button */}
             <button
               onClick={handleDownloadPDF}
               disabled={isExportingPDF}
-              className="px-3.5 py-2 rounded-xl border border-red-500/30 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-60 cursor-pointer"
-              title="Download PDF File Directly"
+              className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm hover:shadow-md disabled:opacity-60 cursor-pointer active:scale-95"
+              title="Download Handwritten Notes as PDF"
             >
               <FileDown className={`w-3.5 h-3.5 ${isExportingPDF ? 'animate-bounce' : ''}`} />
               <span>{isExportingPDF ? 'Generating PDF...' : 'Download PDF'}</span>
@@ -1172,8 +1172,8 @@ export default function NotebookNotesView({
             {/* DOCX / Word Export Button */}
             <button
               onClick={handleExportDocx}
-              className="px-3.5 py-2 rounded-xl border border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
-              title="Download Notes as Microsoft Word (.doc)"
+              className="px-3.5 py-2 rounded-xl border border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs hover:shadow-sm active:scale-95"
+              title="Download Notes as Microsoft Word Document (.doc)"
             >
               {copiedDocx ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <FileText className="w-3.5 h-3.5" />}
               <span>{copiedDocx ? 'Downloaded DOC!' : 'Download DOC'}</span>
@@ -1182,21 +1182,11 @@ export default function NotebookNotesView({
             {/* Share Notes Modal Trigger Button */}
             <button
               onClick={() => setIsShareModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl border border-purple-500/30 bg-purple-50 dark:bg-purple-500/10 hover:bg-purple-100 dark:hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
+              className="px-3.5 py-2 rounded-xl border border-purple-500/30 bg-purple-50 dark:bg-purple-500/10 hover:bg-purple-100 dark:hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs hover:shadow-sm active:scale-95"
               title="Share Notes with Classmates via WhatsApp or Link"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>Share</span>
-            </button>
-
-            {/* Print & Browser Vector PDF Button */}
-            <button
-              onClick={handlePrint}
-              className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all"
-              title="Print or Save as Vector PDF directly from Browser"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Print / Save PDF</span>
             </button>
           </div>
 
@@ -2452,11 +2442,11 @@ export default function NotebookNotesView({
 
             <button
               type="button"
-              onClick={handlePrint}
+              onClick={handleDownloadPDF}
               className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-sm transition-all shrink-0"
             >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Print 1-Page LMR</span>
+              <FileDown className="w-3.5 h-3.5" />
+              <span>Download 1-Page LMR</span>
             </button>
           </div>
 
@@ -3227,11 +3217,11 @@ export default function NotebookNotesView({
 
             <button
               type="button"
-              onClick={handlePrint}
+              onClick={handleDownloadPDF}
               className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all shrink-0"
             >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Print Student Progress Report</span>
+              <FileDown className="w-3.5 h-3.5" />
+              <span>Download Progress Report</span>
             </button>
           </div>
 
