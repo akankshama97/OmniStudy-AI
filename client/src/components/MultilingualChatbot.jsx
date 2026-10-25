@@ -28,6 +28,8 @@ const MULTILINGUAL_QUICK_PROMPTS = {
   ]
 };
 
+const QUICK_PROMPTS = MULTILINGUAL_QUICK_PROMPTS.Hinglish;
+
 /**
  * Rich Text & KaTeX Renderer for Mathematical Expressions & Code
  */
@@ -873,7 +875,7 @@ export default function MultilingualChatbot({
           <div className="pt-2 border-t border-[#E2E8F0] dark:border-[#23314F] my-2">
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
               <span className="text-[10px] uppercase font-bold text-slate-400 shrink-0 font-mono">Suggested:</span>
-              {QUICK_PROMPTS.map((item, pIdx) => (
+              {(MULTILINGUAL_QUICK_PROMPTS[selectedLang] || QUICK_PROMPTS).map((item, pIdx) => (
                 <button
                   key={pIdx}
                   onClick={() => handleSendGeneral(item.prompt)}
