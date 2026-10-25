@@ -682,13 +682,134 @@ export default function NotebookNotesView({
     }
   };
 
-  // Direct 1-Click PDF Download (Backend Vector PDFKit primary, client fallback)
+  // Helper: Generates pristine, self-contained HTML for direct PDF and DOC downloads
+  const getCleanNotesHtml = (n) => {
+    if (!n) return '';
+    return `
+      <div style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #111827; max-width: 800px; margin: 0 auto; padding: 24px; background: #FFFFFF;">
+        <div style="background: #EEF2FF; border: 2px solid #3B82F6; border-radius: 8px; padding: 14px; margin-bottom: 24px; text-align: center;">
+          <span style="font-size: 16px; font-weight: bold; color: #1E40AF; display: block; letter-spacing: 0.5px;">⚡ OMNISTUDY AI — TOPPER CLASSROOM COPY NOTES</span>
+          <span style="font-size: 12px; color: #4B5563; margin-top: 4px; display: block;">Platform Developed by: <strong style="color: #2563EB;">Akanksha Maurya</strong> | All Rights Reserved</span>
+        </div>
+
+        <h1 style="color: #1E3A8A; font-size: 22px; border-bottom: 2px solid #3B82F6; padding-bottom: 8px; margin: 0 0 10px 0;">${n.title || 'Lecture Study Notes'}</h1>
+        
+        <p style="color: #4B5563; font-size: 13px; margin: 0 0 20px 0; background: #F8FAFC; padding: 8px 12px; border-radius: 6px;">
+          <strong>Subject:</strong> ${n.subject || 'General'} &nbsp;|&nbsp;
+          <strong>Target Exam:</strong> ${n.targetExam || 'Exam Ready'} &nbsp;|&nbsp;
+          <strong>Notes Type:</strong> Classroom Topper Copy
+        </p>
+
+        ${n.overview ? `
+          <h2 style="color: #1E40AF; font-size: 16px; margin: 20px 0 8px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">📌 Lecture Overview</h2>
+          <p style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 6px; font-size: 13px; margin: 0 0 16px 0;">${n.overview}</p>
+        ` : ''}
+
+        ${n.quickSummary && n.quickSummary.length > 0 ? `
+          <h2 style="color: #1E40AF; font-size: 16px; margin: 20px 0 8px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">⚡ High-Yield Key Takeaways</h2>
+          <ul style="margin: 0 0 20px 0; padding-left: 20px; font-size: 13px;">
+            ${n.quickSummary.map(s => `<li style="margin-bottom: 6px; color: #1F2937;">${s}</li>`).join('')}
+          </ul>
+        ` : ''}
+
+        ${n.keyConcepts && n.keyConcepts.length > 0 ? `
+          <h2 style="color: #1E40AF; font-size: 18px; margin: 24px 0 12px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">📖 Detailed Classroom Copy Notes</h2>
+          ${n.keyConcepts.map((c, idx) => `
+            <div style="margin-bottom: 20px; padding: 14px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; page-break-inside: avoid;">
+              <h3 style="color: #1E3A8A; font-size: 15px; margin: 0 0 4px 0;">${c.heading || `Topic ${idx + 1}`} <span style="font-size: 11px; color: #64748B; font-weight: normal;">[${c.timestamp_start || '00:00'} - ${c.timestamp_end || ''}]</span></h3>
+              ${c.subheading ? `<p style="font-style: italic; color: #4B5563; font-size: 12px; margin: 0 0 8px 0;">${c.subheading}</p>` : ''}
+
+              ${c.definitions && c.definitions.length > 0 ? `
+                <div style="background: #FEF2F2; border-left: 3px solid #EF4444; padding: 8px 10px; margin: 8px 0; border-radius: 4px;">
+                  <strong style="color: #B91C1C; font-size: 12px;">Definition:</strong>
+                  ${c.definitions.map(d => `<p style="color: #991B1B; font-size: 12px; margin: 2px 0;">${d}</p>`).join('')}
+                </div>
+              ` : ''}
+
+              ${c.points && c.points.length > 0 ? `
+                <strong style="color: #1E3A8A; font-size: 12px; display: block; margin: 8px 0 4px 0;">Blackboard Detailed Points:</strong>
+                <ul style="margin: 0; padding-left: 18px; font-size: 12.5px;">
+                  ${c.points.map(p => `<li style="margin-bottom: 4px; color: #1F2937;">${p}</li>`).join('')}
+                </ul>
+              ` : ''}
+
+              ${c.diagram && (c.diagram.heading || c.diagram.description) ? `
+                <div style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 8px 12px; border-radius: 6px; margin: 10px 0;">
+                  <strong style="color: #2563EB; font-size: 12px;">📐 Board Diagram: ${c.diagram.heading || 'Architecture'}</strong>
+                  <p style="font-size: 12px; color: #4B5563; margin: 2px 0 0 0;">${c.diagram.description || ''}</p>
+                </div>
+              ` : ''}
+
+              ${c.solved_example && c.solved_example.title ? `
+                <div style="background: #F0FDF4; border: 1px solid #86EFAC; padding: 10px; border-radius: 6px; margin: 10px 0;">
+                  <strong style="color: #15803D; font-size: 12px;">🧮 Solved Numerical: ${c.solved_example.title}</strong>
+                  ${c.solved_example.given ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Given:</strong> ${c.solved_example.given}</p>` : ''}
+                  ${c.solved_example.formula ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Formula:</strong> ${c.solved_example.formula}</p>` : ''}
+                  ${c.solved_example.solution ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Solution:</strong> ${c.solved_example.solution.replace(/\n/g, '<br/>')}</p>` : ''}
+                  ${c.solved_example.answer ? `<p style="margin: 3px 0; font-size: 12px; color: #166534; font-weight: bold;"><strong>Answer:</strong> ${c.solved_example.answer}</p>` : ''}
+                </div>
+              ` : ''}
+
+              ${c.teacher_tips && c.teacher_tips.length > 0 ? `
+                <div style="background: #FFF7ED; border-left: 3px solid #F97316; padding: 6px 10px; margin-top: 8px; border-radius: 4px;">
+                  <strong style="color: #C2410C; font-size: 11px;">💡 Teacher Exam Tip:</strong>
+                  ${c.teacher_tips.map(t => `<p style="color: #9A3412; margin: 2px 0; font-size: 11.5px;">${t}</p>`).join('')}
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        ` : ''}
+
+        ${n.formulas && n.formulas.length > 0 ? `
+          <h2 style="color: #1E40AF; font-size: 16px; margin: 24px 0 10px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">⚡ Essential Formulas</h2>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 12px;" border="1" cellpadding="6">
+            <tr style="background: #2563EB; color: #FFFFFF;">
+              <th style="padding: 6px; text-align: left;">Formula Name</th>
+              <th style="padding: 6px; text-align: left;">Mathematical Equation</th>
+              <th style="padding: 6px; text-align: left;">Variables / Details</th>
+            </tr>
+            ${n.formulas.map(f => `
+              <tr>
+                <td style="padding: 6px; border: 1px solid #CBD5E1;"><strong>${f.name}</strong></td>
+                <td style="padding: 6px; border: 1px solid #CBD5E1; font-family: monospace; color: #1E3A8A;">${f.formula}</td>
+                <td style="padding: 6px; border: 1px solid #CBD5E1;">${f.variables || ''}</td>
+              </tr>
+            `).join('')}
+          </table>
+        ` : ''}
+
+        ${n.importantPYQs && n.importantPYQs.length > 0 ? `
+          <h2 style="color: #1E40AF; font-size: 16px; margin: 24px 0 10px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">🎯 Exam Previous Year Questions (PYQs)</h2>
+          ${n.importantPYQs.slice(0, 5).map((q, qIdx) => `
+            <div style="margin-bottom: 12px; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 6px; background: #FFFFFF; page-break-inside: avoid;">
+              <strong style="color: #D97706; font-size: 12px;">Q${qIdx + 1} [${q.examName || q.exam || 'Exam PYQ'} ${q.year || ''}]</strong>
+              <p style="font-weight: bold; margin: 4px 0; font-size: 12.5px;">${q.question}</p>
+              ${q.options && q.options.length > 0 ? `
+                <ul style="margin: 4px 0 6px 0; padding-left: 18px; font-size: 12px;">
+                  ${q.options.map(opt => `<li style="margin-bottom: 2px;">${opt}</li>`).join('')}
+                </ul>
+              ` : ''}
+              <p style="color: #15803D; font-weight: bold; font-size: 12px; margin: 2px 0;">Correct: ${q.correctAnswer || q.answer || ''}</p>
+              ${q.solution || q.explanation ? `<p style="color: #4B5563; font-size: 11.5px; margin: 2px 0;"><strong>Solution:</strong> ${(q.solution || q.explanation).replace(/\n/g, '<br/>')}</p>` : ''}
+            </div>
+          `).join('')}
+        ` : ''}
+
+        <div style="border-top: 1px solid #CBD5E1; padding-top: 14px; margin-top: 28px; text-align: center; color: #64748B; font-size: 11px;">
+          <p style="margin: 2px 0;">Synthesized with <strong>OmniStudy AI</strong> • Platform Developed by <strong style="color: #2563EB;">Akanksha Maurya</strong></p>
+          <p style="margin: 2px 0; color: #94A3B8;">Interactive Web App: https://omni-study-ai-lilac.vercel.app/</p>
+        </div>
+      </div>
+    `;
+  };
+
+  // Direct 1-Click PDF Download (ALWAYS directly downloads file, NEVER opens print preview)
   const handleDownloadPDF = async () => {
     if (!note) return;
     const cleanTitle = (note.title || 'Lecture_Notes').replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_');
     setIsExportingPDF(true);
 
-    // 1. Primary High-Reliability Method: Server-side PDFKit vector export
+    // 1. Primary Method: High-Quality Vector PDF from Server
     try {
       const pdfBlob = await downloadNotePdfApi(note);
       if (pdfBlob && (pdfBlob.size > 500 || pdfBlob.byteLength > 500)) {
@@ -704,246 +825,88 @@ export default function NotebookNotesView({
         return;
       }
     } catch (apiErr) {
-      console.warn('[NotebookNotesView] Server PDF export error, attempting client-side fallback:', apiErr);
+      console.warn('[NotebookNotesView] Server PDF export notice, engaging direct client PDF generator:', apiErr);
     }
 
-    // Give React time to switch activeDark to false for client fallback
-    await new Promise(r => setTimeout(r, 120));
-
+    // 2. Client-side Direct PDF Generation (Uses html2pdf on clean HTML, directly saving to file without print dialog)
     try {
-      if (typeof window !== 'undefined' && notebookRef.current) {
+      if (typeof window !== 'undefined') {
         const html2pdfModule = await import('html2pdf.js');
         const html2pdf = html2pdfModule.default || html2pdfModule;
 
-        const sourceEl = notebookRef.current;
-        const clone = sourceEl.cloneNode(true);
+        const printContainer = document.createElement('div');
+        printContainer.style.position = 'fixed';
+        printContainer.style.top = '0';
+        printContainer.style.left = '0';
+        printContainer.style.width = '800px';
+        printContainer.style.background = '#FFFFFF';
+        printContainer.style.zIndex = '-99999';
+        printContainer.style.opacity = '0.01';
+        printContainer.style.pointerEvents = 'none';
+        printContainer.innerHTML = getCleanNotesHtml(note);
+        document.body.appendChild(printContainer);
 
-        // Strip any shadows, dark backgrounds, and overflow restrictions from the clone
-        clone.classList.remove('dark-ruled-paper', 'dark-grid-paper', 'dark', 'shadow-2xl', 'shadow-md', 'overflow-hidden');
-        clone.classList.add('ruled-paper', 'pdf-export-mode');
-        clone.style.backgroundColor = '#FFFFFF';
-        clone.style.backgroundImage = 'none';
-        clone.style.color = '#0F172A';
-        clone.style.boxShadow = 'none';
-        clone.style.width = '1000px';
-        clone.style.maxWidth = '1000px';
-        clone.style.padding = '20px 24px';
-        clone.style.margin = '0 auto';
-        clone.style.border = 'none';
-
-        // Remove no-print elements from clone
-        const noPrintElements = clone.querySelectorAll('.no-print, button, input');
-        noPrintElements.forEach(el => el.remove());
-
-        // Sanitize all children to ensure clean white backgrounds and sharp dark text
-        const allChildren = clone.querySelectorAll('*');
-        allChildren.forEach(el => {
-          el.classList.remove('dark');
-          el.style.textShadow = 'none';
-          el.style.boxShadow = 'none';
-
-          // Ensure topper cover header is pristine
-          if (el.classList.contains('topper-cover-header')) {
-            el.style.backgroundColor = '#F8FAFC';
-            el.style.borderColor = '#0F172A';
-            el.style.borderWidth = '2px';
-            el.style.color = '#0F172A';
-          } else if (el.classList.contains('concept-block')) {
-            el.style.backgroundColor = '#FFFFFF';
-            el.style.borderColor = '#CBD5E1';
-            el.style.color = '#0F172A';
-          } else if (el.classList.contains('print-signature-footer')) {
-            el.style.backgroundColor = '#0F172A';
-            el.style.color = '#FFFFFF';
-            el.style.display = 'flex';
-          } else if (!el.closest('.print-signature-footer')) {
-            // Check computed background
-            const bg = el.style.backgroundColor;
-            if (bg && (bg.includes('0, 0, 0') || bg.includes('11, 15') || bg.includes('15, 22') || bg.includes('19, 27') || bg.includes('9, 14'))) {
-              el.style.backgroundColor = '#FFFFFF';
-              el.style.color = '#0F172A';
-            }
-          }
-        });
-
-        // Mount clone in off-screen container with white background
-        const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.left = '0';
-        container.style.top = '0';
-        container.style.width = '1040px';
-        container.style.backgroundColor = '#FFFFFF';
-        container.style.zIndex = '-9999';
-        container.style.opacity = '0.01';
-        container.style.pointerEvents = 'none';
-        container.appendChild(clone);
-        document.body.appendChild(container);
-
-        const isEBook = Boolean(note.isPlaylist || note.isEBook);
         const opt = {
-          margin: [8, 8, 10, 8],
-          filename: `${cleanTitle}_${isEBook ? 'Subject_EBook' : 'Notes'}.pdf`,
-          image: { type: 'png' }, // PNG format guarantees transparent regions NEVER turn pitch black!
+          margin: [10, 10, 12, 10],
+          filename: `${cleanTitle}_Notes.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
           html2canvas: {
             scale: 2,
             useCORS: true,
             logging: false,
-            backgroundColor: '#FFFFFF', // Solid pure white canvas background
-            scrollX: 0,
-            scrollY: 0
+            backgroundColor: '#FFFFFF',
+            windowWidth: 800
           },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: {
-            mode: ['css', 'legacy'],
-            avoid: ['.formula-box', '.diagram-container', '.table-container', '.solved-example-box', 'svg', '.teacher-tip-box', '.common-mistake-box', '.pyq-item', '.topper-cover-header']
-          }
+          pagebreak: { mode: ['css', 'legacy'] }
         };
 
         try {
-          await html2pdf().set(opt).from(clone).save();
+          await html2pdf().set(opt).from(printContainer).save();
+          setIsExportingPDF(false);
+          return;
         } finally {
-          if (document.body.contains(container)) {
-            document.body.removeChild(container);
+          if (document.body.contains(printContainer)) {
+            document.body.removeChild(printContainer);
           }
         }
-        setIsExportingPDF(false);
-        return;
       }
-    } catch (err) {
-      console.warn('html2pdf download warning, falling back to browser print:', err);
-      // Fallback: window.print()
-      handlePrint();
+    } catch (clientPdfErr) {
+      console.warn('[NotebookNotesView] Client html2pdf fallback notice:', clientPdfErr);
+    }
+
+    // 3. Guaranteed Direct File Download Fallback (Creates .doc file directly, EXACTLY like Word export - NEVER PRINT)
+    try {
+      const docHeader = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset='utf-8'><title>${note.title || 'Notes'}</title></head><body>${getCleanNotesHtml(note)}</body></html>`;
+      const blob = new Blob(['\ufeff', docHeader], { type: 'application/msword' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${cleanTitle}_Notes.doc`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (finalErr) {
+      console.error('[NotebookNotesView] Export failed:', finalErr);
     } finally {
       setIsExportingPDF(false);
     }
   };
 
-  // Direct Print
-  const handlePrint = () => {
-    window.print();
-  };
-
-  // Export to Microsoft Word Compatible Document (.doc)
+  // Export to Microsoft Word Compatible Document (.doc) - Direct 1-click file download
   const handleExportDocx = () => {
     const cleanTitle = (note.title || 'Lecture_Notes').replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_');
-    
-    let docBody = `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111; max-width: 800px; margin: auto;">
-        <div style="background: #EFF6FF; border: 2px solid #2563EB; border-radius: 8px; padding: 12px; margin-bottom: 20px; text-align: center;">
-          <span style="font-size: 18px; font-weight: bold; color: #1E40AF; display: block;">⚡ OmniStudy AI — Topper Classroom Copy Notes</span>
-          <span style="font-size: 13px; color: #475569;">Website Developed by: <strong style="color: #2563EB;">Akanksha Maurya</strong> | All Rights Reserved</span>
-        </div>
-        <h1 style="color: #1E3A8A; border-bottom: 2px solid #2563EB; padding-bottom: 8px;">${note.title || 'Lecture Notes'}</h1>
-        <p style="color: #475569; font-size: 14px;">
-          <strong>Chapter:</strong> ${note.chapter || ''} &nbsp;|&nbsp;
-          <strong>Subject:</strong> ${note.subject || 'General'} &nbsp;|&nbsp;
-          <strong>Target Exam:</strong> ${note.targetExam || 'Exam Ready'} &nbsp;|&nbsp;
-          <strong>OmniStudy AI</strong> • Developed by Akanksha Maurya
-        </p>
-        
-        <h2 style="color: #2563EB; margin-top: 24px;">Lecture Overview</h2>
-        <p style="background: #F8FAFC; border-left: 4px solid #3B82F6; padding: 12px; font-size: 14px;">${note.overview || ''}</p>
-
-        <h2 style="color: #2563EB; margin-top: 24px;">High-Yield Key Takeaways</h2>
-        <ul>
-          ${(note.quickSummary || []).map(s => `<li style="margin-bottom: 6px;">${s}</li>`).join('')}
-        </ul>
-
-        <h2 style="color: #2563EB; margin-top: 28px;">Detailed Classroom Copy Notes</h2>
-        ${(note.keyConcepts || []).map((c) => `
-          <div style="margin-bottom: 24px; padding: 14px; border: 1px solid #E2E8F0; border-radius: 8px; background: #FFFFFF;">
-            <h3 style="color: #1E40AF; margin-top: 0;">${c.heading} <span style="font-size: 12px; color: #64748B;">[${c.timestamp_start || '00:00'} - ${c.timestamp_end || ''}]</span></h3>
-            ${c.subheading ? `<p style="font-style: italic; color: #475569; margin-top: -6px;">${c.subheading}</p>` : ''}
-            
-            ${c.definitions && c.definitions.length > 0 ? `
-              <div style="background: #FEF2F2; border-left: 4px solid #EF4444; padding: 8px 12px; margin-bottom: 10px;">
-                <strong style="color: #B91C1C;">Definition:</strong>
-                ${c.definitions.map(d => `<p style="color: #991B1B; margin: 4px 0;">${d}</p>`).join('')}
-              </div>
-            ` : ''}
-
-            <strong style="color: #1E3A8A;">Detailed Blackboard Points:</strong>
-            <ul>
-              ${(c.points || []).map(p => `<li style="margin-bottom: 5px; color: #1E293B;">${p}</li>`).join('')}
-            </ul>
-
-            ${c.diagram ? `
-              <div style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 10px; border-radius: 6px; margin: 12px 0;">
-                <strong style="color: #2563EB;">📐 Diagram: ${c.diagram.heading || 'Board Illustration'}</strong>
-                <p style="font-size: 13px; color: #475569; margin: 4px 0 0 0;">${c.diagram.description || ''}</p>
-              </div>
-            ` : ''}
-
-            ${c.solved_example ? `
-              <div style="background: #F0FDF4; border: 1px solid #86EFAC; padding: 10px 14px; border-radius: 6px; margin: 12px 0;">
-                <strong style="color: #15803D;">🧮 Solved Numerical: ${c.solved_example.title}</strong>
-                <p style="margin: 4px 0; font-size: 13px;"><strong>Given:</strong> ${c.solved_example.given}</p>
-                <p style="margin: 4px 0; font-size: 13px;"><strong>Formula:</strong> ${c.solved_example.formula}</p>
-                <p style="margin: 4px 0; font-size: 13px;"><strong>Step-by-Step Solution:</strong><br/>${(c.solved_example.solution || '').replace(/\n/g, '<br/>')}</p>
-                <p style="margin: 4px 0; font-size: 13px; color: #166534; font-weight: bold;"><strong>Answer:</strong> ${c.solved_example.answer}</p>
-              </div>
-            ` : ''}
-
-            ${c.teacher_tips && c.teacher_tips.length > 0 ? `
-              <div style="background: #FFF7ED; border-left: 4px solid #F97316; padding: 8px 12px; margin-top: 10px;">
-                <strong style="color: #C2410C;">💡 Teacher Exam Tip:</strong>
-                ${c.teacher_tips.map(t => `<p style="color: #9A3412; margin: 4px 0; font-size: 13px;">${t}</p>`).join('')}
-              </div>
-            ` : ''}
-          </div>
-        `).join('')}
-
-        ${note.formulas && note.formulas.length > 0 ? `
-          <h2 style="color: #2563EB; margin-top: 28px;">Essential Formulas</h2>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px;" border="1" cellpadding="6">
-            <tr style="background: #2563EB; color: #FFFFFF;">
-              <th>Formula Name</th>
-              <th>Mathematical Equation</th>
-              <th>Variables & SI Units</th>
-            </tr>
-            ${note.formulas.map(f => `
-              <tr>
-                <td><strong>${f.name}</strong></td>
-                <td style="font-family: monospace; color: #1E3A8A;">${f.formula}</td>
-                <td>${f.variables || ''} (${f.units || 'SI'})</td>
-              </tr>
-            `).join('')}
-          </table>
-        ` : ''}
-
-        ${note.importantPYQs && note.importantPYQs.length > 0 ? `
-          <h2 style="color: #2563EB; margin-top: 28px;">Exam Previous Year Questions (PYQs)</h2>
-          ${note.importantPYQs.slice(0, 5).map((q, idx) => `
-            <div style="margin-bottom: 16px; padding: 12px; border: 1px solid #CBD5E1; border-radius: 6px;">
-              <strong style="color: #D97706;">Q${idx + 1} [${q.examName || 'Exam PYQ'} ${q.year || ''}]</strong>
-              <p style="font-weight: bold; margin: 6px 0;">${q.question}</p>
-              ${q.options ? `
-                <ol type="A">
-                  ${q.options.map(opt => `<li>${opt}</li>`).join('')}
-                </ol>
-              ` : ''}
-              <p style="color: #15803D; font-weight: bold;">Correct: ${q.correctAnswer}</p>
-              <p style="color: #475569; font-size: 13px;"><strong>Solution:</strong> ${(q.solution || '').replace(/\n/g, '<br/>')}</p>
-            </div>
-          `).join('')}
-        ` : ''}
-
-        <div style="border-top: 2px solid #E2E8F0; padding-top: 16px; margin-top: 36px; text-align: center; color: #64748B; font-size: 12px;">
-          <p style="margin: 4px 0; font-size: 13px;">Synthesized with <strong>OmniStudy AI</strong> • Platform Developed by <strong style="color: #2563EB;">Akanksha Maurya</strong></p>
-          <p style="margin: 4px 0; color: #94A3B8;">Topper-Grade Handwritten Notebook Notes, Blackboard SVG Diagrams & Real Exam Solved Numericals</p>
-        </div>
-      </div>
-    `;
-
     const docHeader = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-    <head><meta charset='utf-8'><title>${note.title || 'Notes'}</title></head><body>${docBody}</body></html>`;
+    <head><meta charset='utf-8'><title>${note.title || 'Notes'}</title></head><body>${getCleanNotesHtml(note)}</body></html>`;
 
     const blob = new Blob(['\ufeff', docHeader], { type: 'application/msword' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     const isEBook = Boolean(note.isPlaylist || note.isEBook);
     link.download = `${cleanTitle}_${isEBook ? 'Subject_EBook' : 'Notes'}.doc`;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
     setCopiedDocx(true);
     setTimeout(() => setCopiedDocx(false), 2000);
   };

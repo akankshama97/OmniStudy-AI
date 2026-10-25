@@ -296,10 +296,18 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
             </div>
 
             <button
-              onClick={() => window.print()}
-              className="px-4 py-2 rounded-xl bg-[#2563EB] text-white text-xs font-bold flex items-center gap-2"
+              onClick={() => {
+                const title = (result.topic || 'Exam_PYQs').replace(/[^a-zA-Z0-9_-]/g, '_');
+                const content = document.getElementById('pyq-results-section') || document.body;
+                const blob = new Blob(['\ufeff', `<html><head><meta charset='utf-8'></head><body>${content.innerHTML}</body></html>`], { type: 'application/msword' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `${title}_Formula_PYQs.doc`;
+                a.click();
+              }}
+              className="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-sm transition-all"
             >
-              <Printer className="w-3.5 h-3.5" /> Print Sheet
+              <Download className="w-3.5 h-3.5" /> Download Sheet
             </button>
           </div>
 
