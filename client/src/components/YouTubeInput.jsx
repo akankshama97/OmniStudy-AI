@@ -457,7 +457,7 @@ export default function YouTubeInput({
                 </h4>
 
                 <p className="text-[11px] text-[#64748B] dark:text-[#94A3B8] mt-1 truncate">
-                  Channel: {preset.channel}
+                  ⚡ OmniStudy AI Classroom Topper Copy
                 </p>
               </div>
 

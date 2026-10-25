@@ -52,14 +52,19 @@ class ErrorBoundary extends Component {
 export default function App() {
   const { user, loading, logout, showAuthModal, setShowAuthModal } = useAuth();
   const [activeTab,    setActiveTab]    = useState('generator');
-  const [selectedLang, setSelectedLang] = useState('English');
+  const [selectedLang, setSelectedLang] = useState(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('omnistudy_selected_lang') || 'Hinglish' : 'Hinglish'
+  );
   const [theme,        setTheme]        = useState(() => localStorage.getItem('omni_theme') || 'system');
   const [systemIsDark, setSystemIsDark] = useState(() =>
     typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false
   );
   
   // Default to sample lecture in selected language
-  const [currentNote,  setCurrentNote]  = useState(() => getSampleNote('coa-unit-1', 'Hinglish'));
+  const [currentNote,  setCurrentNote]  = useState(() => {
+    const initialLang = typeof window !== 'undefined' ? localStorage.getItem('omnistudy_selected_lang') || 'Hinglish' : 'Hinglish';
+    return getSampleNote('coa-unit-1', initialLang);
+  });
   const [isLoading,    setIsLoading]    = useState(false);
   const [error,        setError]        = useState(null);
   const [timestampTutorPrefill, setTimestampTutorPrefill] = useState(null);
