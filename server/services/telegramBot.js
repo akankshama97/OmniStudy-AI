@@ -91,6 +91,28 @@ export function initTelegramBot() {
 
         const safeFilename = `${(notes.title || 'OmniStudy_Notes').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 40)}.pdf`;
 
+        // Count rich components
+        const conceptCount = Array.isArray(notes.keyConcepts) ? notes.keyConcepts.length : 0;
+        const formulaCount = Array.isArray(notes.formulas) ? notes.formulas.length : 0;
+        const pyqCount = Array.isArray(notes.importantPYQs) ? notes.importantPYQs.length : (Array.isArray(notes.pyqs) ? notes.pyqs.length : 0);
+        const diagramCount = Array.isArray(notes.keyConcepts) ? notes.keyConcepts.filter(k => k.diagram && k.diagram.svg_or_mermaid).length : 0;
+
+        const conceptPreview = Array.isArray(notes.keyConcepts)
+          ? notes.keyConcepts.slice(0, 4).map((c, i) => `  ${i + 1}. ${(c.heading || '').slice(0, 40)}`).join('\n')
+          : '';
+
+        const safeSummary = (notes.quickSummary || notes.overview || notes.summary || '').slice(0, 260);
+
+        const captionText =
+          `📚 *${(notes.title || videoTitle).slice(0, 60)}*\n\n` +
+          `📌 *Core Summary:*\n${safeSummary}...\n\n` +
+          `✍️ *Topics Covered (${conceptCount}):*\n${conceptPreview}\n\n` +
+          `⚡ *Formula Sheet:* ${formulaCount} Equations\n` +
+          `📐 *Blackboard Diagrams:* ${diagramCount} Included in PDF\n` +
+          `🎯 *University PYQs:* ${pyqCount} Solved Questions\n\n` +
+          `🌐 *Interactive App:* https://omni-study-ai-lilac.vercel.app/\n\n` +
+          `💡 *Doubt hai?* Is video ka koi bhi sawal yahan direct Hinglish mein pooch sakte ho! 👇`;
+
         // Step 4: Send Document to Telegram User
         await ctx.replyWithDocument(
           {
@@ -98,7 +120,7 @@ export function initTelegramBot() {
             filename: safeFilename
           },
           {
-            caption: `✅ *${notes.title || videoTitle}*\n\n📌 *Summary:*\n${(notes.summary || '').slice(0, 250)}...\n\n💡 *Doubt hai?* Is video se related koi bhi sawal yahan direct Hinglish mein pooch sakte ho! 👇`,
+            caption: captionText,
             parse_mode: 'Markdown'
           }
         );
