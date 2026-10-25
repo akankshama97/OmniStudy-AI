@@ -101,7 +101,12 @@ export function initTelegramBot() {
           ? notes.keyConcepts.slice(0, 4).map((c, i) => `  ${i + 1}. ${(c.heading || '').slice(0, 40)}`).join('\n')
           : '';
 
-        const safeSummary = (notes.quickSummary || notes.overview || notes.summary || '').slice(0, 260);
+        let summaryStr = '';
+        if (typeof notes.overview === 'string' && notes.overview) summaryStr = notes.overview;
+        else if (typeof notes.summary === 'string' && notes.summary) summaryStr = notes.summary;
+        else if (Array.isArray(notes.quickSummary)) summaryStr = notes.quickSummary.join(' • ');
+        else if (typeof notes.quickSummary === 'string') summaryStr = notes.quickSummary;
+        const safeSummary = (summaryStr || 'Comprehensive Toppers Lecture Copy Notes').slice(0, 260);
 
         const captionText =
           `⚡ *OMNISTUDY AI by Akanksha Maurya*\n` +

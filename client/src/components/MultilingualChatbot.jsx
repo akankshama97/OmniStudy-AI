@@ -585,26 +585,26 @@ export default function MultilingualChatbot({
 
         {/* Mode Switch Pills & Clear */}
         <div className="flex items-center gap-2 self-stretch sm:self-auto justify-between sm:justify-end">
-          <div className="flex items-center gap-1 p-1 rounded-full border border-[#E2E8F0] dark:border-[#23314F] bg-[#F1F5F9] dark:bg-[#0B0F17]">
+          <div className="flex items-center gap-1.5 p-1 rounded-full border border-[#E2E8F0] dark:border-[#23314F] bg-[#F1F5F9] dark:bg-[#0B0F17] shadow-inner">
             <button
               type="button"
               onClick={() => setActiveMode('general')}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeMode === 'general'
-                  ? 'bg-white dark:bg-[#1B2640] text-[#2563EB] dark:text-[#60A5FA] shadow-sm'
+                  ? 'bg-white dark:bg-[#1B2640] text-[#2563EB] dark:text-[#60A5FA] shadow-xs'
                   : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
               }`}
             >
               <Bot className="w-3.5 h-3.5" />
-              <span>General Doubt</span>
+              <span>💬 General Doubt</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveMode('timestamp')}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeMode === 'timestamp'
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs'
                   : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
               }`}
             >
@@ -614,8 +614,9 @@ export default function MultilingualChatbot({
           </div>
 
           <button
+            type="button"
             onClick={handleClearChat}
-            className="p-2 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] text-slate-400 hover:text-red-500 hover:bg-slate-50 dark:hover:bg-[#1B2640] transition-all"
+            className="p-2 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] text-slate-400 hover:text-red-500 hover:bg-slate-50 dark:hover:bg-[#1B2640] transition-all cursor-pointer"
             title="Clear Conversation"
           >
             <Trash2 className="w-4 h-4" />

@@ -119,55 +119,88 @@ export async function generateNotePdfBuffer(note) {
       }
 
       // ════════════════════════════════════════════════════════════
-      // 1. NOTEBOOK COVER / HEADER BANNER
+      // 1. NOTEBOOK COVER / HEADER BANNER (Dynamic Height, ZERO Overlap)
       // ════════════════════════════════════════════════════════════
-      doc.y = 42;
+      const headerStartY = 42;
+      const cleanTitle = cleanMathText(note.title || 'Lecture Master Notes');
+      const subjectText = cleanMathText(note.subject || note.chapter || 'Core Academic Lecture');
+      const examText = cleanMathText(note.targetExam && note.targetExam !== 'Auto-detect' ? note.targetExam : 'University & Board Exam');
+      const subLineText = `📚 Subject: ${subjectText}  |  🎯 Target: ${examText}  |  🌐 https://omni-study-ai-lilac.vercel.app/`;
+
+      // Pre-measure title text height
+      doc.fontSize(13);
+      const titleHeight = doc.heightOfString(cleanTitle, { width: CONTENT_WIDTH - 28 });
+      doc.fontSize(8.5);
+      const subLineHeight = doc.heightOfString(subLineText, { width: CONTENT_WIDTH - 28 });
       
-      // Header Card
-      doc.rect(CONTENT_LEFT, doc.y, CONTENT_WIDTH, 75).fillAndStroke('#EEF2FF', '#C7D2FE');
-      doc.fillColor('#4338CA').fontSize(9.5).text(
+      const headerCardHeight = 12 + 14 + titleHeight + 6 + subLineHeight + 12;
+
+      // Draw Header Card with dynamic height
+      doc.rect(CONTENT_LEFT, headerStartY, CONTENT_WIDTH, headerCardHeight).fillAndStroke('#EEF2FF', '#C7D2FE');
+
+      // 1. Branding row
+      doc.fillColor('#4338CA').fontSize(9).text(
         '⚡ OMNISTUDY AI • CLASSROOM COPY • DEVELOPED BY: AKANKSHA MAURYA',
         CONTENT_LEFT + 14,
-        48,
+        headerStartY + 8,
         { width: CONTENT_WIDTH - 28 }
       );
-      doc.fillColor(INK_BLUE).fontSize(14).text(
-        (note.title || 'Lecture Master Notes').slice(0, 75),
+
+      // 2. Title
+      const titleY = headerStartY + 24;
+      doc.fillColor(INK_BLUE).fontSize(13).text(
+        cleanTitle,
         CONTENT_LEFT + 14,
-        63,
-        { width: CONTENT_WIDTH - 28, ellipsis: true }
+        titleY,
+        { width: CONTENT_WIDTH - 28 }
       );
 
-      const subjectText = note.subject || note.chapter || 'Core Concepts';
-      const examText = note.targetExam && note.targetExam !== 'Auto-detect' ? note.targetExam : 'University & Board Exam';
-
+      // 3. Subject and Exam metadata row
+      const subLineY = titleY + titleHeight + 5;
       doc.fillColor('#4B5563').fontSize(8.5).text(
-        `📚 Subject: ${subjectText}  |  🎯 Target: ${examText}  |  🌐 https://omni-study-ai-lilac.vercel.app/`,
+        subLineText,
         CONTENT_LEFT + 14,
-        86,
+        subLineY,
         { width: CONTENT_WIDTH - 28 }
       );
 
-      doc.y = 130;
+      // Set doc.y safely below the header card
+      doc.y = headerStartY + headerCardHeight + 16;
 
       // ════════════════════════════════════════════════════════════
-      // 2. CORE SUMMARY & CORNELL CUE COLUMN
+      // 2. CORE SUMMARY & CORNELL CUE COLUMN (Dynamic Card Height, ZERO Overlap)
       // ════════════════════════════════════════════════════════════
-      const overviewText = note.quickSummary || note.overview || note.summary || '';
-      if (overviewText) {
-        checkPageBreak(80);
-        // Sticky Note Card for Core Summary
+      let overviewRaw = '';
+      if (typeof note.overview === 'string' && note.overview.trim()) {
+        overviewRaw = note.overview.trim();
+      } else if (typeof note.summary === 'string' && note.summary.trim()) {
+        overviewRaw = note.summary.trim();
+      } else if (Array.isArray(note.quickSummary) && note.quickSummary.length > 0) {
+        overviewRaw = note.quickSummary.join(' • ');
+      } else if (typeof note.quickSummary === 'string') {
+        overviewRaw = note.quickSummary;
+      }
+
+      if (overviewRaw) {
+        const cleanOverview = cleanMathText(overviewRaw.slice(0, 450));
+        doc.fontSize(9).lineGap(1.5);
+        const overviewHeight = doc.heightOfString(cleanOverview, { width: CONTENT_WIDTH - 24, lineGap: 1.5 });
+        const summaryCardHeight = 24 + overviewHeight + 14;
+
+        checkPageBreak(summaryCardHeight + 10);
         const summaryStartY = doc.y;
-        doc.rect(CONTENT_LEFT, summaryStartY, CONTENT_WIDTH, 68).fillAndStroke(STICKY_BG, STICKY_BORDER);
+
+        doc.rect(CONTENT_LEFT, summaryStartY, CONTENT_WIDTH, summaryCardHeight).fillAndStroke(STICKY_BG, STICKY_BORDER);
         
-        doc.fillColor('#B45309').fontSize(11).text('📌 CORE CHAPTER SUMMARY (Topper Notes)', CONTENT_LEFT + 12, summaryStartY + 8);
-        doc.fillColor(INK_BLACK).fontSize(9.5).lineGap(1.5).text(
-          overviewText.slice(0, 320) + (overviewText.length > 320 ? '...' : ''),
+        doc.fillColor('#B45309').fontSize(10.5).text('📌 CORE CHAPTER SUMMARY (Topper Notes)', CONTENT_LEFT + 12, summaryStartY + 8);
+        doc.fillColor(INK_BLACK).fontSize(9).lineGap(1.5).text(
+          cleanOverview,
           CONTENT_LEFT + 12,
           summaryStartY + 24,
           { width: CONTENT_WIDTH - 24 }
         );
-        doc.y = summaryStartY + 80;
+
+        doc.y = summaryStartY + summaryCardHeight + 14;
       }
 
       // Cornell Cues if present
