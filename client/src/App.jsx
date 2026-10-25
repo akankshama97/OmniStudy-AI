@@ -69,8 +69,13 @@ export default function App() {
   const [error,        setError]        = useState(null);
   const [timestampTutorPrefill, setTimestampTutorPrefill] = useState(null);
 
+  const handleOpenGeneralDoubt = () => {
+    setTimestampTutorPrefill(null);
+    setActiveTab('chatbot');
+  };
+
   const handleOpenTimestampTutor = (prefillData) => {
-    setTimestampTutorPrefill(prefillData);
+    setTimestampTutorPrefill(prefillData || { timestamp: '00:00', videoTitle: currentNote?.title || '' });
     setActiveTab('chatbot');
   };
 
@@ -184,82 +189,78 @@ export default function App() {
       />
 
       <main className="flex-1 w-full max-w-full overflow-x-hidden">
-        {activeTab === 'generator' && (
-          <div className="animate-fade-slide-up w-full max-w-full overflow-x-hidden">
-            <YouTubeInput
-              onProcessVideo={handleProcessVideo}
-              isLoading={isLoading}
-              error={error}
-              theme={theme}
-              isDark={isDark}
-              selectedLang={selectedLang}
-              onChangeLanguage={handleChangeLanguage}
-            />
+        {/* Tab 1: Notes Generator & Classroom Copy (Persistent, Never Unmounts) */}
+        <div className={activeTab === 'generator' ? 'block animate-fade-slide-up w-full max-w-full overflow-x-hidden' : 'hidden'}>
+          <YouTubeInput
+            onProcessVideo={handleProcessVideo}
+            isLoading={isLoading}
+            error={error}
+            theme={theme}
+            isDark={isDark}
+            selectedLang={selectedLang}
+            onChangeLanguage={handleChangeLanguage}
+          />
 
-            {currentNote && (
-              <div className="relative">
-                <div className="max-w-6xl mx-auto px-4 mb-2 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB] dark:bg-[#3B82F6]" />
-                    <span className="text-xs font-bold text-[#475569] dark:text-[#CBD5E1] font-mono uppercase tracking-wider">
-                      Student Copy Notes View
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-mono text-[#2563EB] dark:text-[#60A5FA] bg-[#EFF6FF] dark:bg-[#3B82F6]/20 px-3 py-0.5 rounded-full border border-[#2563EB]/20 font-bold">
-                    Classroom Copy Canvas
+          {currentNote && (
+            <div className="relative">
+              <div className="max-w-6xl mx-auto px-4 mb-2 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB] dark:bg-[#3B82F6]" />
+                  <span className="text-xs font-bold text-[#475569] dark:text-[#CBD5E1] font-mono uppercase tracking-wider">
+                    Student Copy Notes View
                   </span>
                 </div>
-
-                <NotebookNotesView
-                  note={currentNote}
-                  selectedLang={selectedLang}
-                  onChangeLanguage={handleChangeLanguage}
-                  onAskDoubtAboutTopic={() => setActiveTab('chatbot')}
-                  onAskTimestampTutor={handleOpenTimestampTutor}
-                  theme={theme}
-                  isDark={isDark}
-                  isLoading={isLoading}
-                />
+                <span className="text-[11px] font-mono text-[#2563EB] dark:text-[#60A5FA] bg-[#EFF6FF] dark:bg-[#3B82F6]/20 px-3 py-0.5 rounded-full border border-[#2563EB]/20 font-bold">
+                  Classroom Copy Canvas
+                </span>
               </div>
-            )}
-          </div>
-        )}
 
-        {activeTab === 'chatbot' && (
-          <div className="animate-fade-slide-up">
-            <MultilingualChatbot
-              currentNote={currentNote}
-              selectedLang={selectedLang}
-              onChangeLanguage={handleChangeLanguage}
-              theme={theme}
-              isDark={isDark}
-              timestampTutorPrefill={timestampTutorPrefill}
-              onClearTimestampPrefill={() => setTimestampTutorPrefill(null)}
-            />
-          </div>
-        )}
+              <NotebookNotesView
+                note={currentNote}
+                selectedLang={selectedLang}
+                onChangeLanguage={handleChangeLanguage}
+                onAskDoubtAboutTopic={handleOpenGeneralDoubt}
+                onAskTimestampTutor={handleOpenTimestampTutor}
+                theme={theme}
+                isDark={isDark}
+                isLoading={isLoading}
+              />
+            </div>
+          )}
+        </div>
 
-        {activeTab === 'pyq' && (
-          <div className="animate-fade-slide-up">
-            <PYQFormulaHub
-              selectedLang={selectedLang}
-              onChangeLanguage={handleChangeLanguage}
-              theme={theme}
-              isDark={isDark}
-            />
-          </div>
-        )}
+        {/* Tab 2: Multilingual Doubt Solver & Timestamp AI Tutor (Persistent) */}
+        <div className={activeTab === 'chatbot' ? 'block animate-fade-slide-up' : 'hidden'}>
+          <MultilingualChatbot
+            currentNote={currentNote}
+            selectedLang={selectedLang}
+            onChangeLanguage={handleChangeLanguage}
+            theme={theme}
+            isDark={isDark}
+            timestampTutorPrefill={timestampTutorPrefill}
+            onClearTimestampPrefill={() => setTimestampTutorPrefill(null)}
+          />
+        </div>
 
-        {activeTab === 'saved' && (
-          <div className="animate-fade-slide-up">
-            <SavedNotesList
-              onSelectNote={(note) => { setCurrentNote(note); setActiveTab('generator'); }}
-              onGoToGenerator={() => setActiveTab('generator')}
-              theme={theme}
-              isDark={isDark}
-            />
-          </div>
-        )}
+        {/* Tab 3: PYQ Formula Hub (Persistent) */}
+        <div className={activeTab === 'pyq' ? 'block animate-fade-slide-up' : 'hidden'}>
+          <PYQFormulaHub
+            selectedLang={selectedLang}
+            onChangeLanguage={handleChangeLanguage}
+            theme={theme}
+            isDark={isDark}
+          />
+        </div>
+
+        {/* Tab 4: Saved Notes (Persistent) */}
+        <div className={activeTab === 'saved' ? 'block animate-fade-slide-up' : 'hidden'}>
+          <SavedNotesList
+            onSelectNote={(note) => { setCurrentNote(note); setActiveTab('generator'); }}
+            onGoToGenerator={() => setActiveTab('generator')}
+            theme={theme}
+            isDark={isDark}
+          />
+        </div>
       </main>
 
       {/* Footer */}

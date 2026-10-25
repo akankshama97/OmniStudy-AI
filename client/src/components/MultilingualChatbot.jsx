@@ -291,7 +291,12 @@ export default function MultilingualChatbot({
     }
   }, [timestampTutorPrefill]);
 
+  const isInitialChat = useRef(true);
   useEffect(() => {
+    if (isInitialChat.current) {
+      isInitialChat.current = false;
+      return;
+    }
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
