@@ -80,9 +80,39 @@ export async function generateNotePdfBuffer(note) {
         drawNotebookBackground();
       });
 
-      // Safe page break helper
-      function checkPageBreak(neededHeight = 60) {
-        if (doc.y + neededHeight > 760) {
+      // Natural Mathematical cleaner - replaces LaTeX code markup with clear unicode/text
+      function cleanMathText(str) {
+        if (!str || typeof str !== 'string') return '';
+        return str
+          .replace(/\$\$/g, '')
+          .replace(/\$/g, '')
+          .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1 / $2)')
+          .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
+          .replace(/\\vec\{([^}]+)\}/g, '$1')
+          .replace(/\\mathbf\{([^}]+)\}/g, '$1')
+          .replace(/\\cdot/g, ' * ')
+          .replace(/\\times/g, ' × ')
+          .replace(/\\div/g, ' / ')
+          .replace(/\\pm/g, ' ± ')
+          .replace(/\\leq/g, ' <= ')
+          .replace(/\\geq/g, ' >= ')
+          .replace(/\\theta/g, 'θ')
+          .replace(/\\pi/g, 'π')
+          .replace(/\\Delta/g, 'Δ')
+          .replace(/\\rightarrow/g, ' -> ')
+          .replace(/\\to/g, ' -> ')
+          .replace(/\\left\(/g, '(')
+          .replace(/\\right\)/g, ')')
+          .replace(/\\left\[/g, '[')
+          .replace(/\\right\]/g, ']')
+          .replace(/\^2/g, '²')
+          .replace(/\^3/g, '³')
+          .replace(/\\/g, '');
+      }
+
+      // Safe page break helper - allows natural flow up to 785 without premature empty gaps
+      function checkPageBreak(neededHeight = 50) {
+        if (doc.y + neededHeight > 785) {
           doc.addPage();
           doc.y = 50;
         }
@@ -185,7 +215,7 @@ export async function generateNotePdfBuffer(note) {
           if (points.length > 0) {
             points.forEach(pt => {
               checkPageBreak(25);
-              const cleanPt = String(pt).replace(/^•\s*/, '');
+              const cleanPt = cleanMathText(String(pt).replace(/^•\s*/, ''));
               doc.fillColor(INK_BLUE).fontSize(9.5).lineGap(1.5).text(`  • ${cleanPt}`, CONTENT_LEFT + 4, doc.y, { width: CONTENT_WIDTH - 8 });
               doc.moveDown(0.3);
             });
@@ -197,7 +227,7 @@ export async function generateNotePdfBuffer(note) {
             checkPageBreak(35);
             doc.rect(CONTENT_LEFT + 10, doc.y, CONTENT_WIDTH - 20, 26).fillAndStroke('#ECFDF5', '#10B981');
             doc.fillColor(INK_GREEN).fontSize(9).text(
-              `💡 Teacher Memory Tip: ${tips.join(' | ')}`,
+              `💡 Teacher Memory Tip: ${cleanMathText(tips.join(' | '))}`,
               CONTENT_LEFT + 18,
               doc.y + 6,
               { width: CONTENT_WIDTH - 36 }
@@ -211,12 +241,12 @@ export async function generateNotePdfBuffer(note) {
             const ex = concept.solved_example;
             doc.rect(CONTENT_LEFT + 10, doc.y, CONTENT_WIDTH - 20, 58).fillAndStroke('#F8FAFC', '#94A3B8');
             doc.fillColor(INK_BLACK).fontSize(9.5).text('📝 Solved Blackboard Example:', CONTENT_LEFT + 16, doc.y + 6);
-            if (ex.given) doc.fillColor('#475569').fontSize(8.5).text(`Given: ${ex.given}`, CONTENT_LEFT + 16, doc.y + 20);
+            if (ex.given) doc.fillColor('#475569').fontSize(8.5).text(`Given: ${cleanMathText(ex.given)}`, CONTENT_LEFT + 16, doc.y + 20);
             if (Array.isArray(ex.steps)) {
-              doc.fillColor(INK_BLUE).fontSize(8.5).text(`Steps: ${ex.steps.slice(0, 2).join(' ➔ ')}`, CONTENT_LEFT + 16, doc.y + 32);
+              doc.fillColor(INK_BLUE).fontSize(8.5).text(`Steps: ${cleanMathText(ex.steps.slice(0, 2).join(' ➔ '))}`, CONTENT_LEFT + 16, doc.y + 32);
             }
             if (ex.finalAnswer) {
-              doc.fillColor(INK_RED).fontSize(9).text(`Answer: ${ex.finalAnswer}`, CONTENT_LEFT + 16, doc.y + 44);
+              doc.fillColor(INK_RED).fontSize(9).text(`Answer: ${cleanMathText(ex.finalAnswer)}`, CONTENT_LEFT + 16, doc.y + 44);
             }
             doc.y += 66;
           }
@@ -292,8 +322,8 @@ export async function generateNotePdfBuffer(note) {
         formulas.forEach((item, fIdx) => {
           checkPageBreak(30);
           const fName = typeof item === 'string' ? item : (item.name || item.title || `Formula #${fIdx + 1}`);
-          const fEquation = typeof item === 'object' ? (item.formula || item.equation || '') : '';
-          const fWhen = typeof item === 'object' && item.whenToUse ? ` (Use: ${item.whenToUse})` : '';
+          const fEquation = cleanMathText(typeof item === 'object' ? (item.formula || item.equation || '') : '');
+          const fWhen = typeof item === 'object' && item.whenToUse ? ` (Use: ${cleanMathText(item.whenToUse)})` : '';
 
           doc.rect(CONTENT_LEFT, doc.y, CONTENT_WIDTH, 24).fillAndStroke('#FEF2F2', '#FECACA');
           doc.fillColor(INK_RED).fontSize(9.5).text(
@@ -329,25 +359,29 @@ export async function generateNotePdfBuffer(note) {
           doc.fillColor('#7C3AED').fontSize(9.5).text(`Q${qIdx + 1}. [${examTag} ${yearTag} ${marksTag}]`, CONTENT_LEFT, doc.y);
           doc.moveDown(0.2);
 
-          doc.fillColor(INK_BLACK).fontSize(9.5).lineGap(1.2).text(q.question || q.q || JSON.stringify(q), CONTENT_LEFT + 6, doc.y, { width: CONTENT_WIDTH - 12 });
+          doc.fillColor(INK_BLACK).fontSize(9.5).lineGap(1.2).text(cleanMathText(q.question || q.q || ''), CONTENT_LEFT + 6, doc.y, { width: CONTENT_WIDTH - 12 });
           doc.moveDown(0.3);
 
           // Options if MCQ
           if (Array.isArray(q.options) && q.options.length > 0) {
             q.options.forEach((opt, oIdx) => {
               const letter = ['A', 'B', 'C', 'D'][oIdx] || `(${oIdx + 1})`;
-              doc.fillColor('#475569').fontSize(8.5).text(`    ${letter}) ${opt}`, CONTENT_LEFT + 8, doc.y);
+              doc.fillColor('#475569').fontSize(8.5).text(`    ${letter}) ${cleanMathText(opt)}`, CONTENT_LEFT + 8, doc.y);
               doc.moveDown(0.2);
             });
           }
 
           // Answer & Explanation
-          if (q.answer || q.solution) {
+          if (q.answer || q.solution || q.correctAnswer) {
             checkPageBreak(30);
-            doc.fillColor(INK_GREEN).fontSize(9).text(`  ✅ Correct Answer: ${q.answer}`, CONTENT_LEFT + 6, doc.y);
-            doc.moveDown(0.2);
-            if (q.explanation) {
-              doc.fillColor('#334155').fontSize(8.5).text(`  💡 Solution Steps: ${q.explanation}`, CONTENT_LEFT + 6, doc.y, { width: CONTENT_WIDTH - 12 });
+            const ans = cleanMathText(q.correctAnswer || q.answer || '');
+            if (ans) {
+              doc.fillColor(INK_GREEN).fontSize(9).text(`  ✅ Correct Answer: ${ans}`, CONTENT_LEFT + 6, doc.y);
+              doc.moveDown(0.2);
+            }
+            const sol = cleanMathText(q.explanation || q.solution || '');
+            if (sol) {
+              doc.fillColor('#334155').fontSize(8.5).text(`  💡 Solution Steps: ${sol}`, CONTENT_LEFT + 6, doc.y, { width: CONTENT_WIDTH - 12 });
             }
           }
 

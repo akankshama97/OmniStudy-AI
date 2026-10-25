@@ -408,53 +408,51 @@ function KaTeXFormula({ formula, displayMode = true }) {
 }
 
 /**
- * Renders text with inline ($...$) and block ($$...$$) KaTeX mathematical formulas
+ * Formats mathematical expressions into clean, natural readable plain text.
+ * Eliminates LaTeX conversion markup (\frac, \sqrt, \vec, $...$) so equations
+ * are 100% visible and readable everywhere (Telegram, PDF, Website).
+ */
+export function formatNaturalMath(str) {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .replace(/\$\$/g, '')
+    .replace(/\$/g, '')
+    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1 / $2)')
+    .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
+    .replace(/\\vec\{([^}]+)\}/g, '$1')
+    .replace(/\\mathbf\{([^}]+)\}/g, '$1')
+    .replace(/\\cdot/g, ' × ')
+    .replace(/\\times/g, ' × ')
+    .replace(/\\div/g, ' ÷ ')
+    .replace(/\\pm/g, ' ± ')
+    .replace(/\\leq/g, ' ≤ ')
+    .replace(/\\geq/g, ' ≥ ')
+    .replace(/\\theta/g, 'θ')
+    .replace(/\\pi/g, 'π')
+    .replace(/\\Delta/g, 'Δ')
+    .replace(/\\alpha/g, 'α')
+    .replace(/\\beta/g, 'β')
+    .replace(/\\lambda/g, 'λ')
+    .replace(/\\sigma/g, 'σ')
+    .replace(/\\omega/g, 'ω')
+    .replace(/\\rightarrow/g, ' → ')
+    .replace(/\\to/g, ' → ')
+    .replace(/\\left\(/g, '(')
+    .replace(/\\right\)/g, ')')
+    .replace(/\\left\[/g, '[')
+    .replace(/\\right\]/g, ']')
+    .replace(/\^2/g, '²')
+    .replace(/\^3/g, '³')
+    .replace(/\\/g, '');
+}
+
+/**
+ * Renders text with natural, clear mathematical formatting
  */
 function MathText({ text, className = '' }) {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!ref.current || !text) return;
-
-    const renderMath = () => {
-      if (typeof window === 'undefined' || !window.katex) {
-        if (ref.current) ref.current.innerText = String(text);
-        return;
-      }
-
-      try {
-        const parsedHtml = String(text).replace(/(\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$|\\\([\s\S]*?\\\)|\$[^$\n]+\$)/g, (match) => {
-          const isDisplay = match.startsWith('\\[') || match.startsWith('$$');
-          let formula = match;
-          if (match.startsWith('\\[') || match.startsWith('$$')) formula = match.slice(2, -2);
-          else if (match.startsWith('\\(')) formula = match.slice(2, -2);
-          else if (match.startsWith('$')) formula = match.slice(1, -1);
-
-          try {
-            return window.katex.renderToString(formula.trim(), {
-              throwOnError: false,
-              displayMode: isDisplay
-            });
-          } catch (err) {
-            return match;
-          }
-        });
-        if (ref.current) ref.current.innerHTML = parsedHtml;
-      } catch (e) {
-        if (ref.current) ref.current.innerText = String(text);
-      }
-    };
-
-    renderMath();
-
-    if (typeof window !== 'undefined' && !window.katex) {
-      const timer = setTimeout(renderMath, 350);
-      return () => clearTimeout(timer);
-    }
-  }, [text]);
-
   if (!text) return null;
-  return <span ref={ref} className={className}>{text}</span>;
+  const natural = formatNaturalMath(String(text));
+  return <span className={className}>{natural}</span>;
 }
 
 export default function NotebookNotesView({
@@ -692,23 +690,23 @@ export default function NotebookNotesView({
           <span style="font-size: 12px; color: #4B5563; margin-top: 4px; display: block;">Platform Developed by: <strong style="color: #2563EB;">Akanksha Maurya</strong> | All Rights Reserved</span>
         </div>
 
-        <h1 style="color: #1E3A8A; font-size: 22px; border-bottom: 2px solid #3B82F6; padding-bottom: 8px; margin: 0 0 10px 0;">${n.title || 'Lecture Study Notes'}</h1>
+        <h1 style="color: #1E3A8A; font-size: 22px; border-bottom: 2px solid #3B82F6; padding-bottom: 8px; margin: 0 0 10px 0;">${formatNaturalMath(n.title || 'Lecture Study Notes')}</h1>
         
         <p style="color: #4B5563; font-size: 13px; margin: 0 0 20px 0; background: #F8FAFC; padding: 8px 12px; border-radius: 6px;">
-          <strong>Subject:</strong> ${n.subject || 'General'} &nbsp;|&nbsp;
-          <strong>Target Exam:</strong> ${n.targetExam || 'Exam Ready'} &nbsp;|&nbsp;
+          <strong>Subject:</strong> ${formatNaturalMath(n.subject || 'General')} &nbsp;|&nbsp;
+          <strong>Target Exam:</strong> ${formatNaturalMath(n.targetExam || 'Exam Ready')} &nbsp;|&nbsp;
           <strong>Notes Type:</strong> Classroom Topper Copy
         </p>
 
         ${n.overview ? `
           <h2 style="color: #1E40AF; font-size: 16px; margin: 20px 0 8px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">📌 Lecture Overview</h2>
-          <p style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 6px; font-size: 13px; margin: 0 0 16px 0;">${n.overview}</p>
+          <p style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 6px; font-size: 13px; margin: 0 0 16px 0;">${formatNaturalMath(n.overview)}</p>
         ` : ''}
 
         ${n.quickSummary && n.quickSummary.length > 0 ? `
           <h2 style="color: #1E40AF; font-size: 16px; margin: 20px 0 8px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">⚡ High-Yield Key Takeaways</h2>
           <ul style="margin: 0 0 20px 0; padding-left: 20px; font-size: 13px;">
-            ${n.quickSummary.map(s => `<li style="margin-bottom: 6px; color: #1F2937;">${s}</li>`).join('')}
+            ${n.quickSummary.map(s => `<li style="margin-bottom: 6px; color: #1F2937;">${formatNaturalMath(s)}</li>`).join('')}
           </ul>
         ` : ''}
 
@@ -716,44 +714,49 @@ export default function NotebookNotesView({
           <h2 style="color: #1E40AF; font-size: 18px; margin: 24px 0 12px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">📖 Detailed Classroom Copy Notes</h2>
           ${n.keyConcepts.map((c, idx) => `
             <div style="margin-bottom: 20px; padding: 14px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; page-break-inside: avoid;">
-              <h3 style="color: #1E3A8A; font-size: 15px; margin: 0 0 4px 0;">${c.heading || `Topic ${idx + 1}`} <span style="font-size: 11px; color: #64748B; font-weight: normal;">[${c.timestamp_start || '00:00'} - ${c.timestamp_end || ''}]</span></h3>
-              ${c.subheading ? `<p style="font-style: italic; color: #4B5563; font-size: 12px; margin: 0 0 8px 0;">${c.subheading}</p>` : ''}
+              <h3 style="color: #1E3A8A; font-size: 15px; margin: 0 0 4px 0;">${formatNaturalMath(c.heading || `Topic ${idx + 1}`)} <span style="font-size: 11px; color: #64748B; font-weight: normal;">[${c.timestamp_start || '00:00'} - ${c.timestamp_end || ''}]</span></h3>
+              ${c.subheading ? `<p style="font-style: italic; color: #4B5563; font-size: 12px; margin: 0 0 8px 0;">${formatNaturalMath(c.subheading)}</p>` : ''}
 
               ${c.definitions && c.definitions.length > 0 ? `
                 <div style="background: #FEF2F2; border-left: 3px solid #EF4444; padding: 8px 10px; margin: 8px 0; border-radius: 4px;">
                   <strong style="color: #B91C1C; font-size: 12px;">Definition:</strong>
-                  ${c.definitions.map(d => `<p style="color: #991B1B; font-size: 12px; margin: 2px 0;">${d}</p>`).join('')}
+                  ${c.definitions.map(d => `<p style="color: #991B1B; font-size: 12px; margin: 2px 0;">${formatNaturalMath(d)}</p>`).join('')}
                 </div>
               ` : ''}
 
               ${c.points && c.points.length > 0 ? `
                 <strong style="color: #1E3A8A; font-size: 12px; display: block; margin: 8px 0 4px 0;">Blackboard Detailed Points:</strong>
                 <ul style="margin: 0; padding-left: 18px; font-size: 12.5px;">
-                  ${c.points.map(p => `<li style="margin-bottom: 4px; color: #1F2937;">${p}</li>`).join('')}
+                  ${c.points.map(p => `<li style="margin-bottom: 4px; color: #1F2937;">${formatNaturalMath(p)}</li>`).join('')}
                 </ul>
               ` : ''}
 
-              ${c.diagram && (c.diagram.heading || c.diagram.description) ? `
-                <div style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 8px 12px; border-radius: 6px; margin: 10px 0;">
-                  <strong style="color: #2563EB; font-size: 12px;">📐 Board Diagram: ${c.diagram.heading || 'Architecture'}</strong>
-                  <p style="font-size: 12px; color: #4B5563; margin: 2px 0 0 0;">${c.diagram.description || ''}</p>
+              ${c.diagram && (c.diagram.heading || c.diagram.description || c.diagram.svg_or_mermaid) ? `
+                <div style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 10px 14px; border-radius: 8px; margin: 12px 0;">
+                  <strong style="color: #2563EB; font-size: 13px;">📐 Board Diagram: ${formatNaturalMath(c.diagram.heading || 'Architecture')}</strong>
+                  ${c.diagram.svg_or_mermaid && c.diagram.svg_or_mermaid.includes('<svg') ? `
+                    <div style="max-width: 500px; margin: 8px auto; text-align: center;">
+                      ${c.diagram.svg_or_mermaid.replace(/<svg\b([^>]*)>/, '<svg $1 style="max-width: 100%; height: auto;">')}
+                    </div>
+                  ` : ''}
+                  <p style="font-size: 12px; color: #4B5563; margin: 4px 0 0 0;">${formatNaturalMath(c.diagram.description || '')}</p>
                 </div>
               ` : ''}
 
               ${c.solved_example && c.solved_example.title ? `
                 <div style="background: #F0FDF4; border: 1px solid #86EFAC; padding: 10px; border-radius: 6px; margin: 10px 0;">
-                  <strong style="color: #15803D; font-size: 12px;">🧮 Solved Numerical: ${c.solved_example.title}</strong>
-                  ${c.solved_example.given ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Given:</strong> ${c.solved_example.given}</p>` : ''}
-                  ${c.solved_example.formula ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Formula:</strong> ${c.solved_example.formula}</p>` : ''}
-                  ${c.solved_example.solution ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Solution:</strong> ${c.solved_example.solution.replace(/\n/g, '<br/>')}</p>` : ''}
-                  ${c.solved_example.answer ? `<p style="margin: 3px 0; font-size: 12px; color: #166534; font-weight: bold;"><strong>Answer:</strong> ${c.solved_example.answer}</p>` : ''}
+                  <strong style="color: #15803D; font-size: 12px;">🧮 Solved Numerical: ${formatNaturalMath(c.solved_example.title)}</strong>
+                  ${c.solved_example.given ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Given:</strong> ${formatNaturalMath(c.solved_example.given)}</p>` : ''}
+                  ${c.solved_example.formula ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Formula:</strong> ${formatNaturalMath(c.solved_example.formula)}</p>` : ''}
+                  ${c.solved_example.solution ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Solution:</strong> ${formatNaturalMath(c.solved_example.solution).replace(/\n/g, '<br/>')}</p>` : ''}
+                  ${c.solved_example.answer ? `<p style="margin: 3px 0; font-size: 12px; color: #166534; font-weight: bold;"><strong>Answer:</strong> ${formatNaturalMath(c.solved_example.answer)}</p>` : ''}
                 </div>
               ` : ''}
 
               ${c.teacher_tips && c.teacher_tips.length > 0 ? `
                 <div style="background: #FFF7ED; border-left: 3px solid #F97316; padding: 6px 10px; margin-top: 8px; border-radius: 4px;">
                   <strong style="color: #C2410C; font-size: 11px;">💡 Teacher Exam Tip:</strong>
-                  ${c.teacher_tips.map(t => `<p style="color: #9A3412; margin: 2px 0; font-size: 11.5px;">${t}</p>`).join('')}
+                  ${c.teacher_tips.map(t => `<p style="color: #9A3412; margin: 2px 0; font-size: 11.5px;">${formatNaturalMath(t)}</p>`).join('')}
                 </div>
               ` : ''}
             </div>
@@ -770,9 +773,9 @@ export default function NotebookNotesView({
             </tr>
             ${n.formulas.map(f => `
               <tr>
-                <td style="padding: 6px; border: 1px solid #CBD5E1;"><strong>${f.name}</strong></td>
-                <td style="padding: 6px; border: 1px solid #CBD5E1; font-family: monospace; color: #1E3A8A;">${f.formula}</td>
-                <td style="padding: 6px; border: 1px solid #CBD5E1;">${f.variables || ''}</td>
+                <td style="padding: 6px; border: 1px solid #CBD5E1;"><strong>${formatNaturalMath(f.name)}</strong></td>
+                <td style="padding: 6px; border: 1px solid #CBD5E1; font-family: monospace; color: #1E3A8A; font-weight: bold;">${formatNaturalMath(f.formula)}</td>
+                <td style="padding: 6px; border: 1px solid #CBD5E1;">${formatNaturalMath(f.variables || '')}</td>
               </tr>
             `).join('')}
           </table>
@@ -782,15 +785,15 @@ export default function NotebookNotesView({
           <h2 style="color: #1E40AF; font-size: 16px; margin: 24px 0 10px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">🎯 Exam Previous Year Questions (PYQs)</h2>
           ${n.importantPYQs.slice(0, 5).map((q, qIdx) => `
             <div style="margin-bottom: 12px; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 6px; background: #FFFFFF; page-break-inside: avoid;">
-              <strong style="color: #D97706; font-size: 12px;">Q${qIdx + 1} [${q.examName || q.exam || 'Exam PYQ'} ${q.year || ''}]</strong>
-              <p style="font-weight: bold; margin: 4px 0; font-size: 12.5px;">${q.question}</p>
+              <strong style="color: #D97706; font-size: 12px;">Q${qIdx + 1} [${formatNaturalMath(q.examName || q.exam || 'Exam PYQ')} ${q.year || ''}]</strong>
+              <p style="font-weight: bold; margin: 4px 0; font-size: 12.5px;">${formatNaturalMath(q.question)}</p>
               ${q.options && q.options.length > 0 ? `
                 <ul style="margin: 4px 0 6px 0; padding-left: 18px; font-size: 12px;">
-                  ${q.options.map(opt => `<li style="margin-bottom: 2px;">${opt}</li>`).join('')}
+                  ${q.options.map(opt => `<li style="margin-bottom: 2px;">${formatNaturalMath(opt)}</li>`).join('')}
                 </ul>
               ` : ''}
-              <p style="color: #15803D; font-weight: bold; font-size: 12px; margin: 2px 0;">Correct: ${q.correctAnswer || q.answer || ''}</p>
-              ${q.solution || q.explanation ? `<p style="color: #4B5563; font-size: 11.5px; margin: 2px 0;"><strong>Solution:</strong> ${(q.solution || q.explanation).replace(/\n/g, '<br/>')}</p>` : ''}
+              <p style="color: #15803D; font-weight: bold; font-size: 12px; margin: 2px 0;">Correct: ${formatNaturalMath(q.correctAnswer || q.answer || '')}</p>
+              ${q.solution || q.explanation ? `<p style="color: #4B5563; font-size: 11.5px; margin: 2px 0;"><strong>Solution:</strong> ${formatNaturalMath(q.solution || q.explanation).replace(/\n/g, '<br/>')}</p>` : ''}
             </div>
           `).join('')}
         ` : ''}
@@ -803,13 +806,13 @@ export default function NotebookNotesView({
     `;
   };
 
-  // Direct 1-Click PDF Download (ALWAYS directly downloads file, NEVER opens print preview)
+  // Direct 1-Click PDF Download (ALWAYS directly downloads 100% visible file, NEVER blank pages)
   const handleDownloadPDF = async () => {
     if (!note) return;
     const cleanTitle = (note.title || 'Lecture_Notes').replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_');
     setIsExportingPDF(true);
 
-    // 1. Primary Method: High-Quality Vector PDF from Server
+    // 1. Primary Method: Vector PDF from Server
     try {
       const pdfBlob = await downloadNotePdfApi(note);
       if (pdfBlob && (pdfBlob.size > 500 || pdfBlob.byteLength > 500)) {
@@ -828,26 +831,31 @@ export default function NotebookNotesView({
       console.warn('[NotebookNotesView] Server PDF export notice, engaging direct client PDF generator:', apiErr);
     }
 
-    // 2. Client-side Direct PDF Generation (Uses html2pdf on clean HTML, directly saving to file without print dialog)
+    // 2. Client-side Direct PDF Generation (Uses html2pdf on clean HTML, with 100% visible solid canvas)
     try {
       if (typeof window !== 'undefined') {
         const html2pdfModule = await import('html2pdf.js');
         const html2pdf = html2pdfModule.default || html2pdfModule;
 
         const printContainer = document.createElement('div');
+        printContainer.id = 'omnistudy-pdf-export-container';
         printContainer.style.position = 'fixed';
         printContainer.style.top = '0';
         printContainer.style.left = '0';
-        printContainer.style.width = '800px';
-        printContainer.style.background = '#FFFFFF';
-        printContainer.style.zIndex = '-99999';
-        printContainer.style.opacity = '0.01';
+        printContainer.style.width = '820px';
+        printContainer.style.backgroundColor = '#FFFFFF';
+        printContainer.style.color = '#0F172A';
+        printContainer.style.zIndex = '99999';
+        printContainer.style.opacity = '1';
         printContainer.style.pointerEvents = 'none';
         printContainer.innerHTML = getCleanNotesHtml(note);
         document.body.appendChild(printContainer);
 
+        // Allow DOM to compute bounding boxes
+        await new Promise(r => setTimeout(r, 120));
+
         const opt = {
-          margin: [10, 10, 12, 10],
+          margin: [8, 8, 10, 8],
           filename: `${cleanTitle}_Notes.pdf`,
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: {
@@ -855,7 +863,8 @@ export default function NotebookNotesView({
             useCORS: true,
             logging: false,
             backgroundColor: '#FFFFFF',
-            windowWidth: 800
+            windowWidth: 820,
+            scrollY: 0
           },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
           pagebreak: { mode: ['css', 'legacy'] }
@@ -875,7 +884,7 @@ export default function NotebookNotesView({
       console.warn('[NotebookNotesView] Client html2pdf fallback notice:', clientPdfErr);
     }
 
-    // 3. Guaranteed Direct File Download Fallback (Creates .doc file directly, EXACTLY like Word export - NEVER PRINT)
+    // 3. Fallback: Guaranteed Direct File Download (.doc)
     try {
       const docHeader = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head><meta charset='utf-8'><title>${note.title || 'Notes'}</title></head><body>${getCleanNotesHtml(note)}</body></html>`;

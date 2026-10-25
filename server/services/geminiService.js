@@ -1087,9 +1087,9 @@ CRITICAL INSTRUCTIONS (MUST MATCH THE EXACT DEPTH & QUALITY OF TOPPER DEMO NOTES
 1. PRODUCE 6 TO 10 COMPREHENSIVE KEY CONCEPTS covering the chronological flow of the lecture from start to finish.
    - Headings must be exact, specific, scientific/academic sub-topics (e.g., "1. Principle of Operation & Working", "2. Mathematical Derivation of Governing Equation", "3. System Architecture & Block Diagram", "4. Step-by-Step Solved Problem").
    - NEVER use generic placeholders like "Topic 1" or repeat the lecture title.
-2. 6 TO 10 DETAILED POINTS PER CONCEPT combining theory, derivations, and reasoning with bold (**bold**) technical terms. All mathematical equations inside points must use standard LaTeX ($...$ or $$...$$).
+2. 6 TO 10 DETAILED POINTS PER CONCEPT combining theory, derivations, and reasoning with bold (**bold**) technical terms. Write all mathematical equations in clean, natural readable format (e.g., F = m * a, Work = Force * Displacement, v = u + a * t, KE = (1/2) * m * v^2). Do NOT use LaTeX conversion syntax (\frac, \sqrt, \vec, $...$, or $$...$$) so that notes display seamlessly on both Telegram bot and website without conversion artifacts.
 3. INCLUDE SELF-CONTAINED SVG DIAGRAMS (<svg viewBox="0 0 540 220" xmlns="http://www.w3.org/2000/svg">...</svg>) for concepts with drawings, circuits, block diagrams, flowcharts, or plots. Ensure diagrams use high-contrast strokes and fills compatible with dark and light themes.
-4. EXTRACT 3 TO 8 OFFICIAL FORMULAS in LaTeX with name, variables, and "whenToUse" in exams.
+4. EXTRACT 3 TO 8 OFFICIAL FORMULAS in clean, natural readable format with name, formula string (e.g. F = m * a), variables, and "whenToUse" in exams. Do NOT use raw LaTeX markup.
 5. CURATE 5 REAL PREVIOUS YEAR EXAM QUESTIONS (PYQs) with exam tag (e.g. AKTU, CBSE, GATE, JEE, DU, VTU), year, marks, 4 options (A, B, C, D), correct answer, and detailed step-by-step explanation!
 6. INCLUDE SPEED SHORTCUTS, TEACHER MEMORY TIPS ("ye exam me aata hai"), and COMMON STUDENT TRAPS to avoid.
 
