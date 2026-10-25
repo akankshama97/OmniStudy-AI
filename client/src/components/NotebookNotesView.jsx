@@ -447,12 +447,35 @@ export function formatNaturalMath(str) {
 }
 
 /**
- * Renders text with natural, clear mathematical formatting
+ * Converts natural math with markdown bold (**word**) to HTML string
+ */
+export function formatNaturalMathHtml(str) {
+  if (!str) return '';
+  const plain = formatNaturalMath(String(str));
+  return plain.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #0F172A; font-weight: 700;">$1</strong>');
+}
+
+/**
+ * Renders text with natural, clear mathematical formatting and highlighted bold terms
  */
 function MathText({ text, className = '' }) {
   if (!text) return null;
   const natural = formatNaturalMath(String(text));
-  return <span className={className}>{natural}</span>;
+  const parts = natural.split(/(\*\*[^*]+\*\*)/g);
+  return (
+    <span className={className}>
+      {parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return (
+            <strong key={i} className="font-extrabold text-[#0F172A] dark:text-[#FFFFFF] underline decoration-blue-500/30 underline-offset-2">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        return part;
+      })}
+    </span>
+  );
 }
 
 export default function NotebookNotesView({
@@ -643,24 +666,38 @@ export default function NotebookNotesView({
       window.speechSynthesis.cancel();
       setIsPlayingAudio(false);
     } else {
-      const summaryText = `${note.title}. Chapter: ${note.chapter || ''}. Overview: ${note.overview}. Key Highlights: ${(note.quickSummary || []).join('. ')}.`;
-      const utterance = new SpeechSynthesisUtterance(summaryText);
+      window.speechSynthesis.cancel();
+
+      // Clean markdown, symbols, and formatting for fluent spoken audio
+      const cleanSummary = (note.overview || '').replace(/[*_#`~]/g, '');
+      const cleanHighlights = (note.quickSummary || []).map(s => s.replace(/[*_#`~]/g, '')).join('. ');
+      const rawText = `${note.title}. ${note.chapter ? `Chapter: ${note.chapter}. ` : ''}Overview: ${cleanSummary}. Key Highlights: ${cleanHighlights}.`;
+      const spokenText = formatNaturalMath(rawText)
+        .replace(/\[\d+:\d+\]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const utterance = new SpeechSynthesisUtterance(spokenText);
       const curLang = (selectedLang || note.language || '').toLowerCase();
       const voices = window.speechSynthesis.getVoices();
 
       if (curLang.includes('hindi')) {
         utterance.lang = 'hi-IN';
-        const hiVoice = voices.find(v => v.lang.includes('hi') || /hindi/i.test(v.name));
+        const hiVoice = voices.find(v => v.lang.includes('hi') || /hindi|swara|kalpana|heera/i.test(v.name));
         if (hiVoice) utterance.voice = hiVoice;
       } else if (curLang.includes('hinglish')) {
-        // Indian accent voice for authentic Hinglish tone (en-IN or hi-IN)
-        utterance.lang = 'en-IN';
-        const inVoice = voices.find(v => v.lang === 'en-IN' || /india|heera|neerja|swara|ravi/i.test(v.name)) ||
-                        voices.find(v => v.lang.includes('hi') || /hindi/i.test(v.name));
-        if (inVoice) utterance.voice = inVoice;
+        // Authentic Indian accent voice for Hinglish: prioritizes Indian voice to read Hindi/English terms smoothly
+        const inVoice = voices.find(v => v.lang.includes('hi') || /hindi|swara|kalpana|heera|neerja/i.test(v.name)) ||
+                        voices.find(v => v.lang === 'en-IN' || /india|ravi|neerja/i.test(v.name));
+        if (inVoice) {
+          utterance.lang = inVoice.lang || 'hi-IN';
+          utterance.voice = inVoice;
+        } else {
+          utterance.lang = 'en-IN';
+        }
       } else {
         utterance.lang = 'en-US';
-        const enVoice = voices.find(v => v.lang === 'en-US' || v.lang.startsWith('en'));
+        const enVoice = voices.find(v => v.lang === 'en-US' || (v.lang.startsWith('en') && !v.lang.includes('IN')));
         if (enVoice) utterance.voice = enVoice;
       }
 
@@ -690,23 +727,23 @@ export default function NotebookNotesView({
           <span style="font-size: 12px; color: #4B5563; margin-top: 4px; display: block;">Platform Developed by: <strong style="color: #2563EB;">Akanksha Maurya</strong> | All Rights Reserved</span>
         </div>
 
-        <h1 style="color: #1E3A8A; font-size: 22px; border-bottom: 2px solid #3B82F6; padding-bottom: 8px; margin: 0 0 10px 0;">${formatNaturalMath(n.title || 'Lecture Study Notes')}</h1>
+        <h1 style="color: #1E3A8A; font-size: 22px; border-bottom: 2px solid #3B82F6; padding-bottom: 8px; margin: 0 0 10px 0;">${formatNaturalMathHtml(n.title || 'Lecture Study Notes')}</h1>
         
         <p style="color: #4B5563; font-size: 13px; margin: 0 0 20px 0; background: #F8FAFC; padding: 8px 12px; border-radius: 6px;">
-          <strong>Subject:</strong> ${formatNaturalMath(n.subject || 'General')} &nbsp;|&nbsp;
-          <strong>Target Exam:</strong> ${formatNaturalMath(n.targetExam || 'Exam Ready')} &nbsp;|&nbsp;
+          <strong>Subject:</strong> ${formatNaturalMathHtml(n.subject || 'General')} &nbsp;|&nbsp;
+          <strong>Target Exam:</strong> ${formatNaturalMathHtml(n.targetExam || 'Exam Ready')} &nbsp;|&nbsp;
           <strong>Notes Type:</strong> Classroom Topper Copy
         </p>
 
         ${n.overview ? `
           <h2 style="color: #1E40AF; font-size: 16px; margin: 20px 0 8px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">📌 Lecture Overview</h2>
-          <p style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 6px; font-size: 13px; margin: 0 0 16px 0;">${formatNaturalMath(n.overview)}</p>
+          <p style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 6px; font-size: 13px; margin: 0 0 16px 0;">${formatNaturalMathHtml(n.overview)}</p>
         ` : ''}
 
         ${n.quickSummary && n.quickSummary.length > 0 ? `
           <h2 style="color: #1E40AF; font-size: 16px; margin: 20px 0 8px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">⚡ High-Yield Key Takeaways</h2>
           <ul style="margin: 0 0 20px 0; padding-left: 20px; font-size: 13px;">
-            ${n.quickSummary.map(s => `<li style="margin-bottom: 6px; color: #1F2937;">${formatNaturalMath(s)}</li>`).join('')}
+            ${n.quickSummary.map(s => `<li style="margin-bottom: 6px; color: #1F2937;">${formatNaturalMathHtml(s)}</li>`).join('')}
           </ul>
         ` : ''}
 
@@ -714,49 +751,49 @@ export default function NotebookNotesView({
           <h2 style="color: #1E40AF; font-size: 18px; margin: 24px 0 12px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">📖 Detailed Classroom Copy Notes</h2>
           ${n.keyConcepts.map((c, idx) => `
             <div style="margin-bottom: 20px; padding: 14px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; page-break-inside: avoid;">
-              <h3 style="color: #1E3A8A; font-size: 15px; margin: 0 0 4px 0;">${formatNaturalMath(c.heading || `Topic ${idx + 1}`)} <span style="font-size: 11px; color: #64748B; font-weight: normal;">[${c.timestamp_start || '00:00'} - ${c.timestamp_end || ''}]</span></h3>
-              ${c.subheading ? `<p style="font-style: italic; color: #4B5563; font-size: 12px; margin: 0 0 8px 0;">${formatNaturalMath(c.subheading)}</p>` : ''}
+              <h3 style="color: #1E3A8A; font-size: 15px; margin: 0 0 4px 0;">${formatNaturalMathHtml(c.heading || `Topic ${idx + 1}`)} <span style="font-size: 11px; color: #64748B; font-weight: normal;">[${c.timestamp_start || '00:00'} - ${c.timestamp_end || ''}]</span></h3>
+              ${c.subheading ? `<p style="font-style: italic; color: #4B5563; font-size: 12px; margin: 0 0 8px 0;">${formatNaturalMathHtml(c.subheading)}</p>` : ''}
 
               ${c.definitions && c.definitions.length > 0 ? `
                 <div style="background: #FEF2F2; border-left: 3px solid #EF4444; padding: 8px 10px; margin: 8px 0; border-radius: 4px;">
                   <strong style="color: #B91C1C; font-size: 12px;">Definition:</strong>
-                  ${c.definitions.map(d => `<p style="color: #991B1B; font-size: 12px; margin: 2px 0;">${formatNaturalMath(d)}</p>`).join('')}
+                  ${c.definitions.map(d => `<p style="color: #991B1B; font-size: 12px; margin: 2px 0;">${formatNaturalMathHtml(d)}</p>`).join('')}
                 </div>
               ` : ''}
 
               ${c.points && c.points.length > 0 ? `
                 <strong style="color: #1E3A8A; font-size: 12px; display: block; margin: 8px 0 4px 0;">Blackboard Detailed Points:</strong>
                 <ul style="margin: 0; padding-left: 18px; font-size: 12.5px;">
-                  ${c.points.map(p => `<li style="margin-bottom: 4px; color: #1F2937;">${formatNaturalMath(p)}</li>`).join('')}
+                  ${c.points.map(p => `<li style="margin-bottom: 4px; color: #1F2937;">${formatNaturalMathHtml(p)}</li>`).join('')}
                 </ul>
               ` : ''}
 
               ${c.diagram && (c.diagram.heading || c.diagram.description || c.diagram.svg_or_mermaid) ? `
                 <div style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 10px 14px; border-radius: 8px; margin: 12px 0;">
-                  <strong style="color: #2563EB; font-size: 13px;">📐 Board Diagram: ${formatNaturalMath(c.diagram.heading || 'Architecture')}</strong>
+                  <strong style="color: #2563EB; font-size: 13px;">📐 Board Diagram: ${formatNaturalMathHtml(c.diagram.heading || 'Architecture')}</strong>
                   ${c.diagram.svg_or_mermaid && c.diagram.svg_or_mermaid.includes('<svg') ? `
                     <div style="max-width: 500px; margin: 8px auto; text-align: center;">
                       ${c.diagram.svg_or_mermaid.replace(/<svg\b([^>]*)>/, '<svg $1 style="max-width: 100%; height: auto;">')}
                     </div>
                   ` : ''}
-                  <p style="font-size: 12px; color: #4B5563; margin: 4px 0 0 0;">${formatNaturalMath(c.diagram.description || '')}</p>
+                  <p style="font-size: 12px; color: #4B5563; margin: 4px 0 0 0;">${formatNaturalMathHtml(c.diagram.description || '')}</p>
                 </div>
               ` : ''}
 
               ${c.solved_example && c.solved_example.title ? `
                 <div style="background: #F0FDF4; border: 1px solid #86EFAC; padding: 10px; border-radius: 6px; margin: 10px 0;">
-                  <strong style="color: #15803D; font-size: 12px;">🧮 Solved Numerical: ${formatNaturalMath(c.solved_example.title)}</strong>
-                  ${c.solved_example.given ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Given:</strong> ${formatNaturalMath(c.solved_example.given)}</p>` : ''}
-                  ${c.solved_example.formula ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Formula:</strong> ${formatNaturalMath(c.solved_example.formula)}</p>` : ''}
-                  ${c.solved_example.solution ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Solution:</strong> ${formatNaturalMath(c.solved_example.solution).replace(/\n/g, '<br/>')}</p>` : ''}
-                  ${c.solved_example.answer ? `<p style="margin: 3px 0; font-size: 12px; color: #166534; font-weight: bold;"><strong>Answer:</strong> ${formatNaturalMath(c.solved_example.answer)}</p>` : ''}
+                  <strong style="color: #15803D; font-size: 12px;">🧮 Solved Numerical: ${formatNaturalMathHtml(c.solved_example.title)}</strong>
+                  ${c.solved_example.given ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Given:</strong> ${formatNaturalMathHtml(c.solved_example.given)}</p>` : ''}
+                  ${c.solved_example.formula ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Formula:</strong> ${formatNaturalMathHtml(c.solved_example.formula)}</p>` : ''}
+                  ${c.solved_example.solution ? `<p style="margin: 3px 0; font-size: 12px;"><strong>Solution:</strong> ${formatNaturalMathHtml(c.solved_example.solution).replace(/\n/g, '<br/>')}</p>` : ''}
+                  ${c.solved_example.answer ? `<p style="margin: 3px 0; font-size: 12px; color: #166534; font-weight: bold;"><strong>Answer:</strong> ${formatNaturalMathHtml(c.solved_example.answer)}</p>` : ''}
                 </div>
               ` : ''}
 
               ${c.teacher_tips && c.teacher_tips.length > 0 ? `
                 <div style="background: #FFF7ED; border-left: 3px solid #F97316; padding: 6px 10px; margin-top: 8px; border-radius: 4px;">
                   <strong style="color: #C2410C; font-size: 11px;">💡 Teacher Exam Tip:</strong>
-                  ${c.teacher_tips.map(t => `<p style="color: #9A3412; margin: 2px 0; font-size: 11.5px;">${formatNaturalMath(t)}</p>`).join('')}
+                  ${c.teacher_tips.map(t => `<p style="color: #9A3412; margin: 2px 0; font-size: 11.5px;">${formatNaturalMathHtml(t)}</p>`).join('')}
                 </div>
               ` : ''}
             </div>
@@ -773,9 +810,9 @@ export default function NotebookNotesView({
             </tr>
             ${n.formulas.map(f => `
               <tr>
-                <td style="padding: 6px; border: 1px solid #CBD5E1;"><strong>${formatNaturalMath(f.name)}</strong></td>
-                <td style="padding: 6px; border: 1px solid #CBD5E1; font-family: monospace; color: #1E3A8A; font-weight: bold;">${formatNaturalMath(f.formula)}</td>
-                <td style="padding: 6px; border: 1px solid #CBD5E1;">${formatNaturalMath(f.variables || '')}</td>
+                <td style="padding: 6px; border: 1px solid #CBD5E1;"><strong>${formatNaturalMathHtml(f.name)}</strong></td>
+                <td style="padding: 6px; border: 1px solid #CBD5E1; font-family: monospace; color: #1E3A8A; font-weight: bold;">${formatNaturalMathHtml(f.formula)}</td>
+                <td style="padding: 6px; border: 1px solid #CBD5E1;">${formatNaturalMathHtml(f.variables || '')}</td>
               </tr>
             `).join('')}
           </table>
@@ -785,15 +822,15 @@ export default function NotebookNotesView({
           <h2 style="color: #1E40AF; font-size: 16px; margin: 24px 0 10px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">🎯 Exam Previous Year Questions (PYQs)</h2>
           ${n.importantPYQs.slice(0, 5).map((q, qIdx) => `
             <div style="margin-bottom: 12px; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 6px; background: #FFFFFF; page-break-inside: avoid;">
-              <strong style="color: #D97706; font-size: 12px;">Q${qIdx + 1} [${formatNaturalMath(q.examName || q.exam || 'Exam PYQ')} ${q.year || ''}]</strong>
-              <p style="font-weight: bold; margin: 4px 0; font-size: 12.5px;">${formatNaturalMath(q.question)}</p>
+              <strong style="color: #D97706; font-size: 12px;">Q${qIdx + 1} [${formatNaturalMathHtml(q.examName || q.exam || 'Exam PYQ')} ${q.year || ''}]</strong>
+              <p style="font-weight: bold; margin: 4px 0; font-size: 12.5px;">${formatNaturalMathHtml(q.question)}</p>
               ${q.options && q.options.length > 0 ? `
                 <ul style="margin: 4px 0 6px 0; padding-left: 18px; font-size: 12px;">
-                  ${q.options.map(opt => `<li style="margin-bottom: 2px;">${formatNaturalMath(opt)}</li>`).join('')}
+                  ${q.options.map(opt => `<li style="margin-bottom: 2px;">${formatNaturalMathHtml(opt)}</li>`).join('')}
                 </ul>
               ` : ''}
-              <p style="color: #15803D; font-weight: bold; font-size: 12px; margin: 2px 0;">Correct: ${formatNaturalMath(q.correctAnswer || q.answer || '')}</p>
-              ${q.solution || q.explanation ? `<p style="color: #4B5563; font-size: 11.5px; margin: 2px 0;"><strong>Solution:</strong> ${formatNaturalMath(q.solution || q.explanation).replace(/\n/g, '<br/>')}</p>` : ''}
+              <p style="color: #15803D; font-weight: bold; font-size: 12px; margin: 2px 0;">Correct: ${formatNaturalMathHtml(q.correctAnswer || q.answer || '')}</p>
+              ${q.solution || q.explanation ? `<p style="color: #4B5563; font-size: 11.5px; margin: 2px 0;"><strong>Solution:</strong> ${formatNaturalMathHtml(q.solution || q.explanation).replace(/\n/g, '<br/>')}</p>` : ''}
             </div>
           `).join('')}
         ` : ''}

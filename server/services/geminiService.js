@@ -692,7 +692,7 @@ export function createFallbackTop20MCQs(chapter, subject = 'General', targetExam
       // Level 2: Core Formulations & Mathematical Relationships (Medium)
       const formulaItem = c.formulas && c.formulas[0];
       const formulaName = formulaItem ? formulaItem.name : `${cHeading} Equation`;
-      const formulaLatex = formulaItem ? formulaItem.formula : `\\vec{F} = m\\vec{a}`;
+      const formulaLatex = formulaItem ? formulaItem.formula : 'F = m * a';
 
       mcqs.push({
         id: i,
@@ -703,11 +703,11 @@ export function createFallbackTop20MCQs(chapter, subject = 'General', targetExam
           : `In the mathematical formulation of "${cHeading}", which equation represents the correct relationship?`,
         options: [
           `Option A: Rate of change remains inversely zero under static load`,
-          `Option B: ${formulaItem ? `${formulaName}: $${formulaLatex}$` : `Directly proportional to applied physical gradient`}`,
+          `Option B: ${formulaItem ? `${formulaName}: ${formulaLatex}` : 'Directly proportional to applied physical gradient'}`,
           `Option C: Inversely quadratic with respect to initial reference parameters`,
           `Option D: Holds true exclusively when temperature approaches absolute zero`
         ],
-        correctAnswer: `Option B: ${formulaItem ? `${formulaName}: $${formulaLatex}$` : `Directly proportional to applied physical gradient`}`,
+        correctAnswer: `Option B: ${formulaItem ? `${formulaName}: ${formulaLatex}` : 'Directly proportional to applied physical gradient'}`,
         correctOptionIndex: 1,
         solution: isHinglish
           ? `Mathematical justification: ${formulaName} establishes the exact quantitative balance derived on the blackboard.`
@@ -1145,7 +1145,7 @@ Return STRICT JSON ONLY matching this schema:
   "formulas": [
     {
       "name": "Formula Name",
-      "formula": "LaTeX formula string",
+      "formula": "Clean natural formula string (e.g. F = m * a, v = u + a * t, KE = (1/2) * m * v^2)",
       "whenToUse": "Specific problem scenario"
     }
   ],
@@ -1428,7 +1428,7 @@ CRITICAL INSTRUCTIONS (STUDENT WILL REVISE 100% FROM THESE NOTES):
    - Provide an exact scientific/academic heading matching what the teacher spoke or wrote.
    - 8 to 12 exhaustive points explaining the theory, derivations, and reasoning ("why").
    - Dictated definitions, boundary conditions, and real-life examples.
-   - Formulas in LaTeX ONLY IF taught by the educator in this lecture. If the lecture has no mathematical formulas, set "formulas": []. NEVER invent or bring outside formulas!
+   - Formulas in clean, natural readable plain text (e.g. F = m * a, KE = (1/2) * m * v^2, v = u + a * t) ONLY IF taught by the educator in this lecture. Do NOT use raw LaTeX syntax (\frac, \sqrt, \vec, $...$). If the lecture has no mathematical formulas, set "formulas": []. NEVER invent or bring outside formulas!
    - Solved numericals with Given, To Find, Formula, Step 1, Step 2, and Final Answer ONLY IF the educator solved a numerical in class. Otherwise set "solved_example": null.
    - MANDATORY: Self-contained SVG diagram (viewBox="0 0 540 220") depicting the blackboard drawing, circuit, block diagram, or plot.
    - Teacher tips and common student exam blunders.
@@ -1528,7 +1528,7 @@ CRITICAL FORMULA RULES (STRICT UNIT-SPECIFIC FIDELITY):
    - If this lecture has NO mathematical formulas (pure theoretical discussion), return [].
 3. For EVERY formula include:
    - "name": Clear formula name
-   - "formula": Valid LaTeX string
+   - "formula": Clean, natural readable plain text formula (e.g. CPU Time = Instruction Count * CPI * Clock Cycle Time, Speedup = T_old / T_new). Do NOT use raw LaTeX syntax.
    - "variables": Meaning of all variables
    - "units": SI or computing unit
    - "conditions": When to apply in exams
@@ -1538,7 +1538,7 @@ Return STRICT JSON ONLY:
   "formulas": [
     {
       "name": "Formula Name",
-      "formula": "LaTeX formula",
+      "formula": "Clean natural formula string (e.g. CPU Time = Instruction Count * CPI * Clock Cycle Time)",
       "variables": "Variables meaning",
       "units": "Units",
       "conditions": "Applicability condition"
@@ -1585,7 +1585,7 @@ CRITICAL MIND MAP RULES:
 - A mind map is NOT just a list of headings! Each branch must terminate in rich cognitive leaves:
   Format of leaves MUST include clear prefix tags:
   - "Topic -> Subtopic -> Definition: Core Principle"
-  - "Topic -> Subtopic -> Formula: Exact LaTeX/Equation"
+  - "Topic -> Subtopic -> Formula: Exact natural plain-text formula (e.g. F = m * a)"
   - "Topic -> Subtopic -> Example: Specific Worked Case"
   - "Topic -> Subtopic -> Trap: Common Exam Blunder"
 - Generate 18 to 28 interconnected nodes covering every extracted topic thoroughly.
@@ -1751,7 +1751,7 @@ Language Style: ${langInstruction}
 
 Provide a direct, crystal-clear, step-by-step explanation:
 1. Core intuition / direct answer in simple words.
-2. Step-by-step mathematical working or derivation with formulas formatted in clean LaTeX.
+2. Step-by-step mathematical working or derivation with formulas formatted in clean, natural readable plain text (e.g. F = m * a, v = u + a * t). Do NOT use raw LaTeX markup (\frac, \sqrt, \vec, $...$) so equations appear clean and readable on Telegram and website.
 3. Any relevant diagram reference or key visual relationship.
 4. Practical exam tip / speed trick / common student mistake to avoid.
 
@@ -1882,7 +1882,7 @@ Return STRICT JSON ONLY matching this schema:
   "formulaSheet": [
     {
       "title": "Formula / Law Name",
-      "formula": "LaTeX formula string",
+      "formula": "Clean natural formula string (e.g. F = m * a, v = u + a * t)",
       "explanation": "Brief physical meaning and applicability conditions",
       "examTip": "Examiner's favorite shortcut or trap"
     }
@@ -1925,7 +1925,7 @@ IMPORTANT: Return STRICT, VALID JSON ONLY. Use double backslashes in LaTeX formu
  */
 export const translateNoteContent = async (note, targetLanguage = 'Hindi') => {
   const langInstruction = targetLanguage.toLowerCase() === 'hindi'
-    ? 'Translate into natural, clear Hindi (Devanagari script). Keep mathematical expressions, formulas, and standard technical acronyms in English/LaTeX.'
+    ? 'Translate into natural, clear Hindi (Devanagari script). Keep mathematical expressions, formulas, and standard technical acronyms in natural English notation.'
     : targetLanguage.toLowerCase() === 'english'
     ? 'Translate into crystal-clear academic English suitable for exams.'
     : 'Translate into engaging conversational Hinglish (Hindi in Roman script + English technical terms as used by Kota faculty & YouTube educators).';
@@ -1955,7 +1955,7 @@ ${JSON.stringify({
 }, null, 2)}
 
 Strict Translation Rules:
-1. Preserve all mathematical formulas and LaTeX syntax exactly as they are (do NOT alter formulas).
+1. Preserve all mathematical formulas exactly as they are (do NOT alter formulas).
 2. Translate all headings, explanations, handwritten tips, bullet points, derivations, PYQ questions, solved numerical explanations, and answers into ${targetLanguage}.
 3. Return STRICT JSON ONLY matching the identical structure. No commentary.`;
 
@@ -2007,7 +2007,7 @@ ${transcriptSnippet || '(ट्रांसक्रिप्ट उपलब्
 1. भाषा: आपका पूरा उत्तर केवल और केवल हिन्दी (देवनागरी लिपि) में होना चाहिए। तकनीकी शब्दों को कोष्ठक में अंग्रेजी में लिख सकते हैं।
 2. केवल उसी टाइमस्टैम्प के विषय पर ध्यान केंद्रित करें।
 3. पहले 2-3 पंक्तियों में बताएं कि शिक्षक उस क्षण क्या सिद्ध या समझा रहे थे।
-4. हर चरण का कारण (WHY) बताएं, केवल निष्कर्ष नहीं। सूत्रों को स्वच्छ LaTeX में लिखें।
+4. हर चरण का कारण (WHY) बताएं, केवल निष्कर्ष नहीं। सूत्रों को स्वच्छ और सरल गणितीय रूप में लिखें (जैसे: F = m * a, v = u + a * t) बिना LaTeX कोड के।
 5. दैनिक जीवन का एक उदाहरण या सादृश्य दें।
 6. अंत में छात्र की समझ परखने के लिए एक छोटा प्रश्न पूछें।`;
   } else if (normLang.includes('eng')) {
@@ -2044,7 +2044,7 @@ ${transcriptSnippet || '(No transcript provided)'}
 Strict Rules:
 1. Language: Reply in natural Hinglish (conversational Hindi in Roman script + English technical terms).
 2. Focus strictly on timestamp [${timestamp || '00:00'}].
-3. Explain why the teacher took each step, and format formulas in clean LaTeX.
+3. Explain why the teacher took each step, and format formulas in clean, natural readable plain text (e.g. F = m * a, v = u + a * t) without raw LaTeX code.
 4. Relatable real-life analogy do.
 5. End with a quick check-question.`;
   }

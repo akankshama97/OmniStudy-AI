@@ -429,42 +429,51 @@
 }
 
 /* ── Dynamic Student Copy Font Sizing (A-, A, A+) ── */
-.font-size-small {
-  font-size: 0.86rem !important;
-}
+.font-size-small,
 .font-size-small .handwritten-font,
 .font-size-small p,
 .font-size-small li,
 .font-size-small td,
-.font-size-small span:not(.font-mono):not(.w-5):not(.w-4):not(.w-3) {
-  font-size: 0.86rem !important;
+.font-size-small div.leading-relaxed,
+.font-size-small span:not(.font-mono):not(.shrink-0) {
+  font-size: 0.82rem !important;
+  line-height: 1.55 !important;
 }
 .font-size-small h2 {
-  font-size: 1.35rem !important;
+  font-size: 1.25rem !important;
 }
 .font-size-small h3 {
-  font-size: 1.15rem !important;
+  font-size: 1.1rem !important;
 }
 
 .font-size-normal {
   font-size: 1rem;
 }
-
-.font-size-large {
-  font-size: 1.18rem !important;
+.font-size-normal .handwritten-font,
+.font-size-normal p,
+.font-size-normal li,
+.font-size-normal td,
+.font-size-normal div.leading-relaxed,
+.font-size-normal span:not(.font-mono):not(.shrink-0) {
+  font-size: 1rem !important;
+  line-height: 1.65 !important;
 }
+
+.font-size-large,
 .font-size-large .handwritten-font,
 .font-size-large p,
 .font-size-large li,
 .font-size-large td,
-.font-size-large span:not(.font-mono):not(.w-5):not(.w-4):not(.w-3) {
-  font-size: 1.18rem !important;
+.font-size-large div.leading-relaxed,
+.font-size-large span:not(.font-mono):not(.shrink-0) {
+  font-size: 1.24rem !important;
+  line-height: 1.8 !important;
 }
 .font-size-large h2 {
-  font-size: 1.95rem !important;
+  font-size: 2rem !important;
 }
 .font-size-large h3 {
-  font-size: 1.55rem !important;
+  font-size: 1.6rem !important;
 }
 
 /* Global & PDF-Export Break Protection for Clean Continuous PDF */

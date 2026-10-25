@@ -323,7 +323,7 @@ export default function MindMapViewer({
     const leftTopics = mindMapTree.children.slice(Math.ceil(totalTopics / 2));
 
     const cx = 900;
-    const cy = 550;
+    const cy = 650;
 
     const calcSide = (topics, isRight) => {
       const direction = isRight ? 1 : -1;
@@ -339,7 +339,7 @@ export default function MindMapViewer({
 
       const gapBetweenBranches = 38;
       const totalBranchHeight = branchHeights.reduce((acc, h) => acc + h, 0) + Math.max(0, count - 1) * gapBetweenBranches;
-      let runningY = cy - (totalBranchHeight / 2);
+      let runningY = Math.max(70, cy - (totalBranchHeight / 2));
 
       return topics.map((topic, i) => {
         const blockHeight = branchHeights[i];
@@ -513,7 +513,7 @@ export default function MindMapViewer({
         {viewMode === 'visual' && (
           <svg
             ref={svgRef}
-            viewBox="0 0 1800 1100"
+            viewBox="0 0 1850 1300"
             className="w-full h-full"
             style={{
               transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
@@ -604,9 +604,9 @@ export default function MindMapViewer({
                           <text
                             x={leaf.isRight ? 26 : -194}
                             y={4}
-                            font-family="'Plus Jakarta Sans', sans-serif"
-                            font-size="11"
-                            font-weight="600"
+                            fontFamily="'Plus Jakarta Sans', sans-serif"
+                            fontSize="11"
+                            fontWeight="600"
                             fill={isDark ? '#F1F5F9' : '#0F172A'}
                           >
                             {leaf.label.slice(0, 24)}
@@ -648,9 +648,9 @@ export default function MindMapViewer({
                       x={topic.isRight ? 14 : -166}
                       y={4}
                       textAnchor="middle"
-                      font-family="'Plus Jakarta Sans', sans-serif"
-                      font-size="10"
-                      font-weight="bold"
+                      fontFamily="'Plus Jakarta Sans', sans-serif"
+                      fontSize="10"
+                      fontWeight="bold"
                       fill="#FFFFFF"
                     >
                       {topic.leaves.length}
@@ -658,9 +658,9 @@ export default function MindMapViewer({
                     <text
                       x={topic.isRight ? 32 : -148}
                       y={-3}
-                      font-family="'Plus Jakarta Sans', sans-serif"
-                      font-size="12"
-                      font-weight="bold"
+                      fontFamily="'Plus Jakarta Sans', sans-serif"
+                      fontSize="12"
+                      fontWeight="bold"
                       fill={isDark ? '#F8FAFC' : '#0F172A'}
                     >
                       {topic.label.slice(0, 18)}
@@ -669,9 +669,9 @@ export default function MindMapViewer({
                     <text
                       x={topic.isRight ? 32 : -148}
                       y={12}
-                      font-family="'JetBrains Mono', monospace"
-                      font-size="9.5"
-                      font-weight="600"
+                      fontFamily="'JetBrains Mono', monospace"
+                      fontSize="9.5"
+                      fontWeight="600"
                       fill={color.darkText || color.text}
                     >
                       {topic.timestamp ? `⏱ ${topic.timestamp}` : 'Topic Branch'}
@@ -691,9 +691,9 @@ export default function MindMapViewer({
                         x="0"
                         y="3.5"
                         textAnchor="middle"
-                        font-family="monospace"
-                        font-size="11"
-                        font-weight="bold"
+                        fontFamily="monospace"
+                        fontSize="11"
+                        fontWeight="bold"
                         fill="#FFFFFF"
                       >
                         {collapsedBranches[topic.id] ? '+' : '−'}
@@ -722,9 +722,9 @@ export default function MindMapViewer({
                 x="0"
                 y="-14"
                 textAnchor="middle"
-                font-family="'Plus Jakarta Sans', sans-serif"
-                font-size="11"
-                font-weight="bold"
+                fontFamily="'Plus Jakarta Sans', sans-serif"
+                fontSize="11"
+                fontWeight="bold"
                 letterSpacing="1"
                 fill="#93C5FD"
               >
@@ -734,9 +734,9 @@ export default function MindMapViewer({
                 x="0"
                 y="12"
                 textAnchor="middle"
-                font-family="'Plus Jakarta Sans', sans-serif"
-                font-size="15"
-                font-weight="800"
+                fontFamily="'Plus Jakarta Sans', sans-serif"
+                fontSize="15"
+                fontWeight="800"
                 fill="#FFFFFF"
               >
                 {cleanTitle.slice(0, 22)}
@@ -746,9 +746,9 @@ export default function MindMapViewer({
                 x="0"
                 y="28"
                 textAnchor="middle"
-                font-family="'JetBrains Mono', monospace"
-                font-size="9"
-                font-weight="600"
+                fontFamily="'JetBrains Mono', monospace"
+                fontSize="9"
+                fontWeight="600"
                 fill="#BFDBFE"
               >
                 Master Knowledge Core
