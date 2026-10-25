@@ -12,6 +12,7 @@ import youtubeRoutes from './routes/youtubeRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import pyqRoutes from './routes/pyqRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import { initTelegramBot } from './services/telegramBot.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -89,6 +90,9 @@ app.get('/', (req, res) => {
   </body>
 </html>`);
 });
+
+// Initialize Telegram Bot if configured
+initTelegramBot();
 
 app.listen(PORT, () => {
   console.log(`🚀 OmniStudy AI Server running on http://localhost:${PORT}`);
