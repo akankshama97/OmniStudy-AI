@@ -11,6 +11,7 @@ export async function generateNotePdfBuffer(note) {
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({
+        bufferPages: true,
         margin: 40,
         size: 'A4',
         info: {
@@ -123,15 +124,19 @@ export async function generateNotePdfBuffer(note) {
       }
 
       // Footer on all pages
-      const pages = doc.bufferedPageRange();
-      for (let i = 0; i < pages.count; i++) {
-        doc.switchToPage(i);
-        doc.fillColor(mutedColor).fontSize(8).text(
-          `OmniStudy AI - Generated with Gemini AI & MERN Stack | Page ${i + 1} of ${pages.count}`,
-          40,
-          780,
-          { align: 'center', width: 515 }
-        );
+      try {
+        const pages = doc.bufferedPageRange();
+        for (let i = 0; i < pages.count; i++) {
+          doc.switchToPage(i);
+          doc.fillColor(mutedColor).fontSize(8).text(
+            `OmniStudy AI - Generated with Gemini AI & MERN Stack | Page ${i + 1} of ${pages.count}`,
+            40,
+            780,
+            { align: 'center', width: 515 }
+          );
+        }
+      } catch (footerErr) {
+        console.warn('[pdfService] Footer pagination warning:', footerErr.message);
       }
 
       doc.end();
