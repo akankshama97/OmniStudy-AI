@@ -72,9 +72,10 @@ async function discoverSupportedModels(apiKey) {
 }
 
 /**
- * Executes a Gemini prompt with automatic fast model queue and quota fallback
+ * Executes a Gemini prompt with automatic fast model queue, quota fallback,
+ * and guaranteed JSON schema enforcement when isJson is true.
  */
-export async function executeGeminiPrompt(prompt, imagePart = null) {
+export async function executeGeminiPrompt(prompt, imagePart = null, isJson = true) {
   const apiKey = getApiKey();
   const genAI = new GoogleGenerativeAI(apiKey);
 
@@ -89,7 +90,14 @@ export async function executeGeminiPrompt(prompt, imagePart = null) {
   for (const modelName of queue) {
     try {
       console.log(`[OmniStudy AI] Calling Gemini model: ${modelName}...`);
-      const model = genAI.getGenerativeModel({ model: modelName });
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+          temperature: 0.65,
+          topP: 0.95,
+          ...(isJson ? { responseMimeType: 'application/json' } : {})
+        }
+      });
       
       const contents = imagePart ? [prompt, imagePart] : prompt;
       const result = await model.generateContent(contents);
@@ -106,8 +114,8 @@ export async function executeGeminiPrompt(prompt, imagePart = null) {
         throw new Error('Invalid Gemini API Key in server/.env.local. Please verify your GEMINI_API_KEY.');
       }
 
-      // If model not found (404), quota exceeded (429), high demand (503), or fetch failed, try next
-      if ([404, 429, 503, 500].includes(err.status) || /quota|not found|exceeded|demand|fetch failed|temporary|network|unavailable/i.test(err.message)) {
+      // If model not found (404), quota exceeded (429), recitation, high demand (503), or fetch failed, try next
+      if ([404, 429, 503, 500].includes(err.status) || /quota|not found|exceeded|recitation|demand|fetch failed|temporary|network|unavailable/i.test(err.message)) {
         if (err.status === 429 || /quota|exceeded/i.test(err.message)) {
           console.log(`[OmniStudy AI] Rate limit (429) on ${modelName}. Waiting 2s before rotating model...`);
           await new Promise(r => setTimeout(r, 2000));
@@ -1074,6 +1082,7 @@ TRANSCRIPT & LECTURE SPOKEN CONTENT:
 "${transcriptContext}"
 
 CRITICAL INSTRUCTIONS (MUST MATCH THE EXACT DEPTH & QUALITY OF TOPPER DEMO NOTES):
+0. ORIGINAL SYNTHESIS (ANTI-RECITATION): Do NOT quote or reproduce transcript sentences verbatim. Synthesize, teach, explain, and write original topper student notes in natural, engaging Hinglish with simple analogies.
 1. PRODUCE 6 TO 10 COMPREHENSIVE KEY CONCEPTS covering the chronological flow of the lecture from start to finish.
    - Headings must be exact, specific, scientific/academic sub-topics (e.g., "1. Principle of Operation & Working", "2. Mathematical Derivation of Governing Equation", "3. System Architecture & Block Diagram", "4. Step-by-Step Solved Problem").
    - NEVER use generic placeholders like "Topic 1" or repeat the lecture title.
