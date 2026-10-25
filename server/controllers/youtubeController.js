@@ -824,3 +824,24 @@ function createEmergencyFallbackNote(videoId, videoTitle, videoDetails, transcri
     commonMistakes: ['Rushing through question statements and missing negative constraints or boundary conditions.']
   };
 }
+
+export const exportNoteToPdf = async (req, res) => {
+  try {
+    const { note } = req.body;
+    if (!note) {
+      return res.status(400).json({ error: 'Note data is required to generate PDF.' });
+    }
+
+    const { generateNotePdfBuffer } = await import('../services/pdfService.js');
+    const pdfBuffer = await generateNotePdfBuffer(note);
+    const safeTitle = (note.title || 'OmniStudy_Notes').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 50);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${safeTitle}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    return res.end(pdfBuffer);
+  } catch (err) {
+    console.error('[exportNoteToPdf Error]:', err);
+    return res.status(500).json({ error: err.message || 'Failed to render PDF.' });
+  }
+};

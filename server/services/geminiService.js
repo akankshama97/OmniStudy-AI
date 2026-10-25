@@ -1082,8 +1082,8 @@ TRANSCRIPT & LECTURE SPOKEN CONTENT:
 "${transcriptContext}"
 
 CRITICAL INSTRUCTIONS (MUST MATCH THE EXACT DEPTH & QUALITY OF TOPPER DEMO NOTES):
-0. STRICT FIDELITY (NO OUTSIDE TOPICS): Cover ONLY topics, concepts, theorems, derivations, and examples ACTUALLY taught in this specific lecture. Do NOT hallucinate or introduce syllabus topics that the teacher did not teach in this video.
-0.1 ORIGINAL SYNTHESIS (ANTI-RECITATION): Do NOT quote or reproduce transcript sentences verbatim. Synthesize, teach, explain, and write original topper student notes in crystal-clear style with simple analogies.
+0. STRICT FIDELITY (LECTURE-ONLY GROUNDING): Cover ONLY topics, concepts, theorems, derivations, and examples ACTUALLY taught in this specific video lecture. Do NOT add outside fluff, unrelated background topics, or preamble before or after. The notes must represent 100% of what was taught in the video and NOTHING extraneous.
+0.1 ORIGINAL DETAILED TOPPER NOTES: Explain every step in crystal-clear detail with comprehensive explanations, step-by-step reasoning, mathematical clarity, and intuitive analogies. Do NOT quote verbatim transcript filler; synthesize high-yield classroom notes.
 1. PRODUCE 6 TO 10 COMPREHENSIVE KEY CONCEPTS covering the chronological flow of the lecture from start to finish.
    - Headings must be exact, specific, scientific/academic sub-topics (e.g., "1. Principle of Operation & Working", "2. Mathematical Derivation of Governing Equation", "3. System Architecture & Block Diagram", "4. Step-by-Step Solved Problem").
    - NEVER use generic placeholders like "Topic 1" or repeat the lecture title.

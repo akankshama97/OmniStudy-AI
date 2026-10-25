@@ -89,7 +89,7 @@ export function initTelegramBot() {
         await ctx.reply('🎨 *Notes generate ho gaye hain!* Ab PDF render ki jaa rahi hai... 🖨️', { parse_mode: 'Markdown' });
         const pdfBuffer = await generateNotePdfBuffer(notes);
 
-        const safeFilename = `${(notes.title || 'OmniStudy_Notes').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 40)}.pdf`;
+        const safeFilename = `OmniStudy_AI_${(notes.title || 'Lecture_Notes').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 35)}.pdf`;
 
         // Count rich components
         const conceptCount = Array.isArray(notes.keyConcepts) ? notes.keyConcepts.length : 0;
@@ -104,6 +104,7 @@ export function initTelegramBot() {
         const safeSummary = (notes.quickSummary || notes.overview || notes.summary || '').slice(0, 260);
 
         const captionText =
+          `⚡ *OMNISTUDY AI by Akanksha Maurya*\n` +
           `📚 *${(notes.title || videoTitle).slice(0, 60)}*\n\n` +
           `📌 *Core Summary:*\n${safeSummary}...\n\n` +
           `✍️ *Topics Covered (${conceptCount}):*\n${conceptPreview}\n\n` +

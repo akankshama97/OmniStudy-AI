@@ -94,32 +94,31 @@ export async function generateNotePdfBuffer(note) {
       doc.y = 42;
       
       // Header Card
-      doc.rect(CONTENT_LEFT, doc.y, CONTENT_WIDTH, 70).fillAndStroke('#EEF2FF', '#C7D2FE');
-      doc.fillColor(INK_BLUE).fontSize(16).text(
-        (note.title || 'OmniStudy AI - Lecture Master Notes').slice(0, 75),
+      doc.rect(CONTENT_LEFT, doc.y, CONTENT_WIDTH, 75).fillAndStroke('#EEF2FF', '#C7D2FE');
+      doc.fillColor('#4338CA').fontSize(9.5).text(
+        '⚡ OMNISTUDY AI • CLASSROOM COPY • DEVELOPED BY: AKANKSHA MAURYA',
         CONTENT_LEFT + 14,
-        50,
+        48,
+        { width: CONTENT_WIDTH - 28 }
+      );
+      doc.fillColor(INK_BLUE).fontSize(14).text(
+        (note.title || 'Lecture Master Notes').slice(0, 75),
+        CONTENT_LEFT + 14,
+        63,
         { width: CONTENT_WIDTH - 28, ellipsis: true }
       );
 
       const subjectText = note.subject || note.chapter || 'Core Concepts';
       const examText = note.targetExam && note.targetExam !== 'Auto-detect' ? note.targetExam : 'University & Board Exam';
-      const styleText = note.teachingStyle || 'Classroom Blackboard Notes';
 
-      doc.fillColor('#4B5563').fontSize(9).text(
-        `📚 Subject: ${subjectText}  |  🎯 Target: ${examText}  |  ✍️ Style: ${styleText}`,
+      doc.fillColor('#4B5563').fontSize(8.5).text(
+        `📚 Subject: ${subjectText}  |  🎯 Target: ${examText}  |  🌐 https://omni-study-ai-lilac.vercel.app/`,
         CONTENT_LEFT + 14,
-        74,
+        86,
         { width: CONTENT_WIDTH - 28 }
       );
 
-      doc.fillColor('#6366F1').fontSize(8.5).text(
-        `🌐 Interactive Web App: https://omni-study-ai-lilac.vercel.app/  |  OmniStudy AI 2026`,
-        CONTENT_LEFT + 14,
-        92
-      );
-
-      doc.y = 126;
+      doc.y = 130;
 
       // ════════════════════════════════════════════════════════════
       // 2. CORE SUMMARY & CORNELL CUE COLUMN
@@ -389,7 +388,7 @@ export async function generateNotePdfBuffer(note) {
           try {
             doc.switchToPage(i);
             doc.fillColor('#64748B').fontSize(8).text(
-              `OmniStudy AI Master Notes  •  Page ${i - start + 1} of ${total}  •  https://omni-study-ai-lilac.vercel.app/`,
+              `⚡ OmniStudy AI Topper Notes (Akanksha Maurya)  •  Page ${i - start + 1} of ${total}  •  https://omni-study-ai-lilac.vercel.app/`,
               CONTENT_LEFT,
               800,
               { align: 'center', width: CONTENT_WIDTH }

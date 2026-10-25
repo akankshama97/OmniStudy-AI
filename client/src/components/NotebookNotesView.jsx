@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import DiagramRenderer from './DiagramRenderer';
 import MindMapViewer from './MindMapViewer';
+import { downloadNotePdfApi } from '../services/api';
 
 /**
  * Derives 20 high-yield practice MCQs from note concepts if not already persisted
@@ -681,12 +682,32 @@ export default function NotebookNotesView({
     }
   };
 
-  // Direct 1-Click PDF Download using html2pdf.js with Cloned Sanitized Pure White Canvas
+  // Direct 1-Click PDF Download (Backend Vector PDFKit primary, client fallback)
   const handleDownloadPDF = async () => {
+    if (!note) return;
     const cleanTitle = (note.title || 'Lecture_Notes').replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_');
     setIsExportingPDF(true);
 
-    // Give React time to switch activeDark to false
+    // 1. Primary High-Reliability Method: Server-side PDFKit vector export
+    try {
+      const pdfBlob = await downloadNotePdfApi(note);
+      if (pdfBlob && (pdfBlob.size > 500 || pdfBlob.byteLength > 500)) {
+        const blobUrl = window.URL.createObjectURL(new Blob([pdfBlob], { type: 'application/pdf' }));
+        const downloadLink = document.createElement('a');
+        downloadLink.href = blobUrl;
+        downloadLink.download = `${cleanTitle}_Notes.pdf`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 2000);
+        setIsExportingPDF(false);
+        return;
+      }
+    } catch (apiErr) {
+      console.warn('[NotebookNotesView] Server PDF export error, attempting client-side fallback:', apiErr);
+    }
+
+    // Give React time to switch activeDark to false for client fallback
     await new Promise(r => setTimeout(r, 120));
 
     try {
@@ -748,11 +769,13 @@ export default function NotebookNotesView({
         // Mount clone in off-screen container with white background
         const container = document.createElement('div');
         container.style.position = 'fixed';
-        container.style.left = '-9999px';
+        container.style.left = '0';
         container.style.top = '0';
         container.style.width = '1040px';
         container.style.backgroundColor = '#FFFFFF';
         container.style.zIndex = '-9999';
+        container.style.opacity = '0.01';
+        container.style.pointerEvents = 'none';
         container.appendChild(clone);
         document.body.appendChild(container);
 
@@ -815,7 +838,7 @@ export default function NotebookNotesView({
           <strong>Chapter:</strong> ${note.chapter || ''} &nbsp;|&nbsp;
           <strong>Subject:</strong> ${note.subject || 'General'} &nbsp;|&nbsp;
           <strong>Target Exam:</strong> ${note.targetExam || 'Exam Ready'} &nbsp;|&nbsp;
-          <strong>Educator:</strong> ${note.channelTitle || 'Educator'}
+          <strong>OmniStudy AI</strong> • Developed by Akanksha Maurya
         </p>
         
         <h2 style="color: #2563EB; margin-top: 24px;">Lecture Overview</h2>
@@ -1024,10 +1047,9 @@ export default function NotebookNotesView({
           </h2>
 
           <div className="flex items-center gap-3 mt-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 flex-wrap">
-            <span className="flex items-center gap-1.5">
-              <span>👨‍🏫</span>
-              <span>Educator:</span>
-              <strong className="text-slate-800 dark:text-slate-200 font-semibold">{note.channelTitle}</strong>
+            <span className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium">
+              <span>⚡</span>
+              <span>OmniStudy AI • Developed by Akanksha Maurya</span>
             </span>
             {note.chapter && (
               <>
@@ -1419,7 +1441,7 @@ export default function NotebookNotesView({
                 <div className="font-bold text-red-600 dark:text-red-400 tracking-wide">
                   <span>SUBJECT: <strong className="text-slate-800 dark:text-slate-200">{note.subject || 'Computer Science & Engineering'}</strong></span>
                   <span className="mx-2 text-slate-400">•</span>
-                  <span>EDUCATOR: <strong className="text-slate-800 dark:text-slate-200">{note.channelTitle || 'Gate Smashers / Knowledge Gate'}</strong></span>
+                  <span>NOTES TYPE: <strong className="text-slate-800 dark:text-slate-200">CLASSROOM TOPPER COPY</strong></span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="px-2.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-800 dark:text-amber-300 font-bold text-[11px] whitespace-nowrap">
@@ -3334,7 +3356,7 @@ export default function NotebookNotesView({
             <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 mb-4 text-xs">
               <div className="font-bold text-slate-800 dark:text-slate-200 truncate">{note.chapter || note.title}</div>
               <div className="text-slate-500 dark:text-slate-400 mt-0.5">
-                {note.subject} • {note.channelTitle} • {note.targetExam || 'AKTU B.Tech'}
+                {note.subject} • {note.targetExam || 'AKTU B.Tech'} • OmniStudy AI
               </div>
             </div>
 
@@ -3342,7 +3364,7 @@ export default function NotebookNotesView({
               {/* WhatsApp Share Button */}
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  `📚 *${note.chapter || note.title}* - Topper Classroom Copy Notes\n\nEducator: ${note.channelTitle}\nSubject: ${note.subject}\nTarget Exam: ${note.targetExam || 'AKTU B.Tech'}\n\n⚡ Created on OmniStudy AI (Developed by Akanksha Maurya):\n${window.location.href}`
+                  `📚 *${note.chapter || note.title}* - Topper Classroom Copy Notes\n\nSubject: ${note.subject}\nTarget Exam: ${note.targetExam || 'AKTU B.Tech'}\n\n⚡ Created on OmniStudy AI (Developed by Akanksha Maurya):\n${window.location.href}`
                 )}`}
                 target="_blank"
                 rel="noreferrer"

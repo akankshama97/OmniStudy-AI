@@ -90,3 +90,9 @@ export const translateNoteApi = async (note, targetLanguage = 'Hindi') => {
   });
   return response.data;
 };
+
+
+export const downloadNotePdfApi = async (note) => {
+  const response = await api.post('/youtube/export-pdf', { note }, { responseType: 'blob' });
+  return response.data;
+};
