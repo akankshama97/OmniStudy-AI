@@ -4,7 +4,7 @@ import axios from 'axios';
 export const AuthContext = createContext(null);
 
 // Use relative '/api' so Vite proxy works in dev, and production server proxy works in prod
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL ? (import.meta.env.VITE_API_URL.replace(/\/$/, '') + '/api') : '/api';
 
 export const DEFAULT_GUEST_USER = {
   id: 'guest_student',
