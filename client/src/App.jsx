@@ -208,6 +208,7 @@ export default function App() {
                   onAskTimestampTutor={handleOpenTimestampTutor}
                   theme={theme}
                   isDark={isDark}
+                  isLoading={isLoading}
                 />
               </div>
             )}

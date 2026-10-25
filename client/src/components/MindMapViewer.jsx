@@ -322,31 +322,40 @@ export default function MindMapViewer({
     const rightTopics = mindMapTree.children.slice(0, Math.ceil(totalTopics / 2));
     const leftTopics = mindMapTree.children.slice(Math.ceil(totalTopics / 2));
 
-    const cx = 800;
-    const cy = 480;
+    const cx = 900;
+    const cy = 550;
 
     const calcSide = (topics, isRight) => {
       const direction = isRight ? 1 : -1;
-      const startX = cx + (direction * 180);
+      const startX = cx + (direction * 190);
       const count = topics.length;
-      const spacingY = Math.max(160, Math.min(240, 700 / Math.max(count, 1)));
-      const totalH = (count - 1) * spacingY;
-      const startY = cy - (totalH / 2);
+
+      // Calculate dynamic non-overlapping heights for each branch
+      const branchHeights = topics.map(topic => {
+        const isCollapsed = collapsedBranches[topic.id];
+        const leafCount = isCollapsed ? 0 : (topic.children || []).length;
+        return Math.max(76, leafCount * 44 + 20);
+      });
+
+      const gapBetweenBranches = 38;
+      const totalBranchHeight = branchHeights.reduce((acc, h) => acc + h, 0) + Math.max(0, count - 1) * gapBetweenBranches;
+      let runningY = cy - (totalBranchHeight / 2);
 
       return topics.map((topic, i) => {
-        const topicX = startX + (direction * 60);
-        const topicY = startY + (i * spacingY);
-        const isCollapsed = collapsedBranches[topic.id];
+        const blockHeight = branchHeights[i];
+        const topicX = startX + (direction * 75);
+        const topicY = runningY + (blockHeight / 2);
+        runningY += blockHeight + gapBetweenBranches;
 
-        // Layout leaves
-        const leaves = isCollapsed ? [] : topic.children;
+        const isCollapsed = collapsedBranches[topic.id];
+        const leaves = isCollapsed ? [] : (topic.children || []);
         const leafCount = leaves.length;
-        const leafSpacingY = Math.max(34, Math.min(48, 180 / Math.max(leafCount, 1)));
-        const leafTotalH = (leafCount - 1) * leafSpacingY;
+        const leafSpacingY = 44; // Guaranteed 16px vertical gap between 28px card heights
+        const leafTotalH = Math.max(0, leafCount - 1) * leafSpacingY;
         const leafStartY = topicY - (leafTotalH / 2);
 
         const leafNodes = leaves.map((leaf, li) => {
-          const leafX = topicX + (direction * 220);
+          const leafX = topicX + (direction * 245);
           const leafY = leafStartY + (li * leafSpacingY);
           return {
             ...leaf,
@@ -504,7 +513,7 @@ export default function MindMapViewer({
         {viewMode === 'visual' && (
           <svg
             ref={svgRef}
-            viewBox="0 0 1600 960"
+            viewBox="0 0 1800 1100"
             className="w-full h-full"
             style={{
               transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,

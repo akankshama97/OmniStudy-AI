@@ -406,9 +406,60 @@ function KaTeXFormula({ formula, displayMode = true }) {
   return <div ref={ref} className="overflow-x-auto py-1 font-mono text-center text-sm md:text-base font-bold break-words" />;
 }
 
+/**
+ * Renders text with inline ($...$) and block ($$...$$) KaTeX mathematical formulas
+ */
+function MathText({ text, className = '' }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!ref.current || !text) return;
+
+    const renderMath = () => {
+      if (typeof window === 'undefined' || !window.katex) {
+        if (ref.current) ref.current.innerText = String(text);
+        return;
+      }
+
+      try {
+        const parsedHtml = String(text).replace(/(\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$|\\\([\s\S]*?\\\)|\$[^$\n]+\$)/g, (match) => {
+          const isDisplay = match.startsWith('\\[') || match.startsWith('$$');
+          let formula = match;
+          if (match.startsWith('\\[') || match.startsWith('$$')) formula = match.slice(2, -2);
+          else if (match.startsWith('\\(')) formula = match.slice(2, -2);
+          else if (match.startsWith('$')) formula = match.slice(1, -1);
+
+          try {
+            return window.katex.renderToString(formula.trim(), {
+              throwOnError: false,
+              displayMode: isDisplay
+            });
+          } catch (err) {
+            return match;
+          }
+        });
+        if (ref.current) ref.current.innerHTML = parsedHtml;
+      } catch (e) {
+        if (ref.current) ref.current.innerText = String(text);
+      }
+    };
+
+    renderMath();
+
+    if (typeof window !== 'undefined' && !window.katex) {
+      const timer = setTimeout(renderMath, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [text]);
+
+  if (!text) return null;
+  return <span ref={ref} className={className}>{text}</span>;
+}
+
 export default function NotebookNotesView({
   note,
   selectedLang = 'English',
+  isLoading = false,
   onChangeLanguage,
   onAskDoubtAboutTopic,
   onAskTimestampTutor,
@@ -595,8 +646,25 @@ export default function NotebookNotesView({
     } else {
       const summaryText = `${note.title}. Chapter: ${note.chapter || ''}. Overview: ${note.overview}. Key Highlights: ${(note.quickSummary || []).join('. ')}.`;
       const utterance = new SpeechSynthesisUtterance(summaryText);
-      const curLang = (note.language || selectedLang || '').toLowerCase();
-      utterance.lang = curLang.includes('hindi') ? 'hi-IN' : 'en-US';
+      const curLang = (selectedLang || note.language || '').toLowerCase();
+      const voices = window.speechSynthesis.getVoices();
+
+      if (curLang.includes('hindi')) {
+        utterance.lang = 'hi-IN';
+        const hiVoice = voices.find(v => v.lang.includes('hi') || /hindi/i.test(v.name));
+        if (hiVoice) utterance.voice = hiVoice;
+      } else if (curLang.includes('hinglish')) {
+        // Indian accent voice for authentic Hinglish tone (en-IN or hi-IN)
+        utterance.lang = 'en-IN';
+        const inVoice = voices.find(v => v.lang === 'en-IN' || /india|heera|neerja|swara|ravi/i.test(v.name)) ||
+                        voices.find(v => v.lang.includes('hi') || /hindi/i.test(v.name));
+        if (inVoice) utterance.voice = inVoice;
+      } else {
+        utterance.lang = 'en-US';
+        const enVoice = voices.find(v => v.lang === 'en-US' || v.lang.startsWith('en'));
+        if (enVoice) utterance.voice = enVoice;
+      }
+
       utterance.rate = audioSpeed;
       utterance.onend = () => setIsPlayingAudio(false);
       utterance.onerror = () => setIsPlayingAudio(false);
@@ -631,7 +699,7 @@ export default function NotebookNotesView({
 
         // Strip any shadows, dark backgrounds, and overflow restrictions from the clone
         clone.classList.remove('dark-ruled-paper', 'dark-grid-paper', 'dark', 'shadow-2xl', 'shadow-md', 'overflow-hidden');
-        clone.classList.add('ruled-paper');
+        clone.classList.add('ruled-paper', 'pdf-export-mode');
         clone.style.backgroundColor = '#FFFFFF';
         clone.style.backgroundImage = 'none';
         clone.style.color = '#0F172A';
@@ -929,7 +997,7 @@ export default function NotebookNotesView({
               { id: 'Hindi',    label: 'हिंदी' },
               { id: 'English',  label: 'English' }
             ].map(({ id, label }) => {
-              const currentActive = (note.language || selectedLang || 'English').toLowerCase();
+              const currentActive = (selectedLang || note.language || 'English').toLowerCase();
               const isActive = currentActive === id.toLowerCase();
               return (
                 <button
@@ -1326,7 +1394,8 @@ export default function NotebookNotesView({
       {activeTab === 'notes' && (
         <div
           ref={notebookRef}
-          className={`rounded-3xl p-5 sm:p-8 md:p-12 shadow-2xl border min-h-[900px] relative w-full overflow-hidden transition-all ${getPaperClass()}`}
+          data-fontsize={fontSize}
+          className={`rounded-3xl p-5 sm:p-8 md:p-12 shadow-2xl border min-h-[900px] relative w-full overflow-hidden transition-all font-size-${fontSize} ${getPaperClass()} ${getFontSizeClass()}`}
         >
           {/* Left Red Margin Spiral Hole Accents */}
           <div className="absolute left-1 sm:left-2 top-0 bottom-0 w-6 spiral-binder opacity-70 pointer-events-none no-print" />
@@ -1622,8 +1691,9 @@ export default function NotebookNotesView({
                     {concept.definitions && concept.definitions.length > 0 && (
                       <div className="my-3 space-y-1.5">
                         {concept.definitions.map((def, dIdx) => (
-                          <div key={dIdx} className="p-3 rounded-xl bg-red-500/5 border-l-4 border-red-500 text-xs sm:text-sm font-bold text-[#B91C1C] dark:text-[#FCA5A5] handwritten-font">
-                            📌 {def}
+                          <div key={dIdx} className="p-3 rounded-xl bg-red-500/5 border-l-4 border-red-500 text-xs sm:text-sm font-bold text-[#B91C1C] dark:text-[#FCA5A5] handwritten-font flex items-start gap-1.5">
+                            <span>📌</span>
+                            <MathText text={def} className="flex-1" />
                           </div>
                         ))}
                       </div>
@@ -1635,7 +1705,7 @@ export default function NotebookNotesView({
                       {concept.points.map((pt, pIdx) => (
                         <li key={pIdx} className="text-sm md:text-base handwritten-font flex items-start gap-2.5 text-[#1E3A8A] dark:text-[#93C5FD]">
                           <span className="text-blue-500 font-bold">•</span>
-                          <span className="flex-1 min-w-0 leading-relaxed">{pt}</span>
+                          <MathText text={pt} className="flex-1 min-w-0 leading-relaxed" />
                         </li>
                       ))}
                     </ul>
@@ -1661,7 +1731,7 @@ export default function NotebookNotesView({
                           {(concept.table.rows || []).map((row, ri) => (
                             <tr key={ri} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-100/50">
                               {row.map((cell, ci) => (
-                                <td key={ci} className="p-2.5 font-sans">{cell}</td>
+                                <td key={ci} className="p-2.5 font-sans"><MathText text={cell} /></td>
                               ))}
                             </tr>
                           ))}
@@ -1686,7 +1756,7 @@ export default function NotebookNotesView({
                       {concept.teacher_tips.map((tip, tIdx) => (
                         <div key={tIdx} className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/30 text-xs sm:text-sm font-semibold text-[#C2410C] dark:text-[#FDBA74] handwritten-font flex items-start gap-2">
                           <Lightbulb className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                          <span>{tip}</span>
+                          <MathText text={tip} className="flex-1" />
                         </div>
                       ))}
                     </div>

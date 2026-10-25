@@ -415,11 +415,19 @@ export default function MultilingualChatbot({
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
     } catch (err) {
-      console.warn('Doubt solver fallback:', err.message);
-      const fallback = `[OmniStudy AI Tutor]:\n1. Core Concept: Pehle physical intuition aur boundary conditions check karein.\n2. Step-by-Step Method: Given values ko SI units me convert karein -> Governing equation apply karein -> Calculation simplify karein.\n3. Exam Tip: Option elimination aur dimensional analysis se 50% multiple choice questions 30 seconds me solve ho jate hain!`;
+      console.warn('Doubt solver error:', err.message);
+      const errorDetail = err.response?.data?.error || err.message;
+      let displayMsg = '';
+      if (/quota|429/i.test(errorDetail)) {
+        displayMsg = '⚠️ Gemini API Quota Limit reach ho gaya hai. Please 30 seconds wait karein aur fir se doubt poochhein.';
+      } else if (/network|offline|failed to fetch/i.test(errorDetail)) {
+        displayMsg = '🌐 Server connection issue: Please check internet connection or backend server status.';
+      } else {
+        displayMsg = `[OmniStudy AI Tutor]:\n- Core intuition: Pehle given parameters aur physical boundary conditions check karein.\n- Step-by-Step: Given values ko standard SI units me convert karke governing equation apply karein.\n- Exam Tip: Option elimination aur dimensional analysis se answer verify karein!\n\n(AI Tutor Notice: ${errorDetail || 'Response generated'})`;
+      }
       setMessages(prev => [...prev, {
         sender: 'ai',
-        text: fallback,
+        text: displayMsg,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
     } finally {
@@ -444,7 +452,21 @@ export default function MultilingualChatbot({
       const utterance = new SpeechSynthesisUtterance(text.replace(/\\\[|\\\]|\\\(|\\\)/g, ''));
       utterance.rate = 1.0;
       const l = (selectedLang || 'Hinglish').toLowerCase();
-      utterance.lang = l.includes('hindi') ? 'hi-IN' : 'en-US';
+      const voices = window.speechSynthesis.getVoices();
+      if (l.includes('hindi')) {
+        utterance.lang = 'hi-IN';
+        const hiVoice = voices.find(v => v.lang.includes('hi') || /hindi/i.test(v.name));
+        if (hiVoice) utterance.voice = hiVoice;
+      } else if (l.includes('hinglish')) {
+        utterance.lang = 'en-IN';
+        const inVoice = voices.find(v => v.lang === 'en-IN' || /india|heera|neerja|swara|ravi/i.test(v.name)) ||
+                        voices.find(v => v.lang.includes('hi') || /hindi/i.test(v.name));
+        if (inVoice) utterance.voice = inVoice;
+      } else {
+        utterance.lang = 'en-US';
+        const enVoice = voices.find(v => v.lang === 'en-US' || v.lang.startsWith('en'));
+        if (enVoice) utterance.voice = enVoice;
+      }
       utterance.onend = () => setSpeakingIdx(null);
       utterance.onerror = () => setSpeakingIdx(null);
       window.speechSynthesis.speak(utterance);

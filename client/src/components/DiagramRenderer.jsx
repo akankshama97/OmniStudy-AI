@@ -85,17 +85,20 @@ export default function DiagramRenderer({
       svg = svg.replace('<svg', '<svg viewBox="0 0 540 220"');
     }
 
-    // Dark/Light mode color replacements for readability
+    // Dark/Light mode color replacements for high contrast and readability
     if (isDark) {
-      svg = svg.replace(/fill=["']#?000000["']/gi, 'fill="#F8FAFC"')
-               .replace(/fill=["']black["']/gi, 'fill="#F8FAFC"')
-               .replace(/stroke=["']#?000000["']/gi, 'stroke="#93C5FD"')
-               .replace(/stroke=["']black["']/gi, 'stroke="#93C5FD"');
+      svg = svg
+        .replace(/fill=["'](?:#ffffff|#faf8f5|#f8fafc|#f1f5f9|white)["']/gi, 'fill="rgba(255,255,255,0.06)"')
+        .replace(/fill=["']rgba\(15,\s*23,\s*42,\s*0\.04\)["']/gi, 'fill="rgba(255,255,255,0.06)"')
+        .replace(/fill=["']#(?:000000|0f172a|1e293b|334155|475569|111827|1e3a8a|0f1626)["']/gi, 'fill="#F8FAFC"')
+        .replace(/fill=["']black["']/gi, 'fill="#F8FAFC"')
+        .replace(/fill=["']#(?:64748b|94a3b8)["']/gi, 'fill="#CBD5E1"')
+        .replace(/stroke=["']#(?:000000|0f172a|1e293b|334155|475569|cbd5e1)["']/gi, 'stroke="#38BDF8"')
+        .replace(/stroke=["']black["']/gi, 'stroke="#38BDF8"');
     } else {
-      svg = svg.replace(/fill=["']#?ffffff["']/gi, 'fill="#0F172A"')
-               .replace(/fill=["']white["']/gi, 'fill="#0F172A"')
-               .replace(/stroke=["']#?ffffff["']/gi, 'stroke="#1E3A8A"')
-               .replace(/stroke=["']white["']/gi, 'stroke="#1E3A8A"');
+      svg = svg
+        .replace(/fill=["']#(?:ffffff|fff)["'](?=\s*[^>]*>[\s\S]*?<\/text>)/gi, 'fill="#0F172A"')
+        .replace(/stroke=["']#(?:ffffff|fff)["']/gi, 'stroke="#CBD5E1"');
     }
 
     return svg;

@@ -383,14 +383,20 @@ export async function generateNotePdfBuffer(note) {
       // ════════════════════════════════════════════════════════════
       try {
         const pages = doc.bufferedPageRange();
-        for (let i = 0; i < pages.count; i++) {
-          doc.switchToPage(i);
-          doc.fillColor('#64748B').fontSize(8).text(
-            `OmniStudy AI Master Notes  •  Page ${i + 1} of ${pages.count}  •  https://omni-study-ai-lilac.vercel.app/`,
-            CONTENT_LEFT,
-            800,
-            { align: 'center', width: CONTENT_WIDTH }
-          );
+        const start = typeof pages.start === 'number' ? pages.start : 0;
+        const total = typeof pages.count === 'number' ? pages.count : 0;
+        for (let i = start; i < start + total; i++) {
+          try {
+            doc.switchToPage(i);
+            doc.fillColor('#64748B').fontSize(8).text(
+              `OmniStudy AI Master Notes  •  Page ${i - start + 1} of ${total}  •  https://omni-study-ai-lilac.vercel.app/`,
+              CONTENT_LEFT,
+              800,
+              { align: 'center', width: CONTENT_WIDTH }
+            );
+          } catch (pErr) {
+            // Safe ignore if page out of buffer range
+          }
         }
       } catch (fErr) {
         console.warn('[pdfService] Footer numbering notice:', fErr.message);

@@ -427,3 +427,62 @@
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
+
+/* ── Dynamic Student Copy Font Sizing (A-, A, A+) ── */
+.font-size-small {
+  font-size: 0.86rem !important;
+}
+.font-size-small .handwritten-font,
+.font-size-small p,
+.font-size-small li,
+.font-size-small td,
+.font-size-small span:not(.font-mono):not(.w-5):not(.w-4):not(.w-3) {
+  font-size: 0.86rem !important;
+}
+.font-size-small h2 {
+  font-size: 1.35rem !important;
+}
+.font-size-small h3 {
+  font-size: 1.15rem !important;
+}
+
+.font-size-normal {
+  font-size: 1rem;
+}
+
+.font-size-large {
+  font-size: 1.18rem !important;
+}
+.font-size-large .handwritten-font,
+.font-size-large p,
+.font-size-large li,
+.font-size-large td,
+.font-size-large span:not(.font-mono):not(.w-5):not(.w-4):not(.w-3) {
+  font-size: 1.18rem !important;
+}
+.font-size-large h2 {
+  font-size: 1.95rem !important;
+}
+.font-size-large h3 {
+  font-size: 1.55rem !important;
+}
+
+/* Global & PDF-Export Break Protection for Clean Continuous PDF */
+.formula-box,
+.diagram-container,
+.table-container,
+.solved-example-box,
+.pyq-item,
+.teacher-tip-box,
+.common-mistake-box,
+.pdf-export-mode .formula-box,
+.pdf-export-mode .diagram-container,
+.pdf-export-mode .table-container,
+.pdf-export-mode .solved-example-box,
+.pdf-export-mode .pyq-item,
+.pdf-export-mode .teacher-tip-box,
+.pdf-export-mode .common-mistake-box,
+.pdf-export-mode svg {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}

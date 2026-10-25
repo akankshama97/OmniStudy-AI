@@ -1082,12 +1082,13 @@ TRANSCRIPT & LECTURE SPOKEN CONTENT:
 "${transcriptContext}"
 
 CRITICAL INSTRUCTIONS (MUST MATCH THE EXACT DEPTH & QUALITY OF TOPPER DEMO NOTES):
-0. ORIGINAL SYNTHESIS (ANTI-RECITATION): Do NOT quote or reproduce transcript sentences verbatim. Synthesize, teach, explain, and write original topper student notes in natural, engaging Hinglish with simple analogies.
+0. STRICT FIDELITY (NO OUTSIDE TOPICS): Cover ONLY topics, concepts, theorems, derivations, and examples ACTUALLY taught in this specific lecture. Do NOT hallucinate or introduce syllabus topics that the teacher did not teach in this video.
+0.1 ORIGINAL SYNTHESIS (ANTI-RECITATION): Do NOT quote or reproduce transcript sentences verbatim. Synthesize, teach, explain, and write original topper student notes in crystal-clear style with simple analogies.
 1. PRODUCE 6 TO 10 COMPREHENSIVE KEY CONCEPTS covering the chronological flow of the lecture from start to finish.
    - Headings must be exact, specific, scientific/academic sub-topics (e.g., "1. Principle of Operation & Working", "2. Mathematical Derivation of Governing Equation", "3. System Architecture & Block Diagram", "4. Step-by-Step Solved Problem").
    - NEVER use generic placeholders like "Topic 1" or repeat the lecture title.
-2. 6 TO 10 DETAILED POINTS PER CONCEPT combining theory, derivations, and reasoning with bold (**bold**) technical terms.
-3. INCLUDE SELF-CONTAINED SVG DIAGRAMS (<svg viewBox="0 0 540 220" xmlns="http://www.w3.org/2000/svg">...</svg>) for concepts with drawings, circuits, block diagrams, flowcharts, or plots.
+2. 6 TO 10 DETAILED POINTS PER CONCEPT combining theory, derivations, and reasoning with bold (**bold**) technical terms. All mathematical equations inside points must use standard LaTeX ($...$ or $$...$$).
+3. INCLUDE SELF-CONTAINED SVG DIAGRAMS (<svg viewBox="0 0 540 220" xmlns="http://www.w3.org/2000/svg">...</svg>) for concepts with drawings, circuits, block diagrams, flowcharts, or plots. Ensure diagrams use high-contrast strokes and fills compatible with dark and light themes.
 4. EXTRACT 3 TO 8 OFFICIAL FORMULAS in LaTeX with name, variables, and "whenToUse" in exams.
 5. CURATE 5 REAL PREVIOUS YEAR EXAM QUESTIONS (PYQs) with exam tag (e.g. AKTU, CBSE, GATE, JEE, DU, VTU), year, marks, 4 options (A, B, C, D), correct answer, and detailed step-by-step explanation!
 6. INCLUDE SPEED SHORTCUTS, TEACHER MEMORY TIPS ("ye exam me aata hai"), and COMMON STUDENT TRAPS to avoid.
@@ -1763,7 +1764,7 @@ Keep your tone motivating and academic.`;
     };
   }
 
-  return await executeGeminiPrompt(prompt, imagePart);
+  return await executeGeminiPrompt(prompt, imagePart, false);
 };
 
 /**
@@ -2011,5 +2012,5 @@ ${languageFormatting}
 
 Tone: Friendly, patient, motivating, structured. Use markdown formatting with bold headings for readability.`;
 
-  return await executeGeminiPrompt(prompt);
+  return await executeGeminiPrompt(prompt, null, false);
 };
