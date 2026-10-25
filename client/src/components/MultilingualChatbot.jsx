@@ -7,12 +7,26 @@ import {
 } from 'lucide-react';
 import { solveDoubt, solveTimestampTutorApi, fetchTranscriptSnippetApi } from '../services/api';
 
-const QUICK_PROMPTS = [
-  { label: "Bhai simple Hinglish me samjha do", prompt: "Mujhe ye topic super simple bhasha me real life example ke saath samjha do bhai!" },
-  { label: "Exam Memory Trick / Mnemonic do", prompt: "Is topic ko exam tak yaad rakhne ke liye koi solid shortcut trick ya mnemonic batao!" },
-  { label: "Step-by-step Numerical Example", prompt: "Is concept par ek standard exam numerical question step-by-step formula explain karte hue solve karo." },
-  { label: "Common Mistakes to Avoid in Exam", prompt: "Students is concept ke questions me sabse zyada kya silly mistake karte hain? Exam alert points batao." }
-];
+const MULTILINGUAL_QUICK_PROMPTS = {
+  English: [
+    { label: "Explain simply with an analogy", prompt: "Explain this topic in super simple terms using an intuitive everyday analogy!" },
+    { label: "Exam Memory Trick / Mnemonic", prompt: "Give me a high-yield memory trick or mnemonic to remember this concept for exams." },
+    { label: "Step-by-step Numerical Problem", prompt: "Walk me step-by-step through a standard exam numerical problem on this concept." },
+    { label: "Common Traps & Mistakes", prompt: "What are the common student traps and pitfalls to avoid when answering exam questions on this?" }
+  ],
+  Hindi: [
+    { label: "सरल हिंदी में समझाइए", prompt: "कृपया इस विषय को दैनिक जीवन के एक सरल उदाहरण के साथ विस्तार से समझाइए।" },
+    { label: "परीक्षा याद रखने की ट्रिक", prompt: "परीक्षा के लिए इस टॉपिक को याद रखने की कोई आसान शॉर्टकट ट्रिक या सूत्र बताइए।" },
+    { label: "स्टेप-बाय-स्टेप न्यूमेरिकल हल", prompt: "इस सिद्धांत पर आधारित एक महत्वपूर्ण परीक्षा न्यूमेरिकल प्रश्न चरणबद्ध तरीके से हल करें।" },
+    { label: "सामान्य गलतियाँ जो न करें", prompt: "परीक्षा में छात्र इस टॉपिक में क्या सामान्य गलतियाँ करते हैं और उनसे कैसे बचें?" }
+  ],
+  Hinglish: [
+    { label: "Bhai simple Hinglish me samjha do", prompt: "Mujhe ye topic super simple bhasha me real life example ke saath samjha do bhai!" },
+    { label: "Exam Memory Trick / Mnemonic do", prompt: "Is topic ko exam tak yaad rakhne ke liye koi solid shortcut trick ya mnemonic batao!" },
+    { label: "Step-by-step Numerical Example", prompt: "Is concept par ek standard exam numerical question step-by-step formula explain karte hue solve karo." },
+    { label: "Common Mistakes to Avoid in Exam", prompt: "Students is concept ke questions me sabse zyada kya silly mistake karte hain? Exam alert points batao." }
+  ]
+};
 
 /**
  * Rich Text & KaTeX Renderer for Mathematical Expressions & Code
@@ -138,6 +152,39 @@ export default function MultilingualChatbot({
   const [tutorTimestamp, setTutorTimestamp] = useState('00:00');
   const [tutorTranscript, setTutorTranscript] = useState('');
   const [tutorDoubt, setTutorDoubt] = useState('');
+
+  // Handle immediate chat greeting update on language toggle
+  const prevLangRef = useRef(selectedLang);
+  useEffect(() => {
+    if (prevLangRef.current !== selectedLang) {
+      prevLangRef.current = selectedLang;
+      const langNotice = selectedLang === 'Hindi'
+        ? '🌐 भाषा बदलकर "हिंदी (Devanagari)" कर दी गई है। अब आप प्रश्न हिंदी में पूछ सकते हैं!'
+        : selectedLang === 'English'
+        ? '🌐 Language switched to "English". AI Tutor will now reply in English!'
+        : '🌐 Language switched to "Hinglish". Ab AI tutor aapse natural Hinglish me baat karega!';
+      
+      setMessages(prev => {
+        if (prev.length <= 1 && prev[0]?.sender === 'ai') {
+          return [{
+            sender: 'ai',
+            text: getGreeting(selectedLang),
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isTimestampTutor: false
+          }];
+        }
+        return [
+          ...prev,
+          {
+            sender: 'ai',
+            text: langNotice,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isSystemNotice: true
+          }
+        ];
+      });
+    }
+  }, [selectedLang]);
   const [isFetchingSnippet, setIsFetchingSnippet] = useState(false);
 
   // General Chat state
@@ -524,7 +571,7 @@ export default function MultilingualChatbot({
                     onClick={() => onChangeLanguage && onChangeLanguage(langId)}
                     className={`px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all ${
                       (selectedLang || 'English').toLowerCase() === langId.toLowerCase()
-                        ? 'bg-white dark:bg-[#1B2640] text-[#0F172A] dark:text-[#F8FAFC] shadow-sm'
+                        ? 'bg-[#2563EB] text-white shadow-xs font-bold'
                         : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
                     }`}
                   >

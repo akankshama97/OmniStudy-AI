@@ -1728,11 +1728,15 @@ export const solveStudentDoubt = async (
   imageBase64 = null,
   imageMimeType = 'image/jpeg'
 ) => {
-  const langInstruction = language.toLowerCase() === 'hinglish'
-    ? 'Reply in engaging, friendly Hinglish (conversational Hindi in Roman script mixed with clear English technical words) like a helpful senior bhaiya/didi tutor.'
-    : language.toLowerCase() === 'hindi'
-    ? 'Reply in clear Hindi with standard technical terms.'
-    : 'Reply in clear, student-friendly English.';
+  const normLang = (language || 'Hinglish').toLowerCase();
+  let langInstruction = '';
+  if (normLang.includes('hindi')) {
+    langInstruction = 'CRITICAL LANGUAGE RULE: You MUST write your ENTIRE explanation in HINDI using Devanagari script (शुद्ध और सरल हिन्दी). Explain every single point in Hindi. Do NOT write sentences in English. Only mathematical formulas ($...$) and specific technical acronyms should be in Latin/English.';
+  } else if (normLang.includes('eng')) {
+    langInstruction = 'CRITICAL LANGUAGE RULE: You MUST write your ENTIRE explanation in clear, academic, student-friendly ENGLISH. Do NOT mix any Hindi words or Devanagari script.';
+  } else {
+    langInstruction = 'CRITICAL LANGUAGE RULE: You MUST write in natural, engaging HINGLISH (conversational Hindi written in Roman/Latin script + standard English technical terms, as used by premier Kota teachers and toppers). Example: "Pehle hum given values ko identify karke SI unit me likhenge..."';
+  }
 
   let contextStr = '';
   if (videoContext) {
@@ -1986,31 +1990,64 @@ export const solveTimestampTutorQuery = async ({
 - Hindi words in Roman script, technical terms in English (e.g. velocity, acceleration, derivation, step). Friendly, patient senior tutor tone.`;
   }
 
-  const prompt = `Tum ek friendly aur patient AI tutor ho. Ek student YouTube lecture dekh rha tha aur ek particular timestamp pe use kuch samajh nahi aaya. Tumhara kaam hai us specific hisse ko saral tarike se samjhana.
+  let prompt = '';
+  if (normLang.includes('hindi')) {
+    prompt = `आप एक विशेषज्ञ और अत्यंत धैर्यवान AI ट्यूटर हैं। एक छात्र यूट्यूब लेक्चर देख रहा था और टाइमस्टैम्प [${timestamp || '00:00'}] पर उसे कुछ समझ नहीं आया। आपका कार्य उस विशिष्ट अवधारणा या प्रश्न को बहुत सरल और सटीक हिन्दी में समझाना है।
 
-Tumhe ye info mili hai:
+महत्वपूर्ण जानकारी:
+- वीडियो शीर्षक: "${videoTitle || 'यूट्यूब लेक्चर'}"
+- छात्र का टाइमस्टैम्प: [${timestamp || '00:00'}]
+- उस समय का ट्रांसक्रिप्ट:
+"""
+${transcriptSnippet || '(ट्रांसक्रिप्ट उपलब्ध नहीं है)'}
+"""
+- छात्र का प्रश्न / संदेह: "${studentDoubt || 'इस टाइमस्टैम्प पर शिक्षक क्या समझा रहे हैं, कृपया विस्तार से समझाइए।'}"
+
+अनिवार्य नियम:
+1. भाषा: आपका पूरा उत्तर केवल और केवल हिन्दी (देवनागरी लिपि) में होना चाहिए। तकनीकी शब्दों को कोष्ठक में अंग्रेजी में लिख सकते हैं।
+2. केवल उसी टाइमस्टैम्प के विषय पर ध्यान केंद्रित करें।
+3. पहले 2-3 पंक्तियों में बताएं कि शिक्षक उस क्षण क्या सिद्ध या समझा रहे थे।
+4. हर चरण का कारण (WHY) बताएं, केवल निष्कर्ष नहीं। सूत्रों को स्वच्छ LaTeX में लिखें।
+5. दैनिक जीवन का एक उदाहरण या सादृश्य दें।
+6. अंत में छात्र की समझ परखने के लिए एक छोटा प्रश्न पूछें।`;
+  } else if (normLang.includes('eng')) {
+    prompt = `You are an expert, encouraging academic AI tutor. A student was watching a lecture and got stuck at timestamp [${timestamp || '00:00'}]. Your job is to break down that specific segment clearly.
+
+Context Information:
+- Video Title: "${videoTitle || 'Lecture Video'}"
+- Timestamp: [${timestamp || '00:00'}]
+- Transcript around this moment:
+"""
+${transcriptSnippet || '(No transcript snippet available)'}
+"""
+- Student Doubt: "${studentDoubt || 'What is being explained at this timestamp? Please explain step-by-step.'}"
+
+Strict Instructions:
+1. Language: Answer ENTIRELY in clear, academic, student-friendly ENGLISH. Do NOT use any Hindi words.
+2. Focus strictly on what happens at [${timestamp || '00:00'}].
+3. First 2-3 sentences: Explain the core idea the teacher was demonstrating at this moment.
+4. Step-by-step reasoning: Explain the "WHY" behind every mathematical or conceptual step, not just the "WHAT".
+5. Real-life analogy: Provide an intuitive everyday analogy.
+6. Concept check: End with a quick question to verify understanding.`;
+  } else {
+    prompt = `Tum ek friendly aur patient senior AI tutor ho. Ek student YouTube lecture dekh rha tha aur timestamp [${timestamp || '00:00'}] pe stuck ho gaya. Tumhara kaam hai us specific hisse ko Hinglish me crystal-clear explain karna.
+
+Info:
 - Video Title: "${videoTitle || 'YouTube Lecture'}"
-- Student ka Timestamp: [${timestamp || '00:00'}]
-- Us timestamp ke aas-paas ka Transcript:
+- Timestamp: [${timestamp || '00:00'}]
+- Transcript:
 """
 ${transcriptSnippet || '(No transcript provided)'}
 """
-- Student ka Doubt: "${studentDoubt || 'Is timestamp par kya explain kiya jaa raha hai, mujhe clear nahi hua. Please detail me samjhao.'}"
+- Student Doubt: "${studentDoubt || 'Is timestamp par kya explain kiya jaa raha hai, mujhe clear nahi hua. Detail me samjhao.'}"
 
-Strict Rules jo tumhe follow karne hain:
-1. Sirf us timestamp ke concept/question pe focus karo, pura lecture mat samjhao.
-2. Pehle 2-3 line me batao ki us waqt [${timestamp || '00:00'}] teacher kya samjha rha tha ya kya solve kar rha tha.
-3. Phir step-by-step samjhao. Agar question/derivation solve ho rha hai to har step ka "kyu" (WHY) batao, sirf "kya" (WHAT) nahi. Har formula ko clean LaTeX me likho (jaise \\( F = ma \\) ya display mode me).
-4. Agar koi prerequisite concept missing lagta hai jiski wajah se confusion ho sakta hai, to use alag se short me batao ("Prerequisite Check" / "Pehle ye clear karo").
-5. Ek simple example ya analogy do jo student ki daily life se related ho.
-6. Last me ek chhota check-question pucho taaki student confirm kare ki samajh aaya.
-7. Transcript auto-generated hai, isme spelling mistakes ho sakti hain. Context se sahi samjho.
-8. Agar transcript me info kam ya unclear hai, to guess mat karo. Saaf bolo ki kya clear nahi hai aur student se detail maango.
-9. Answer me jahan zarurat ho timestamp cite karo, jaise [${timestamp || '00:00'}].
-
-${languageFormatting}
-
-Tone: Friendly, patient, motivating, structured. Use markdown formatting with bold headings for readability.`;
+Strict Rules:
+1. Language: Reply in natural Hinglish (conversational Hindi in Roman script + English technical terms).
+2. Focus strictly on timestamp [${timestamp || '00:00'}].
+3. Explain why the teacher took each step, and format formulas in clean LaTeX.
+4. Relatable real-life analogy do.
+5. End with a quick check-question.`;
+  }
 
   return await executeGeminiPrompt(prompt, null, false);
 };

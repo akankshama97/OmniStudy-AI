@@ -90,7 +90,12 @@ export default function App() {
   // Language switching helper
   const handleChangeLanguage = async (newLang) => {
     setSelectedLang(newLang);
-    if (!currentNote) return;
+    try {
+      localStorage.setItem('omnistudy_selected_lang', newLang);
+    } catch (e) {}
+
+    // Only attempt note re-translation if actively on the notes generator tab
+    if (activeTab !== 'generator' || !currentNote) return;
 
     // Check sample presets (presets and demos)
     const sampleIds = ['dstl-full-playlist-ebook', 'coa-unit-1', 'kKKM8Y-u7ds', 'RBSGKlAoi3w'];

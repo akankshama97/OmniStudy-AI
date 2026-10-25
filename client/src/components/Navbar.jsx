@@ -116,10 +116,10 @@ export default function Navbar({
                   key={id}
                   type="button"
                   onClick={() => setSelectedLang(id)}
-                  className={`px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all duration-150 ${
+                  className={`px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all duration-150 cursor-pointer ${
                     isSelected
-                      ? 'bg-white dark:bg-[#1B2640] text-[#0F172A] dark:text-[#F8FAFC] shadow-sm'
-                      : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-[#F8FAFC]'
+                      ? 'bg-[#2563EB] text-white shadow-xs font-extrabold'
+                      : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-[#F8FAFC] hover:bg-slate-200/50 dark:hover:bg-slate-800/50'
                   }`}
                   title={title}
                 >
