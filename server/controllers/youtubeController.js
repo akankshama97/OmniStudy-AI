@@ -702,13 +702,12 @@ function createEmergencyFallbackNote(videoId, videoTitle, videoDetails, transcri
         }
       }
 
-      const points = sentences.length >= 4
-        ? sentences.slice(0, 10)
+      const points = sentences.length >= 3
+        ? sentences.slice(0, 8)
         : [
-            `${cleanTitle} ke core concepts aur fundamental parameters board par systematically explain kiye gaye.`,
-            `Step-by-step mathematical reasoning establish karti hai ki standard boundary conditions satisfy ho sakein.`,
-            `Theoretical foundations se practical problem-solving logic derive hota hai.`,
-            `Exam evaluation perspective se har derivation me units aur conditions specify karna compulsory hai.`
+            `${heading} ke main principles aur practical applications board par explain kiye gaye.`,
+            `Key derivations aur operational formulas step-by-step follow karte hain.`,
+            `Important examination criteria aur scoring techniques highlight kiye gaye.`
           ];
 
       const cleanHeading = `${idx + 1}. ${heading.replace(/^\d+[\.\:\-\s]*/, '')}`;
@@ -730,20 +729,19 @@ function createEmergencyFallbackNote(videoId, videoTitle, videoDetails, transcri
         timestamp_start: chunk.startTime || `0${idx * 8}:00`,
         timestamp_end: chunk.endTime || `0${(idx + 1) * 8}:00`,
         heading: cleanHeading,
-        subheading: `Classroom board derivation and micro-operations [${chunk.startTime} - ${chunk.endTime}]`,
-        definitions: [`${heading}: Core academic principle establishing relationships between key system parameters.`],
+        subheading: `Classroom board derivation [${chunk.startTime} - ${chunk.endTime}]`,
+        definitions: [`${heading}: Key foundational relationship explained by the educator.`],
         points: points,
         formulas: genuineFormulas,
         diagram: generateFallbackDiagram(heading, subject),
         solved_example: null,
         teacher_tips: [
-          "Teacher exam tip: Always draw neat block diagrams with clear input, control, and data paths.",
-          "University Exams: Specify boundary conditions and standard notations to secure full step marks."
+          `Exam tip for ${heading}: Har intermediate derivation step par units aur boundary conditions specify karein.`
         ],
         common_mistake: {
-          mistake: "Confusing architectural control lines with standard data buses.",
-          whyWrong: "Leads to loss of conceptual marks in university evaluations.",
-          correction: "Clearly label control lines (dashed) and data paths (solid arrows) in diagrams."
+          mistake: `Numerical solving mein standard units aur signs verify na karna.`,
+          whyWrong: "Step-marking mein marks cut hote hain.",
+          correction: "Hamesha final answer likhte waqt standard notation aur units mention karein."
         }
       });
     });
