@@ -50,16 +50,7 @@ const PRESET_VIDEOS = [
   }
 ];
 
-const POPULAR_EXAMS = [
-  "Auto-detect",
-  "AKTU B.Tech",
-  "JEE Main / Adv",
-  "NEET",
-  "GATE",
-  "CBSE 9-12"
-];
-
-const ALL_EXAMS = [
+const EXAM_OPTIONS = [
   "Auto-detect",
   "AKTU B.Tech (Semester Exams)",
   "JEE Main / Adv",
@@ -94,7 +85,6 @@ export default function YouTubeInput({
   const [inputMode, setInputMode] = useState('lecture'); // 'lecture' | 'playlist'
   const [selectedExam, setSelectedExam] = useState('Auto-detect');
   const [otherExamText, setOtherExamText] = useState('');
-  const [showAllExams, setShowAllExams] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
   const [copiedPaste, setCopiedPaste] = useState(false);
 
@@ -247,10 +237,10 @@ export default function YouTubeInput({
             </button>
           </div>
 
-          {/* Exam Selector Chips (Compact single row) */}
+          {/* Exam Selector Chips (All Target Exams Visible) */}
           <div className="flex items-center gap-1.5 flex-wrap pt-1 text-xs">
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mr-1">Target Exam:</span>
-            {(showAllExams ? ALL_EXAMS : POPULAR_EXAMS).map(exam => (
+            {EXAM_OPTIONS.map(exam => (
               <button
                 key={exam}
                 type="button"
@@ -264,16 +254,6 @@ export default function YouTubeInput({
                 {exam}
               </button>
             ))}
-
-            {!showAllExams && (
-              <button
-                type="button"
-                onClick={() => setShowAllExams(true)}
-                className="text-[11px] text-[#2563EB] dark:text-[#60A5FA] hover:underline font-semibold px-1 cursor-pointer"
-              >
-                + More Exams
-              </button>
-            )}
           </div>
 
           {/* Free text input if 'Other' is chosen */}

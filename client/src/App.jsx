@@ -214,10 +214,10 @@ export default function App() {
                       setCurrentNote(null);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="px-3 py-1 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#131B2E] text-slate-600 dark:text-slate-300 hover:text-red-500 hover:border-red-300 dark:hover:border-red-500/40 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95"
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#131B2E] text-slate-700 dark:text-slate-300 hover:text-red-600 hover:border-red-400 dark:hover:border-red-500/50 transition-all shadow-xs cursor-pointer active:scale-95"
                     title="Close notes and return to example cards"
                   >
-                    <span>✕ Close Notes</span>
+                    <span>Close Notes</span>
                   </button>
                   <span className="text-[11px] font-mono text-[#2563EB] dark:text-[#60A5FA] bg-[#EFF6FF] dark:bg-[#3B82F6]/20 px-3 py-1 rounded-full border border-[#2563EB]/20 font-bold hidden sm:inline">
                     Classroom Copy Canvas
@@ -248,10 +248,10 @@ export default function App() {
                       setCurrentNote(null);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="px-3 py-1 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shrink-0 cursor-pointer shadow-sm active:scale-95 transition-all flex items-center gap-1"
+                    className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shrink-0 cursor-pointer shadow-sm active:scale-95 transition-all"
                     title="Close notes and return to clean view"
                   >
-                    <span>✕ Close Notes</span>
+                    <span>Close Notes</span>
                   </button>
                 </div>
               </div>
