@@ -7,23 +7,22 @@ import {
 import { searchPYQs } from '../services/api';
 
 const POPULAR_SUBJECTS = [
-  { name: "Newton's Laws of Motion & Friction", exam: "JEE Main / Class 11" },
-  { name: "Thermodynamics & Carnot Cycle", exam: "JEE / NEET / B.Tech" },
-  { name: "Calculus: Integration & Definite Integrals", exam: "CBSE Class 12 / JEE" },
-  { name: "Binary Trees & BST Traversals", exam: "GATE / B.Tech CSE" },
-  { name: "Chemical Bonding & VSEPR Theory", exam: "NEET / CBSE Class 11" },
-  { name: "Indian Constitution: Fundamental Rights", exam: "UPSC / SSC / State PSC" }
+  { name: "Newton's Laws of Motion & Friction", exam: "JEE Main / Class 11", icon: "⚛️" },
+  { name: "Thermodynamics & Carnot Cycle", exam: "JEE / NEET / B.Tech", icon: "🔥" },
+  { name: "Calculus: Integration & Definite Integrals", exam: "CBSE Class 12 / JEE", icon: "∫" },
+  { name: "Binary Trees & BST Traversals", exam: "GATE / B.Tech CSE", icon: "🌳" },
+  { name: "Chemical Bonding & VSEPR Theory", exam: "NEET / CBSE Class 11", icon: "🧪" },
+  { name: "Digital Logic & Boolean Algebra", exam: "GATE / AKTU B.Tech", icon: "💻" }
 ];
 
 const SAMPLE_EXAMS = [
   "JEE Main & Advanced",
   "NEET UG",
   "CBSE Class 12 Board",
-  "UPSC Civil Services",
+  "AKTU B.Tech Semester",
   "SSC CGL",
   "GATE Computer Science",
-  "College Semester Exam",
-  "CUET UG"
+  "College Semester Exam"
 ];
 
 function KaTeXInline({ formula }) {
@@ -167,20 +166,20 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
   };
 
   return (
-    <div className="max-w-6xl mx-auto my-8 px-4">
+    <div className="max-w-6xl mx-auto my-6 sm:my-8 px-3 sm:px-4">
 
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#EFF6FF] dark:bg-[#3B82F6]/20 border border-[#2563EB]/20 text-[#2563EB] dark:text-[#60A5FA] text-xs font-semibold mb-3">
+      <div className="text-center mb-6 sm:mb-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFF6FF] dark:bg-[#3B82F6]/20 border border-[#2563EB]/20 text-[#2563EB] dark:text-[#60A5FA] text-xs font-semibold mb-2.5">
           <GraduationCap className="w-4 h-4" />
           <span>TOP 5 Exam Questions & Formula Engine</span>
         </div>
 
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-2 text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']">
           Search Exam PYQs & Formulas
         </h2>
 
-        <p className="text-[#334155] dark:text-[#CBD5E1] text-sm md:text-base max-w-xl mx-auto">
+        <p className="text-[#334155] dark:text-[#CBD5E1] text-xs sm:text-sm md:text-base max-w-xl mx-auto">
           Extract verified past year questions with 4 options, model answers, elimination shortcuts, and KaTeX formula cheat sheets.
         </p>
       </div>
@@ -188,7 +187,7 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
       {/* Search Bar */}
       <form
         onSubmit={handleSearch}
-        className="p-5 rounded-2xl border shadow-sm mb-6 space-y-4 bg-white dark:bg-[#131B2E] border-[#E2E8F0] dark:border-[#23314F]"
+        className="p-4 sm:p-5 rounded-2xl border shadow-sm mb-6 space-y-3 sm:space-y-4 bg-white dark:bg-[#131B2E] border-[#E2E8F0] dark:border-[#23314F]"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-[#2563EB]">
@@ -211,7 +210,7 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
             </label>
             <input
               type="text"
-              placeholder="e.g. JEE Main, NEET, CBSE 12th, UPSC, GATE"
+              placeholder="e.g. JEE Main, NEET, CBSE 12th, GATE, AKTU B.Tech"
               value={exam}
               onChange={(e) => setExam(e.target.value)}
               className="w-full bg-transparent text-sm text-[#0F172A] dark:text-[#F8FAFC] focus:outline-none placeholder-slate-400 dark:placeholder-slate-500"
@@ -259,23 +258,39 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
         </div>
       </form>
 
-      {/* Popular Subjects */}
+      {/* Popular Subjects Cards */}
       <div className="mb-8">
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#64748B] dark:text-[#94A3B8] mb-3">
-          Popular Topics (Click to Instant Search):
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB] dark:text-[#60A5FA] font-mono flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Suggested Exam Topics</span>
+          </span>
+          <span className="text-[11px] text-slate-400 font-mono">
+            Click any card to auto-search
+          </span>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
           {POPULAR_SUBJECTS.map((subj, idx) => (
-            <button
+            <div
               key={idx}
               onClick={() => handleQuickSubjectClick(subj)}
-              className="px-3 py-1.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-white dark:bg-[#131B2E] hover:border-[#2563EB] text-xs font-semibold text-[#0F172A] dark:text-[#F8FAFC] hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-all flex items-center gap-2 shadow-sm"
+              className="p-3 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-white dark:bg-[#131B2E] hover:border-[#2563EB] dark:hover:border-[#3B82F6] hover:shadow-sm cursor-pointer transition-all flex items-center justify-between gap-2 group"
             >
-              <span>{subj.name}</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#EFF6FF] dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#60A5FA] font-mono">
-                {subj.exam}
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-lg shrink-0">{subj.icon}</span>
+                <div className="min-w-0">
+                  <h4 className="text-xs font-bold text-[#0F172A] dark:text-[#F8FAFC] group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors truncate">
+                    {subj.name}
+                  </h4>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    {subj.exam}
+                  </span>
+                </div>
+              </div>
+              <span className="text-[#2563EB] dark:text-[#60A5FA] text-xs font-bold shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                →
               </span>
-            </button>
+            </div>
           ))}
         </div>
       </div>

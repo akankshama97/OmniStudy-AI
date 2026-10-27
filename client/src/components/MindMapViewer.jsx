@@ -255,6 +255,25 @@ export default function MindMapViewer({
 
   const handleMouseUp = () => setIsDragging(false);
 
+  // Mobile Touch Pan Controls
+  const handleTouchStart = (e) => {
+    if (e.target.closest('button') || e.target.closest('.interactive-node')) return;
+    if (e.touches && e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.touches[0].clientX - pan.x, y: e.touches[0].clientY - pan.y });
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging || !e.touches || e.touches.length !== 1) return;
+    setPan({
+      x: e.touches[0].clientX - dragStart.x,
+      y: e.touches[0].clientY - dragStart.y
+    });
+  };
+
+  const handleTouchEnd = () => setIsDragging(false);
+
   const handleWheel = (e) => {
     e.preventDefault();
     const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
@@ -496,7 +515,10 @@ export default function MindMapViewer({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
-        className={`w-full h-[580px] rounded-2xl border overflow-hidden relative select-none cursor-grab active:cursor-grabbing transition-colors ${
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className={`w-full h-[420px] sm:h-[580px] rounded-2xl border overflow-hidden relative select-none cursor-grab active:cursor-grabbing transition-colors ${
           isDark ? 'bg-[#070B14] border-[#1B253B]' : 'bg-[#F8FAFC] border-slate-200'
         }`}
       >

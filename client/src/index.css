@@ -125,6 +125,16 @@
     box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-color);
   }
 
+  /* Mobile Phone Responsive Paper Texture Adjustment */
+  @media (max-width: 640px) {
+    .ruled-paper, .dark-ruled-paper {
+      background-image:
+        linear-gradient(90deg, transparent 24px, var(--paper-margin) 24px, var(--paper-margin) 26px, transparent 26px),
+        linear-gradient(var(--paper-line) 1.2px, transparent 0);
+      background-size: 100% 100%, 100% 1.85rem;
+    }
+  }
+
   /* 2. Engineering Graph / Grid Paper */
   .grid-paper {
     background-color: #F8FAFC;
@@ -494,4 +504,42 @@
 .pdf-export-mode svg {
   break-inside: avoid !important;
   page-break-inside: avoid !important;
+}
+
+/* ── Mobile Phone & Laptop Cross-Device Responsive Rules ── */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+/* Ensure KaTeX math formulas never overflow or break mobile layout */
+.katex-display {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  max-width: 100% !important;
+  padding: 6px 0 !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.katex {
+  max-width: 100%;
+  text-rendering: auto;
+}
+
+/* Prevent tables and diagram containers from overflowing screen width */
+.table-container,
+.diagram-container,
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Smooth touch scrolling for horizontal pill bars */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }

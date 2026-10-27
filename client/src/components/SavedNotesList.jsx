@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import {
   Library, BookOpen, Clock, ChevronRight, RefreshCw,
   Search, Award, Zap, Sparkles, Trash2, AlertTriangle, FileText
@@ -100,7 +100,7 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
   const totalPYQs = notes.reduce((acc, curr) => acc + (curr.importantPYQs?.length || 0), 0);
 
   return (
-    <div className="max-w-6xl mx-auto my-8 px-4 font-['Inter']">
+    <div className="max-w-6xl mx-auto my-6 sm:my-8 px-3 sm:px-4 font-['Inter']">
 
       {/* Notification Banner */}
       {actionMessage && (
@@ -110,7 +110,7 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
             : 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'
         }`}>
           <span>{actionMessage.text}</span>
-          <button onClick={() => setActionMessage(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-4 font-bold">✕</button>
+          <button onClick={() => setActionMessage(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-4 font-bold">âœ•</button>
         </div>
       )}
 

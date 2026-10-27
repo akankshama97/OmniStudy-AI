@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useAuth } from '../context/useAuth';
 import { Sparkles, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle, BookOpen, Brain, Zap, Shield, X, ArrowRight } from 'lucide-react';
 
@@ -36,7 +36,7 @@ export default function AuthPage({ isDark, onClose }) {
     try {
       if (mode === 'signup') {
         await register(form.name.trim(), form.email.trim().toLowerCase(), form.password);
-        setSuccess('Account created! Welcome to OmniStudy AI 🎉');
+        setSuccess('Account created! Welcome to OmniStudy AI ðŸŽ‰');
       } else {
         await login(form.email.trim().toLowerCase(), form.password);
         setSuccess('Welcome back! Logging you in...');
@@ -49,17 +49,17 @@ export default function AuthPage({ isDark, onClose }) {
   };
 
   const features = [
-    { icon: BookOpen, label: 'YouTube → Notes', desc: 'Kisi bhi lecture se instant notes' },
+    { icon: BookOpen, label: 'YouTube â†’ Notes', desc: 'Kisi bhi lecture se instant notes' },
     { icon: Brain, label: 'AI Mind Maps', desc: 'Visual concept maps automatically' },
     { icon: Zap, label: 'PYQ Solver', desc: 'Top 5 exam questions + solutions' },
     { icon: Shield, label: 'Multilingual', desc: 'Hindi, English, Hinglish support' },
   ];
 
   return (
-    <div className={`min-h-screen flex flex-col lg:flex-row font-sans ${isDark ? 'bg-[#0B0F17] text-[#F8FAFC]' : 'bg-[#F0F4FF] text-[#0F172A]'}`}>
+    <div className={`min-h-0 flex flex-col lg:flex-row font-sans w-full ${isDark ? 'bg-[#0B0F17] text-[#F8FAFC]' : 'bg-[#F0F4FF] text-[#0F172A]'}`}>
 
       {/* Left Panel - Branding */}
-      <div className={`lg:w-[45%] flex flex-col justify-between p-8 lg:p-14 relative overflow-hidden ${isDark ? 'bg-gradient-to-br from-[#0F1626] via-[#131B2E] to-[#1a2440]' : 'bg-gradient-to-br from-[#1E3A8A] via-[#1e40af] to-[#2563EB]'}`}>
+      <div className={`lg:w-[45%] flex flex-col justify-between p-6 sm:p-8 lg:p-14 relative overflow-hidden ${isDark ? 'bg-gradient-to-br from-[#0F1626] via-[#131B2E] to-[#1a2440]' : 'bg-gradient-to-br from-[#1E3A8A] via-[#1e40af] to-[#2563EB]'}`}>
 
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -84,10 +84,10 @@ export default function AuthPage({ isDark, onClose }) {
           <div className="mb-10">
             <h1 className="text-3xl lg:text-4xl font-black text-white leading-tight mb-4">
               YouTube lectures ko<br />
-              <span className="text-blue-200">perfect notes</span> mein badlo! 🎯
+              <span className="text-blue-200">perfect notes</span> mein badlo! ðŸŽ¯
             </h1>
             <p className="text-blue-100 text-base leading-relaxed">
-              AI-powered study platform jo teacher ki exact content capture karta hai — bilkul copy-paste jaisi notes, mind maps aur PYQs.
+              AI-powered study platform jo teacher ki exact content capture karta hai â€” bilkul copy-paste jaisi notes, mind maps aur PYQs.
             </p>
           </div>
 
@@ -137,8 +137,8 @@ export default function AuthPage({ isDark, onClose }) {
           {/* Tab Switch */}
           <div className={`flex items-center p-1 rounded-2xl mb-8 ${isDark ? 'bg-[#1B2640]' : 'bg-[#F1F5F9]'}`}>
             {[
-              { id: 'login', label: '🔑 Login' },
-              { id: 'signup', label: '✨ Sign Up' }
+              { id: 'login', label: 'ðŸ”‘ Login' },
+              { id: 'signup', label: 'âœ¨ Sign Up' }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -157,7 +157,7 @@ export default function AuthPage({ isDark, onClose }) {
           {/* Header */}
           <div className="mb-7">
             <h2 className="text-2xl font-black mb-1">
-              {mode === 'login' ? 'Welcome Back! 👋' : 'Join OmniStudy AI! 🚀'}
+              {mode === 'login' ? 'Welcome Back! ðŸ‘‹' : 'Join OmniStudy AI! ðŸš€'}
             </h2>
             <p className={`text-sm ${isDark ? 'text-[#94A3B8]' : 'text-[#64748B]'}`}>
               {mode === 'login'
@@ -287,10 +287,10 @@ export default function AuthPage({ isDark, onClose }) {
                   </button>
                 </div>
                 {form.confirmPassword && form.confirmPassword !== form.password && (
-                  <p className="text-xs text-red-500 mt-1.5">❌ Passwords match nahi kar rahe!</p>
+                  <p className="text-xs text-red-500 mt-1.5">âŒ Passwords match nahi kar rahe!</p>
                 )}
                 {form.confirmPassword && form.confirmPassword === form.password && form.confirmPassword.length >= 6 && (
-                  <p className="text-xs text-emerald-500 mt-1.5">✅ Passwords match kar rahe hain!</p>
+                  <p className="text-xs text-emerald-500 mt-1.5">âœ… Passwords match kar rahe hain!</p>
                 )}
               </div>
             )}
@@ -354,7 +354,7 @@ export default function AuthPage({ isDark, onClose }) {
 
           {/* Footer note */}
           <div className={`mt-4 text-center text-[11px] ${isDark ? 'text-[#475569]' : 'text-[#94A3B8]'}`}>
-            🔒 Your data is secure. We never share your information.
+            ðŸ”’ Your data is secure. We never share your information.
           </div>
         </div>
       </div>

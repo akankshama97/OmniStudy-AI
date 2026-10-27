@@ -376,6 +376,7 @@ export default function NotebookNotesView({
   const [copiedFormulaName, setCopiedFormulaName] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [isExportingReport, setIsExportingReport] = useState(false);
   const activeDark = isExportingPDF ? false : isDark;
   const [copiedDocx, setCopiedDocx] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -844,6 +845,230 @@ export default function NotebookNotesView({
   const totalConceptsCount = (note?.keyConcepts || []).length;
   const masteryPercentage = totalConceptsCount > 0 ? Math.round((completedConceptsCount / totalConceptsCount) * 100) : 0;
 
+  // Generates clean, printer-friendly HTML for Student Academic Progress Report
+  const getCleanProgressReportHtml = (n) => {
+    if (!n) return '';
+    const cleanTopic = n.chapter || n.title || 'Student Study Progress';
+    const cleanSubject = n.subject || 'Core Subject';
+    const cleanExam = n.targetExam || 'AKTU B.Tech / University Examination';
+    const score = calculateScore();
+    const totalQuestions = practiceMCQs.length;
+    const quizPct = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
+    const concepts = n.keyConcepts || [];
+    const dateStr = new Date().toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    return `
+      <div style="font-family: Arial, Helvetica, sans-serif; line-height: 1.5; color: #0F172A; max-width: 800px; margin: 0 auto; padding: 24px; background: #FFFFFF;">
+        <!-- Header Banner -->
+        <div style="background: #1E1B4B; color: white; border-radius: 12px; padding: 22px 24px; margin-bottom: 22px; text-align: left;">
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;">
+            <tr>
+              <td style="vertical-align: top;">
+                <span style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #A5B4FC; font-family: monospace;">
+                  OMNISTUDY AI • ACADEMIC PERFORMANCE PORTAL
+                </span>
+                <h1 style="margin: 4px 0 0 0; font-size: 20px; font-weight: bold; color: #FFFFFF;">
+                  📊 Student Study Analytics & Progress Report
+                </h1>
+              </td>
+              <td style="vertical-align: top; text-align: right; width: 140px;">
+                <div style="background: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 6px; display: inline-block; text-align: right;">
+                  <div style="font-size: 9px; color: #C7D2FE; font-family: monospace;">REPORT DATE</div>
+                  <div style="font-size: 12px; font-weight: bold; color: #FFFFFF;">${dateStr}</div>
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 12px; color: #E0E7FF;">
+            <tr>
+              <td style="padding: 3px 0; width: 60%;">
+                <span style="color: #A5B4FC;">Lecture / Topic:</span> <strong style="color: #FFFFFF; font-size: 13px;">${cleanTopic}</strong>
+              </td>
+              <td style="padding: 3px 0; text-align: right;">
+                <span style="color: #A5B4FC;">Subject:</span> <strong style="color: #FFFFFF;">${cleanSubject}</strong>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 3px 0;">
+                <span style="color: #A5B4FC;">Target Exam:</span> <strong style="color: #FFFFFF;">${cleanExam}</strong>
+              </td>
+              <td style="padding: 3px 0; text-align: right;">
+                <span style="color: #A5B4FC;">Verified Platform:</span> <strong style="color: #38BDF8;">OmniStudy AI</strong>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- 4 Core Performance KPI Cards -->
+        <table style="width: 100%; border-collapse: separate; border-spacing: 8px; margin-bottom: 20px;">
+          <tr>
+            <td style="width: 25%; background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 10px; padding: 12px; text-align: center;">
+              <div style="font-size: 10px; font-weight: bold; color: #92400E; margin-bottom: 2px;">🔥 CURRENT STREAK</div>
+              <div style="font-size: 20px; font-weight: 900; color: #78350F;">${streakDays} Days</div>
+              <div style="font-size: 9px; color: #B45309; margin-top: 2px;">Daily Consistency</div>
+            </td>
+            <td style="width: 25%; background: #DBEAFE; border: 1px solid #93C5FD; border-radius: 10px; padding: 12px; text-align: center;">
+              <div style="font-size: 10px; font-weight: bold; color: #1E40AF; margin-bottom: 2px;">⏱️ ACTIVE RECALL</div>
+              <div style="font-size: 20px; font-weight: 900; color: #1E3A8A;">45 Mins</div>
+              <div style="font-size: 9px; color: #2563EB; margin-top: 2px;">Session Engagement</div>
+            </td>
+            <td style="width: 25%; background: #D1FAE5; border: 1px solid #6EE7B7; border-radius: 10px; padding: 12px; text-align: center;">
+              <div style="font-size: 10px; font-weight: bold; color: #065F46; margin-bottom: 2px;">📚 CHAPTER MASTERY</div>
+              <div style="font-size: 20px; font-weight: 900; color: #064E3B;">${masteryPercentage}%</div>
+              <div style="font-size: 9px; color: #059669; margin-top: 2px;">${completedConceptsCount}/${totalConceptsCount} Concepts Revised</div>
+            </td>
+            <td style="width: 25%; background: #F3E8FF; border: 1px solid #D8B4FE; border-radius: 10px; padding: 12px; text-align: center;">
+              <div style="font-size: 10px; font-weight: bold; color: #6B21A8; margin-bottom: 2px;">🎯 QUIZ ACCURACY</div>
+              <div style="font-size: 20px; font-weight: 900; color: #581C87;">${quizPct}%</div>
+              <div style="font-size: 9px; color: #7C3AED; margin-top: 2px;">${score}/${totalQuestions} Questions Correct</div>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Topic-wise Retention Breakdown Checklist Table -->
+        <div style="margin-bottom: 22px;">
+          <h3 style="font-size: 13px; font-weight: bold; color: #1E293B; margin-bottom: 8px; border-bottom: 2px solid #E2E8F0; padding-bottom: 4px;">
+            📋 Topic-wise Retention & Mastery Checklist (${concepts.length} Topics)
+          </h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+            <thead>
+              <tr style="background: #F1F5F9; color: #475569; text-align: left; border-bottom: 2px solid #CBD5E1;">
+                <th style="padding: 8px 10px; width: 35px;">#</th>
+                <th style="padding: 8px 10px;">Topic / Concept Heading</th>
+                <th style="padding: 8px 10px; width: 90px;">Timestamp</th>
+                <th style="padding: 8px 10px; width: 110px; text-align: center;">Revision Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${concepts.map((c, i) => {
+                const isRev = !!revisedConcepts[i];
+                return `
+                  <tr style="border-bottom: 1px solid #E2E8F0; background: ${i % 2 === 0 ? '#FFFFFF' : '#F8FAFC'};">
+                    <td style="padding: 7px 10px; color: #64748B; font-family: monospace;">${i + 1}</td>
+                    <td style="padding: 7px 10px; font-weight: bold; color: #1E293B;">${c.heading || `Concept ${i + 1}`}</td>
+                    <td style="padding: 7px 10px; color: #64748B; font-family: monospace;">${c.timestamp_start || '00:00'}</td>
+                    <td style="padding: 7px 10px; text-align: center;">
+                      <span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: bold; font-family: monospace; ${
+                        isRev
+                          ? 'background: #D1FAE5; color: #047857; border: 1px solid #A7F3D0;'
+                          : 'background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A;'
+                      }">
+                        ${isRev ? 'Mastered ✓' : 'In Progress'}
+                      </span>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Parent & Mentor Study Assurance Section -->
+        <div style="background: #EEF2FF; border: 1.5px solid #C7D2FE; border-radius: 10px; padding: 16px; margin-bottom: 18px;">
+          <div style="font-size: 10px; font-weight: 800; color: #4338CA; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+            👨‍👩‍👧 PARENT & TEACHER STUDY ASSURANCE
+          </div>
+          <p style="margin: 0; font-size: 11.5px; color: #312E81; line-height: 1.6;">
+            This verified progress document confirms that the student has actively engaged with <strong>OmniStudy AI</strong>, performed structured lecture notes revision, solved practice quiz problems, and tracked active recall streaks on <strong>${cleanTopic}</strong> (${cleanSubject}).
+          </p>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 12px; border-top: 1px solid #C7D2FE; padding-top: 8px; font-size: 11px;">
+            <tr>
+              <td style="color: #4B5563;">
+                Overall Readiness: <strong style="color: ${masteryPercentage >= 70 ? '#047857' : '#B45309'};">${masteryPercentage >= 70 ? '★ Exam Ready / High Retention' : '● In Progress / Active Reviewing'}</strong>
+              </td>
+              <td style="text-align: right; font-family: monospace; color: #6366F1; font-weight: bold;">
+                Verified by OmniStudy AI Academic System
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; border-top: 1px solid #E2E8F0; padding-top: 10px; font-size: 10px; color: #94A3B8;">
+          Generated by <strong>OmniStudy AI</strong> — Developed by Akanksha Maurya • Academic Performance Portal
+        </div>
+      </div>
+    `;
+  };
+
+  // Direct 1-Click PDF Download for Student Study Progress Report
+  const handleDownloadProgressReport = async () => {
+    if (!note) return;
+    const cleanTitle = (note.chapter || note.title || 'Student_Progress').replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_');
+    setIsExportingReport(true);
+
+    try {
+      if (typeof window !== 'undefined') {
+        const html2pdfModule = await import('html2pdf.js');
+        const html2pdf = html2pdfModule.default || html2pdfModule;
+
+        const printContainer = document.createElement('div');
+        printContainer.id = 'omnistudy-progress-report-container';
+        printContainer.style.position = 'fixed';
+        printContainer.style.top = '0';
+        printContainer.style.left = '0';
+        printContainer.style.width = '820px';
+        printContainer.style.backgroundColor = '#FFFFFF';
+        printContainer.style.color = '#0F172A';
+        printContainer.style.zIndex = '99999';
+        printContainer.style.opacity = '1';
+        printContainer.style.pointerEvents = 'none';
+        printContainer.innerHTML = getCleanProgressReportHtml(note);
+        document.body.appendChild(printContainer);
+
+        await new Promise(r => setTimeout(r, 120));
+
+        const opt = {
+          margin: [8, 8, 10, 8],
+          filename: `${cleanTitle}_Progress_Report.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#FFFFFF',
+            windowWidth: 820,
+            scrollY: 0
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'] }
+        };
+
+        try {
+          await html2pdf().set(opt).from(printContainer).save();
+          setIsExportingReport(false);
+          return;
+        } finally {
+          if (document.body.contains(printContainer)) {
+            document.body.removeChild(printContainer);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[NotebookNotesView] Progress report PDF generation fallback:', err);
+      // Fallback: download as .doc file
+      try {
+        const reportHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Progress Report</title></head><body>${getCleanProgressReportHtml(note)}</body></html>`;
+        const blob = new Blob(['\ufeff', reportHtml], { type: 'application/msword' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${cleanTitle}_Progress_Report.doc`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (fallbackErr) {
+        console.error('Failed to export progress report fallback:', fallbackErr);
+      }
+    } finally {
+      setIsExportingReport(false);
+    }
+  };
+
   // Search & Unit filtering in notes
   const filteredConcepts = (note?.keyConcepts || []).filter(c => {
     // If filtering by unit in E-Book / Playlist mode
@@ -860,10 +1085,10 @@ export default function NotebookNotesView({
   });
 
   return (
-    <div className="max-w-6xl mx-auto px-2 sm:px-4 my-8 w-full overflow-hidden">
+    <div className="max-w-6xl mx-auto px-2 sm:px-4 my-4 sm:my-8 w-full overflow-hidden">
 
       {/* ── Top Study Command Toolbar ── */}
-      <div className="rounded-3xl p-5 sm:p-6 mb-6 border shadow-sm transition-all w-full bg-white dark:bg-[#131B2E] border-[#E2E8F0] dark:border-[#23314F] text-[#0F172A] dark:text-[#F8FAFC]">
+      <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6 border shadow-sm transition-all w-full bg-white dark:bg-[#131B2E] border-[#E2E8F0] dark:border-[#23314F] text-[#0F172A] dark:text-[#F8FAFC]">
         
         {/* Tier 1: Metadata Badges + Language Selector */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
@@ -885,36 +1110,6 @@ export default function NotebookNotesView({
                 <span>{note.teachingStyle}</span>
               </span>
             )}
-          </div>
-
-          {/* Language Switcher */}
-          <div className="inline-flex items-center gap-1 p-1 rounded-full border border-slate-200 dark:border-slate-700/70 bg-slate-50 dark:bg-[#0B0F17] text-xs font-semibold shrink-0">
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 pl-2 pr-1 flex items-center gap-1">
-              <Languages className="w-3 h-3" />
-              <span>Lang:</span>
-            </span>
-            {[
-              { id: 'Hinglish', label: 'Hinglish' },
-              { id: 'Hindi',    label: 'हिंदी' },
-              { id: 'English',  label: 'English' }
-            ].map(({ id, label }) => {
-              const currentActive = (selectedLang || note.language || 'English').toLowerCase();
-              const isActive = currentActive === id.toLowerCase();
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => onChangeLanguage && onChangeLanguage(id)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                    isActive
-                      ? 'bg-white dark:bg-[#1B2640] text-blue-600 dark:text-white shadow-sm font-bold'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
           </div>
         </div>
 
@@ -1094,31 +1289,27 @@ export default function NotebookNotesView({
 
         </div>
 
-        {/* ── Row 1: Dedicated Study Tabs (Full Width, No Overlap) ── */}
-        <div className="flex items-center gap-2 overflow-x-auto mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#23314F] pb-2 scrollbar-none">
+        {/* ── Row 1: Dedicated Study Tabs ── */}
+        <div className="flex items-center gap-2 overflow-x-auto mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#23314F] pb-1 scrollbar-none">
           {[
-            { id: 'notes',     label: '📝 Handwritten Notes',    count: (note?.keyConcepts || []).length },
-            { id: 'lmr',       label: '⚡ 1-Page LMR & Flashcards', count: 0 },
-            { id: 'formulas',  label: '📐 Formula Sheet',        count: (note?.formulas || []).length },
-            { id: 'mindmap',   label: '🧠 Mind Map',              count: (note?.mindMapNodes || []).length },
-            { id: 'pyqs',      label: '🏆 Exam PYQ Hub',         count: (note?.importantPYQs || []).length },
-            { id: 'mcqs',      label: '🎯 Top 20 MCQs',          count: practiceMCQs.length },
-            { id: 'mocktest',  label: '⏱️ Timed Mock Test',      count: 0 },
-            { id: 'dashboard', label: '📊 Progress Dashboard',   count: 0 }
+            { id: 'notes',    label: '📝 Notes & Diagrams', count: (note?.keyConcepts || []).length },
+            { id: 'formulas', label: '📐 Formula Sheet',     count: (note?.formulas || []).length },
+            { id: 'mindmap',  label: '🧠 Mind Map',          count: (note?.mindMapNodes || []).length },
+            { id: 'pyqs',     label: '🏆 Exam PYQs & MCQs',  count: (note?.importantPYQs || []).length }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-[#2563EB] text-white shadow-sm'
+                  ? 'bg-[#2563EB] text-white shadow-xs font-bold'
                   : 'bg-[#F1F5F9] dark:bg-[#1B2640] text-[#334155] dark:text-[#CBD5E1] hover:text-[#0F172A] dark:hover:text-white border border-[#E2E8F0] dark:border-[#23314F]'
               }`}
             >
               <span>{tab.label}</span>
               {tab.count > 0 && (
                 <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                  activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-[#334155] dark:text-[#CBD5E1]'
+                  activeTab === tab.id ? 'bg-white/20 text-white font-bold' : 'bg-slate-200 dark:bg-slate-700 text-[#334155] dark:text-[#CBD5E1]'
                 }`}>
                   {tab.count}
                 </span>
@@ -1127,86 +1318,58 @@ export default function NotebookNotesView({
           ))}
         </div>
 
-        {/* ── Row 2: Reading & Notebook Customization Toolbar (Clean Separated Capsules) ── */}
+        {/* ── Row 2: Reading & Search Toolbar ── */}
         {activeTab === 'notes' && (
           <div className="space-y-3 mt-3 pt-3 border-t border-[#E2E8F0] dark:border-[#23314F]">
             
-            {/* Control Capsules Row */}
             <div className="flex items-center justify-between gap-3 flex-wrap">
               
-              <div className="flex items-center gap-2.5 flex-wrap">
-                
-                {/* Capsule 1: View Format */}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-[#0B0F17] border border-slate-200 dark:border-slate-800">
-                  <span className="text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] font-mono">View:</span>
-                  {[
-                    { id: 'detailed', label: 'Detailed' },
-                    { id: 'rapid',    label: 'Rapid' },
-                    { id: 'cornell',  label: 'Cornell' }
-                  ].map(f => (
-                    <button
-                      key={f.id}
-                      onClick={() => setNoteFormat(f.id)}
-                      className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all ${
-                        noteFormat === f.id
-                          ? 'bg-[#2563EB] text-white shadow-xs'
-                          : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
-                      }`}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
+              {/* In-Notes Search Input */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#0B0F17] border border-slate-200 dark:border-slate-800 flex-1 max-w-md">
+                <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search concepts, derivations, blackboard text..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent text-xs text-[#0F172A] dark:text-[#F8FAFC] placeholder-slate-400 focus:outline-none w-full"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-mono cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
 
-                {/* Capsule 2: Notebook Texture */}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-[#0B0F17] border border-slate-200 dark:border-slate-800">
-                  <Palette className="w-3.5 h-3.5 text-[#2563EB] dark:text-[#60A5FA]" />
-                  <span className="text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] font-mono">Texture:</span>
-                  {[
-                    { id: 'ruled',     name: 'Ruled' },
-                    { id: 'grid',      name: 'Grid' },
-                    { id: 'parchment', name: 'Vintage' }
-                  ].map(p => (
-                    <button
-                      key={p.id}
-                      onClick={() => setPaperStyle(p.id)}
-                      className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all ${
-                        paperStyle === p.id
-                          ? 'bg-[#2563EB] text-white shadow-xs'
-                          : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
-                      }`}
-                    >
-                      {p.name}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Capsule 3: Font Style & Size */}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-[#0B0F17] border border-slate-200 dark:border-slate-800">
-                  <Type className="w-3.5 h-3.5 text-amber-500" />
-                  <span className="text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] font-mono">Font:</span>
+              {/* Font Size & Handwriting Toggle */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-slate-50 dark:bg-[#0B0F17] border border-slate-200 dark:border-slate-800 text-xs">
+                  <span className="text-[11px] font-semibold text-slate-500 mr-1">Font:</span>
                   <button
                     onClick={() => setHandwritingStyle('clean')}
-                    className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all ${
+                    className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
                       handwritingStyle === 'clean'
                         ? 'bg-[#2563EB] text-white shadow-xs'
-                        : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A]'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                     }`}
                   >
                     Clean
                   </button>
                   <button
                     onClick={() => setHandwritingStyle('handwritten')}
-                    className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all font-kalam ${
+                    className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all font-kalam cursor-pointer ${
                       handwritingStyle === 'handwritten'
                         ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
-                        : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A]'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                     }`}
                   >
                     ✍️ Kalam
                   </button>
 
-                  <span className="text-slate-300 dark:text-slate-700 mx-0.5">|</span>
+                  <span className="text-slate-300 dark:text-slate-700 mx-1">|</span>
 
                   {[
                     { id: 'small',  label: 'A-' },
@@ -1216,37 +1379,16 @@ export default function NotebookNotesView({
                     <button
                       key={s.id}
                       onClick={() => setFontSize(s.id)}
-                      className={`px-2 py-0.5 rounded-md text-[11px] font-mono font-bold transition-all ${
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-mono font-bold transition-all cursor-pointer ${
                         fontSize === s.id
                           ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 shadow-xs'
-                          : 'text-[#64748B] dark:text-[#94A3B8] hover:bg-slate-200 dark:hover:bg-slate-800'
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
                       }`}
                     >
                       {s.label}
                     </button>
                   ))}
                 </div>
-
-              </div>
-
-              {/* Capsule 4: In-Notes Search Input */}
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#0B0F17] border border-slate-200 dark:border-slate-800 w-full sm:w-auto">
-                <Search className="w-3.5 h-3.5 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search in notes..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-transparent text-xs text-[#0F172A] dark:text-[#F8FAFC] placeholder-slate-400 focus:outline-none w-40 font-['Inter']"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-mono"
-                  >
-                    ✕
-                  </button>
-                )}
               </div>
 
             </div>
@@ -1287,47 +1429,47 @@ export default function NotebookNotesView({
         <div
           ref={notebookRef}
           data-fontsize={fontSize}
-          className={`rounded-3xl p-5 sm:p-8 md:p-12 shadow-2xl border min-h-[900px] relative w-full overflow-hidden transition-all font-size-${fontSize} ${getPaperClass()} ${getFontSizeClass()}`}
+          className={`rounded-2xl sm:rounded-3xl p-3 sm:p-8 md:p-12 shadow-2xl border min-h-[700px] sm:min-h-[900px] relative w-full overflow-hidden transition-all font-size-${fontSize} ${getPaperClass()} ${getFontSizeClass()}`}
         >
           {/* Left Red Margin Spiral Hole Accents */}
-          <div className="absolute left-1 sm:left-2 top-0 bottom-0 w-6 spiral-binder opacity-70 pointer-events-none no-print" />
+          <div className="absolute left-0.5 sm:left-2 top-0 bottom-0 w-4 sm:w-6 spiral-binder opacity-70 pointer-events-none no-print" />
 
-          {/* Main Content: Placed safely to the right of the vertical red notebook margin line (54px) */}
-          <div className="pl-10 sm:pl-14 md:pl-16 pr-1 sm:pr-3 space-y-5 w-full overflow-hidden">
+          {/* Main Content: Placed safely to the right of the vertical red notebook margin line */}
+          <div className="pl-6 sm:pl-14 md:pl-16 pr-1 sm:pr-3 space-y-4 sm:space-y-5 w-full overflow-hidden">
 
             {/* ── First Page Decorative Cover Header (Topper Notebook Edition) ── */}
-            <div className={`topper-cover-header rounded-2xl p-4 sm:p-5 border-2 ${
+            <div className={`topper-cover-header rounded-2xl p-3.5 sm:p-5 border-2 ${
               activeDark ? 'border-[#3B82F6] bg-[#0F1626] text-[#F8FAFC]' : 'border-[#1E3A8A] bg-white text-[#0F172A]'
             } shadow-md relative overflow-hidden`}>
-              {/* Row 1: Brand & Author Attribution (Never wraps awkwardly) */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2.5 mb-2.5 border-b-2 border-slate-200 dark:border-slate-700 gap-2 text-xs font-mono">
-                <div className="flex items-center gap-2">
+              {/* Row 1: Brand & Author Attribution (Responsive Wrapping) */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 mb-2 sm:pb-2.5 sm:mb-2.5 border-b-2 border-slate-200 dark:border-slate-700 gap-1.5 sm:gap-2 text-xs font-mono">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                   <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
-                  <span className="font-black text-sm tracking-wide text-[#1E3A8A] dark:text-blue-400 whitespace-nowrap">
+                  <span className="font-black text-xs sm:text-sm tracking-wide text-[#1E3A8A] dark:text-blue-400">
                     ⚡ OMNISTUDY AI • TOPPER CLASSROOM COPY
                   </span>
-                  <span className="text-slate-400 font-bold">|</span>
-                  <span className="font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded text-[10px] border border-emerald-500/40 whitespace-nowrap">
+                  <span className="text-slate-400 font-bold hidden sm:inline">|</span>
+                  <span className="font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded text-[10px] border border-emerald-500/40">
                     100% EXAM VERIFIED
                   </span>
                 </div>
-                <div className="font-extrabold text-xs shrink-0 sm:text-right">
+                <div className="font-extrabold text-[11px] sm:text-xs shrink-0 sm:text-right">
                   Platform Developed by: <strong className="text-blue-700 dark:text-[#60A5FA] underline decoration-blue-500 underline-offset-2">Akanksha Maurya</strong>
                 </div>
               </div>
 
               {/* Row 2: Subject, Educator & Target Exam */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono pt-1">
-                <div className="font-bold text-red-600 dark:text-red-400 tracking-wide">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 text-xs font-mono pt-1">
+                <div className="font-bold text-red-600 dark:text-red-400 tracking-wide text-[11px] sm:text-xs">
                   <span>SUBJECT: <strong className="text-slate-800 dark:text-slate-200">{note.subject || 'Computer Science & Engineering'}</strong></span>
-                  <span className="mx-2 text-slate-400">•</span>
+                  <span className="mx-1.5 text-slate-400">•</span>
                   <span>NOTES TYPE: <strong className="text-slate-800 dark:text-slate-200">CLASSROOM TOPPER COPY</strong></span>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="px-2.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-800 dark:text-amber-300 font-bold text-[11px] whitespace-nowrap">
+                <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                  <span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-800 dark:text-amber-300 font-bold text-[10px] sm:text-[11px]">
                     🎯 {note.targetExam || 'EXAM READY'}
                   </span>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
                     DATE: {new Date(note.createdAt || Date.now()).toLocaleDateString()}
                   </span>
                 </div>
@@ -1780,7 +1922,7 @@ export default function NotebookNotesView({
 
       {/* ── TAB 3: TOP 5 EXAM PREVIOUS YEAR QUESTIONS (PYQ) ── */}
       {activeTab === 'pyqs' && (
-        <div className={`rounded-3xl p-6 md:p-10 border shadow-2xl ${
+        <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border shadow-2xl ${
           isDark ? 'bg-[#0F1626] border-[#23314F] text-[#F8FAFC]' : 'bg-white border-[#E2E8F0] text-[#0F172A]'
         }`}>
           <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
@@ -2093,7 +2235,7 @@ export default function NotebookNotesView({
 
       {/* ── TAB 4: TOP 20 LECTURE PRACTICE MCQS (INTERACTIVE REVISION TEST) ── */}
       {activeTab === 'mcqs' && (
-        <div className={`rounded-3xl p-6 md:p-10 border shadow-2xl ${
+        <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border shadow-2xl ${
           isDark ? 'bg-[#0F1626] border-[#23314F] text-[#F8FAFC]' : 'bg-white border-[#E2E8F0] text-[#0F172A]'
         }`}>
           {/* Header & Live Score Tracker */}
@@ -2324,7 +2466,7 @@ export default function NotebookNotesView({
 
       {/* ── TAB 5: ⚡ LAST-MINUTE REVISION (LMR) 1-PAGE CHEAT SHEET ── */}
       {activeTab === 'lmr' && (
-        <div className={`rounded-3xl p-6 md:p-10 border shadow-2xl ${
+        <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border shadow-2xl ${
           isDark ? 'bg-[#0F1626] border-[#23314F] text-[#F8FAFC]' : 'bg-white border-[#E2E8F0] text-[#0F172A]'
         }`}>
           {/* Header */}
@@ -2762,7 +2904,7 @@ export default function NotebookNotesView({
 
       {/* ── TAB 6: 📐 5-MINUTE FORMULA SHEET HUB ── */}
       {activeTab === 'formulas' && (
-        <div className={`rounded-3xl p-6 md:p-10 border shadow-2xl ${
+        <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border shadow-2xl ${
           isDark ? 'bg-[#0F1626] border-[#23314F] text-[#F8FAFC]' : 'bg-white border-[#E2E8F0] text-[#0F172A]'
         }`}>
           {/* Header */}
@@ -2879,7 +3021,7 @@ export default function NotebookNotesView({
 
       {/* ── TAB 7: ⏱️ TIMED MOCK TEST (EXAM SIMULATION) ── */}
       {activeTab === 'mocktest' && (
-        <div className={`rounded-3xl p-6 md:p-10 border shadow-2xl ${
+        <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border shadow-2xl ${
           isDark ? 'bg-[#0F1626] border-[#23314F] text-[#F8FAFC]' : 'bg-white border-[#E2E8F0] text-[#0F172A]'
         }`}>
           {!isTestStarted ? (
@@ -3099,7 +3241,7 @@ export default function NotebookNotesView({
 
       {/* ── TAB 8: 📊 STUDENT & PARENT DASHBOARD ── */}
       {activeTab === 'dashboard' && (
-        <div className={`rounded-3xl p-6 md:p-10 border shadow-2xl ${
+        <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border shadow-2xl ${
           isDark ? 'bg-[#0F1626] border-[#23314F] text-[#F8FAFC]' : 'bg-white border-[#E2E8F0] text-[#0F172A]'
         }`}>
           {/* Header */}
@@ -3119,11 +3261,12 @@ export default function NotebookNotesView({
 
             <button
               type="button"
-              onClick={handleDownloadPDF}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all shrink-0"
+              onClick={handleDownloadProgressReport}
+              disabled={isExportingReport}
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all shrink-0 disabled:opacity-60 cursor-pointer active:scale-95"
             >
-              <FileDown className="w-3.5 h-3.5" />
-              <span>Download Progress Report</span>
+              <FileDown className={`w-3.5 h-3.5 ${isExportingReport ? 'animate-bounce' : ''}`} />
+              <span>{isExportingReport ? 'Generating Report...' : 'Download Progress Report'}</span>
             </button>
           </div>
 

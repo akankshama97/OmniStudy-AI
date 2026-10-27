@@ -60,11 +60,8 @@ export default function App() {
     typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false
   );
   
-  // Default to sample lecture in selected language
-  const [currentNote,  setCurrentNote]  = useState(() => {
-    const initialLang = typeof window !== 'undefined' ? localStorage.getItem('omnistudy_selected_lang') || 'Hinglish' : 'Hinglish';
-    return getSampleNote('coa-unit-1', initialLang);
-  });
+  // Default to null so page starts clean and uncluttered with example cards
+  const [currentNote,  setCurrentNote]  = useState(null);
   const [isLoading,    setIsLoading]    = useState(false);
   const [error,        setError]        = useState(null);
   const [timestampTutorPrefill, setTimestampTutorPrefill] = useState(null);
@@ -188,7 +185,7 @@ export default function App() {
         onOpenAuth={() => setShowAuthModal(true)}
       />
 
-      <main className="flex-1 w-full max-w-full overflow-x-hidden">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 md:pb-0">
         {/* Tab 1: Notes Generator & Classroom Copy (Persistent, Never Unmounts) */}
         <div className={activeTab === 'generator' ? 'block animate-fade-slide-up w-full max-w-full overflow-x-hidden' : 'hidden'}>
           <YouTubeInput
@@ -201,18 +198,31 @@ export default function App() {
             onChangeLanguage={handleChangeLanguage}
           />
 
-          {currentNote && (
-            <div className="relative">
-              <div className="max-w-6xl mx-auto px-4 mb-2 flex items-center justify-between">
+          {currentNote ? (
+            <div id="student-notes-section" className="relative animate-fade-slide-up mt-6">
+              <div className="max-w-6xl mx-auto px-4 mb-3 flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB] dark:bg-[#3B82F6]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-xs font-bold text-[#475569] dark:text-[#CBD5E1] font-mono uppercase tracking-wider">
-                    Student Copy Notes View
+                    Active Notes: <strong className="text-[#0F172A] dark:text-white font-sans text-xs sm:text-sm">{currentNote.chapter || currentNote.title}</strong>
                   </span>
                 </div>
-                <span className="text-[11px] font-mono text-[#2563EB] dark:text-[#60A5FA] bg-[#EFF6FF] dark:bg-[#3B82F6]/20 px-3 py-0.5 rounded-full border border-[#2563EB]/20 font-bold">
-                  Classroom Copy Canvas
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentNote(null);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="px-3 py-1 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#131B2E] text-slate-600 dark:text-slate-300 hover:text-red-500 hover:border-red-300 dark:hover:border-red-500/40 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95"
+                    title="Close notes and return to example cards"
+                  >
+                    <span>✕ Close Notes</span>
+                  </button>
+                  <span className="text-[11px] font-mono text-[#2563EB] dark:text-[#60A5FA] bg-[#EFF6FF] dark:bg-[#3B82F6]/20 px-3 py-1 rounded-full border border-[#2563EB]/20 font-bold hidden sm:inline">
+                    Classroom Copy Canvas
+                  </span>
+                </div>
               </div>
 
               <NotebookNotesView
@@ -225,6 +235,30 @@ export default function App() {
                 isDark={isDark}
                 isLoading={isLoading}
               />
+
+              {/* Bottom Sticky Dismiss Bar for Clean UX */}
+              <div className="sticky bottom-4 z-30 max-w-sm mx-auto px-4 my-6 pointer-events-auto">
+                <div className="bg-slate-900/90 dark:bg-[#131B2E]/95 backdrop-blur-md text-white p-2.5 px-4 rounded-2xl shadow-xl border border-slate-700/60 flex items-center justify-between gap-3 text-xs">
+                  <span className="truncate text-slate-300 font-medium">
+                    📖 <strong className="text-white">{currentNote.chapter || currentNote.title}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentNote(null);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="px-3 py-1 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shrink-0 cursor-pointer shadow-sm active:scale-95 transition-all flex items-center gap-1"
+                    title="Close notes and return to clean view"
+                  >
+                    <span>✕ Close Notes</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="max-w-4xl mx-auto px-4 text-center pb-12 pt-2 text-xs text-slate-400 dark:text-slate-500 font-mono">
+              💡 Choose any example lecture card above or paste your YouTube video URL to generate instant Topper Notes.
             </div>
           )}
         </div>
@@ -264,7 +298,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className={`border-t py-6 text-center text-xs mt-12 transition-colors ${
+      <footer className={`border-t py-6 text-center text-xs mt-12 mb-14 md:mb-0 transition-colors ${
         isDark ? 'border-[#23314F] bg-[#131B2E] text-[#94A3B8]' : 'border-[#E2E8F0] bg-white text-[#64748B]'
       }`}>
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -276,7 +310,7 @@ export default function App() {
             <span className="text-slate-400">• YouTube Lecture to Student Copy Notes</span>
           </div>
           <div className="flex items-center gap-4 text-[11px] text-[#64748B] dark:text-[#94A3B8]">
-            <span>JEE • NEET • CBSE • UPSC • GATE • College</span>
+            <span>JEE • NEET • CBSE • GATE • College</span>
             <span>•</span>
             <span>Made for Students</span>
           </div>

@@ -547,7 +547,7 @@ export default function MultilingualChatbot({
     .slice(0, 6);
 
   return (
-    <div className="max-w-5xl mx-auto my-8 px-4">
+    <div className="max-w-5xl mx-auto my-6 sm:my-8 px-3 sm:px-4">
 
       {/* ── Chatbot Header & Mode Switcher ── */}
       <div className="p-4 sm:p-5 rounded-2xl border shadow-sm mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-[#131B2E] border-[#E2E8F0] dark:border-[#23314F] transition-colors">
@@ -569,23 +569,6 @@ export default function MultilingualChatbot({
 
             <div className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1 flex items-center gap-2 flex-wrap">
               <span>Context: <strong className="text-[#0F172A] dark:text-[#F8FAFC] truncate max-w-xs inline-block align-bottom">{currentNote ? currentNote.title : 'General Academic Doubt'}</strong></span>
-              <span>•</span>
-              <div className="inline-flex items-center gap-1 p-0.5 rounded-full border border-[#E2E8F0] dark:border-[#23314F] bg-[#F1F5F9] dark:bg-[#0B0F17] text-[11px] font-semibold">
-                {['English', 'Hindi', 'Hinglish'].map(langId => (
-                  <button
-                    key={langId}
-                    type="button"
-                    onClick={() => onChangeLanguage && onChangeLanguage(langId)}
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all ${
-                      (selectedLang || 'English').toLowerCase() === langId.toLowerCase()
-                        ? 'bg-[#2563EB] text-white shadow-xs font-bold'
-                        : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
-                    }`}
-                  >
-                    {langId === 'Hindi' ? 'हिंदी' : langId}
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
         </div>
@@ -873,14 +856,17 @@ export default function MultilingualChatbot({
         {/* ── Quick Prompt Chips (General Mode) ── */}
         {activeMode === 'general' && (
           <div className="pt-2 border-t border-[#E2E8F0] dark:border-[#23314F] my-2">
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-              <span className="text-[10px] uppercase font-bold text-slate-400 shrink-0 font-mono">Suggested:</span>
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-[10px] uppercase font-bold text-slate-400 shrink-0 font-mono flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-[#2563EB]" />
+                <span>Suggested:</span>
+              </span>
               {(MULTILINGUAL_QUICK_PROMPTS[selectedLang] || QUICK_PROMPTS).map((item, pIdx) => (
                 <button
                   key={pIdx}
                   onClick={() => handleSendGeneral(item.prompt)}
                   disabled={loading}
-                  className="text-[11px] px-3 py-1 rounded-full border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] hover:bg-[#EFF6FF] dark:hover:bg-[#1B2640] text-[#475569] dark:text-[#CBD5E1] hover:text-[#2563EB] dark:hover:text-[#60A5FA] hover:border-[#2563EB]/40 transition-all whitespace-nowrap shrink-0"
+                  className="text-[11px] font-semibold px-3 py-1.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-white dark:bg-[#1B2640] hover:bg-[#EFF6FF] dark:hover:bg-[#2563EB]/20 text-[#334155] dark:text-[#CBD5E1] hover:text-[#2563EB] dark:hover:text-[#60A5FA] hover:border-[#2563EB]/40 transition-all whitespace-nowrap shrink-0 shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer"
                 >
                   {item.label}
                 </button>

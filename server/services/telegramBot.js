@@ -165,9 +165,13 @@ export function initTelegramBot() {
     });
 
     // Launch bot
-    bot.launch(() => {
-      console.log('\x1b[32m[OmniStudy AI Telegram Bot]: 🤖 Bot successfully connected and listening for messages!\x1b[0m');
-    });
+    bot.launch()
+      .then(() => {
+        console.log('\x1b[32m[OmniStudy AI Telegram Bot]: 🤖 Bot successfully connected and listening for messages!\x1b[0m');
+      })
+      .catch((err) => {
+        console.warn(`\x1b[33m[OmniStudy AI Telegram Bot Warning]: Could not reach Telegram servers (${err.message}). Bot is disabled until connectivity to api.telegram.org is restored.\x1b[0m`);
+      });
 
     // Graceful stop
     process.once('SIGINT', () => bot.stop('SIGINT'));
