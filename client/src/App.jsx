@@ -60,8 +60,8 @@ export default function App() {
     typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false
   );
   
-  // Default to null so page starts clean and uncluttered with example cards
-  const [currentNote,  setCurrentNote]  = useState(null);
+  // Default to COA Unit 1 sample notes so sample notes are always visible on load
+  const [currentNote,  setCurrentNote]  = useState(() => getSampleNote('coa-unit-1', 'Hinglish'));
   const [isLoading,    setIsLoading]    = useState(false);
   const [error,        setError]        = useState(null);
   const [timestampTutorPrefill, setTimestampTutorPrefill] = useState(null);

@@ -1289,20 +1289,24 @@ export default function NotebookNotesView({
 
         </div>
 
-        {/* ── Row 1: Dedicated Study Tabs ── */}
-        <div className="flex items-center gap-2 overflow-x-auto mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#23314F] pb-1 scrollbar-none">
+        {/* ── Row 1: Dedicated Study Tabs (All Features Restored) ── */}
+        <div className="flex items-center gap-2 overflow-x-auto mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#23314F] pb-2 scrollbar-none">
           {[
-            { id: 'notes',    label: '📝 Notes & Diagrams', count: (note?.keyConcepts || []).length },
-            { id: 'formulas', label: '📐 Formula Sheet',     count: (note?.formulas || []).length },
-            { id: 'mindmap',  label: '🧠 Mind Map',          count: (note?.mindMapNodes || []).length },
-            { id: 'pyqs',     label: '🏆 Exam PYQs & MCQs',  count: (note?.importantPYQs || []).length }
+            { id: 'notes',     label: '📝 Handwritten Notes',    count: (note?.keyConcepts || []).length },
+            { id: 'lmr',       label: '⚡ 1-Page LMR & Flashcards', count: 0 },
+            { id: 'formulas',  label: '📐 Formula Sheet',        count: (note?.formulas || []).length },
+            { id: 'mindmap',   label: '🧠 Mind Map',              count: (note?.mindMapNodes || []).length },
+            { id: 'pyqs',      label: '🏆 Exam PYQ Hub',         count: (note?.importantPYQs || []).length },
+            { id: 'mcqs',      label: '🎯 Top 20 MCQs',          count: practiceMCQs.length },
+            { id: 'mocktest',  label: '⏱️ Timed Mock Test',      count: 0 },
+            { id: 'dashboard', label: '📊 Progress Dashboard',   count: 0 }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-[#2563EB] text-white shadow-xs font-bold'
+                  ? 'bg-[#2563EB] text-white shadow-sm font-bold'
                   : 'bg-[#F1F5F9] dark:bg-[#1B2640] text-[#334155] dark:text-[#CBD5E1] hover:text-[#0F172A] dark:hover:text-white border border-[#E2E8F0] dark:border-[#23314F]'
               }`}
             >
