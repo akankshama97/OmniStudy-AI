@@ -170,7 +170,11 @@ export function initTelegramBot() {
         console.log('\x1b[32m[OmniStudy AI Telegram Bot]: 🤖 Bot successfully connected and listening for messages!\x1b[0m');
       })
       .catch((err) => {
-        console.warn(`\x1b[33m[OmniStudy AI Telegram Bot Warning]: Could not reach Telegram servers (${err.message}). Bot is disabled until connectivity to api.telegram.org is restored.\x1b[0m`);
+        if (err.message && (err.message.includes('409') || err.message.includes('Conflict'))) {
+          console.log('\x1b[36m[OmniStudy AI Telegram Bot]: ℹ️ Bot is already actively running on your deployed cloud server. (Local polling paused to prevent duplicate messages).\x1b[0m');
+        } else {
+          console.warn(`\x1b[33m[OmniStudy AI Telegram Bot Warning]: Could not reach Telegram servers (${err.message}).\x1b[0m`);
+        }
       });
 
     // Graceful stop
