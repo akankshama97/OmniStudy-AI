@@ -30,34 +30,7 @@ export const processVideo = async (req, res) => {
     console.log(`[OmniStudy AI] Processing Video ID: ${videoId} | Exam: ${selectedExam} | Language: ${language} | Force: ${forceRefresh}`);
     const cacheKey = `${videoId}_${language}_${selectedExam}`;
 
-    // Step 1: Check cache in DB or memory (only serve cache if note is genuinely comprehensive with >= 8 concepts covering full duration)
-    if (!forceRefresh && req.query.force !== 'true') {
-      try {
-        const existingNote = await Note.findOne({ videoId, language });
-        if (existingNote && Array.isArray(existingNote.keyConcepts) && existingNote.keyConcepts.length >= 8) {
-          const uniqueHeadings = new Set(existingNote.keyConcepts.map(c => (c.heading || '').toLowerCase().replace(/[^a-z0-9]/g, '')));
-          const hasDiverseHeadings = uniqueHeadings.size >= Math.min(6, existingNote.keyConcepts.length * 0.75);
-          if (hasDiverseHeadings) {
-            console.log(`[OmniStudy AI] Serving verified comprehensive cached note for ${cacheKey}`);
-            return res.json({ success: true, cached: true, note: existingNote });
-          } else {
-            console.log(`[OmniStudy AI] Cached note for ${cacheKey} had repetitive headings. Regenerating deep notes...`);
-          }
-        }
-      } catch (dbErr) {
-        if (memoryNotesStore.has(cacheKey)) {
-          const mNote = memoryNotesStore.get(cacheKey);
-          if (mNote && Array.isArray(mNote.keyConcepts) && mNote.keyConcepts.length >= 8) {
-            const uniqueHeadings = new Set(mNote.keyConcepts.map(c => (c.heading || '').toLowerCase().replace(/[^a-z0-9]/g, '')));
-            if (uniqueHeadings.size >= Math.min(6, mNote.keyConcepts.length * 0.75)) {
-              return res.json({ success: true, cached: true, note: mNote });
-            }
-          }
-        }
-      }
-    }
-
-    // Step 2: Fetch Video metadata & check accessibility
+    // Step 1: Fetch Video metadata & accessibility first to know exact duration for full lecture coverage
     const videoDetails = await getVideoDetails(videoId);
 
     if (videoDetails.isPrivate) {
@@ -73,6 +46,36 @@ export const processVideo = async (req, res) => {
     }
 
     let videoTitle = videoDetails?.title || 'YouTube Lecture';
+    const durationSec = videoDetails?.durationSec || 0;
+    // For long lectures (e.g. 1-2 hours), require proportional concept count to guarantee full chronological coverage
+    const minRequiredConcepts = durationSec >= 5400 ? 12 : durationSec >= 2700 ? 9 : 6;
+
+    // Step 2: Check cache in DB or memory (only serve cache if note genuinely covers the full video duration)
+    if (!forceRefresh && req.query.force !== 'true') {
+      try {
+        const existingNote = await Note.findOne({ videoId, language });
+        if (existingNote && Array.isArray(existingNote.keyConcepts) && existingNote.keyConcepts.length >= minRequiredConcepts) {
+          const uniqueHeadings = new Set(existingNote.keyConcepts.map(c => (c.heading || '').toLowerCase().replace(/[^a-z0-9]/g, '')));
+          const hasDiverseHeadings = uniqueHeadings.size >= Math.min(6, existingNote.keyConcepts.length * 0.75);
+          if (hasDiverseHeadings) {
+            console.log(`[OmniStudy AI] Serving verified comprehensive cached note for ${cacheKey} (${existingNote.keyConcepts.length} concepts covering ${Math.round(durationSec / 60)} mins)`);
+            return res.json({ success: true, cached: true, note: existingNote });
+          } else {
+            console.log(`[OmniStudy AI] Cached note for ${cacheKey} had repetitive headings. Regenerating deep notes...`);
+          }
+        }
+      } catch (dbErr) {
+        if (memoryNotesStore.has(cacheKey)) {
+          const mNote = memoryNotesStore.get(cacheKey);
+          if (mNote && Array.isArray(mNote.keyConcepts) && mNote.keyConcepts.length >= minRequiredConcepts) {
+            const uniqueHeadings = new Set(mNote.keyConcepts.map(c => (c.heading || '').toLowerCase().replace(/[^a-z0-9]/g, '')));
+            if (uniqueHeadings.size >= Math.min(6, mNote.keyConcepts.length * 0.75)) {
+              return res.json({ success: true, cached: true, note: mNote });
+            }
+          }
+        }
+      }
+    }
 
     // Step 3: Fetch Transcripts and Chunks (Covering 100% of the video duration)
     const transcriptResult = await getTranscript(videoId, videoDetails);

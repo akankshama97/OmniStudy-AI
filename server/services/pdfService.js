@@ -80,33 +80,45 @@ export async function generateNotePdfBuffer(note) {
         drawNotebookBackground();
       });
 
-      // Natural Mathematical cleaner - replaces LaTeX code markup with clear unicode/text
+      // Natural Mathematical cleaner - replaces LaTeX code markup and emojis with clean text for PDFKit
       function cleanMathText(str) {
         if (!str || typeof str !== 'string') return '';
         return str
+          .replace(/⚡/g, '[*]')
+          .replace(/📌/g, '[•]')
+          .replace(/💡/g, '[TIP]')
+          .replace(/🧮/g, '[CALC]')
+          .replace(/📐/g, '[DIAGRAM]')
+          .replace(/🎯/g, '[EXAM]')
+          .replace(/🚀/g, '[SPEED]')
+          .replace(/⚠️/g, '[WARNING]')
+          .replace(/✍️/g, '[NOTE]')
+          .replace(/❓/g, '[?]')
+          .replace(/✅/g, '[OK]')
+          .replace(/•/g, '-')
           .replace(/\$\$/g, '')
           .replace(/\$/g, '')
           .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1 / $2)')
-          .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
+          .replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)')
           .replace(/\\vec\{([^}]+)\}/g, '$1')
           .replace(/\\mathbf\{([^}]+)\}/g, '$1')
           .replace(/\\cdot/g, ' * ')
-          .replace(/\\times/g, ' × ')
+          .replace(/\\times/g, ' * ')
           .replace(/\\div/g, ' / ')
-          .replace(/\\pm/g, ' ± ')
+          .replace(/\\pm/g, ' +/- ')
           .replace(/\\leq/g, ' <= ')
           .replace(/\\geq/g, ' >= ')
-          .replace(/\\theta/g, 'θ')
-          .replace(/\\pi/g, 'π')
-          .replace(/\\Delta/g, 'Δ')
+          .replace(/\\theta/g, 'theta')
+          .replace(/\\pi/g, 'pi')
+          .replace(/\\Delta/g, 'Delta')
           .replace(/\\rightarrow/g, ' -> ')
           .replace(/\\to/g, ' -> ')
           .replace(/\\left\(/g, '(')
           .replace(/\\right\)/g, ')')
           .replace(/\\left\[/g, '[')
           .replace(/\\right\]/g, ']')
-          .replace(/\^2/g, '²')
-          .replace(/\^3/g, '³')
+          .replace(/\^2/g, '^2')
+          .replace(/\^3/g, '^3')
           .replace(/\\/g, '');
       }
 
@@ -125,7 +137,7 @@ export async function generateNotePdfBuffer(note) {
       const cleanTitle = cleanMathText(note.title || 'Lecture Master Notes');
       const subjectText = cleanMathText(note.subject || note.chapter || 'Core Academic Lecture');
       const examText = cleanMathText(note.targetExam && note.targetExam !== 'Auto-detect' ? note.targetExam : 'University & Board Exam');
-      const subLineText = `📚 Subject: ${subjectText}  |  🎯 Target: ${examText}  |  🌐 https://omni-study-ai-lilac.vercel.app/`;
+      const subLineText = `Subject: ${subjectText}  |  Target: ${examText}  |  https://omni-study-ai-lilac.vercel.app/`;
 
       // Pre-measure title text height
       doc.fontSize(13);
@@ -140,7 +152,7 @@ export async function generateNotePdfBuffer(note) {
 
       // 1. Branding row
       doc.fillColor('#4338CA').fontSize(9).text(
-        '⚡ OMNISTUDY AI • CLASSROOM COPY • DEVELOPED BY: AKANKSHA MAURYA',
+        'OMNISTUDY AI • CLASSROOM COPY • DEVELOPED BY: AKANKSHA MAURYA',
         CONTENT_LEFT + 14,
         headerStartY + 8,
         { width: CONTENT_WIDTH - 28 }
@@ -192,7 +204,7 @@ export async function generateNotePdfBuffer(note) {
 
         doc.rect(CONTENT_LEFT, summaryStartY, CONTENT_WIDTH, summaryCardHeight).fillAndStroke(STICKY_BG, STICKY_BORDER);
         
-        doc.fillColor('#B45309').fontSize(10.5).text('📌 CORE CHAPTER SUMMARY (Topper Notes)', CONTENT_LEFT + 12, summaryStartY + 8);
+        doc.fillColor('#B45309').fontSize(10.5).text('CORE CHAPTER SUMMARY (Topper Notes)', CONTENT_LEFT + 12, summaryStartY + 8);
         doc.fillColor(INK_BLACK).fontSize(9).lineGap(1.5).text(
           cleanOverview,
           CONTENT_LEFT + 12,
@@ -206,10 +218,10 @@ export async function generateNotePdfBuffer(note) {
       // Cornell Cues if present
       if (Array.isArray(note.cueColumn) && note.cueColumn.length > 0) {
         checkPageBreak(50);
-        doc.fillColor(INK_BLUE).fontSize(10).text('💡 Key Questions & Cues:', CONTENT_LEFT, doc.y);
+        doc.fillColor(INK_BLUE).fontSize(10).text('Key Questions & Cues:', CONTENT_LEFT, doc.y);
         doc.moveDown(0.3);
         note.cueColumn.slice(0, 4).forEach(cue => {
-          doc.fillColor('#475569').fontSize(9).text(`  ❓ ${cue}`, CONTENT_LEFT, doc.y, { width: CONTENT_WIDTH });
+          doc.fillColor('#475569').fontSize(9).text(`  - ${cleanMathText(cue)}`, CONTENT_LEFT, doc.y, { width: CONTENT_WIDTH });
           doc.moveDown(0.2);
         });
         doc.moveDown(0.6);
@@ -222,7 +234,7 @@ export async function generateNotePdfBuffer(note) {
 
       if (concepts.length > 0) {
         checkPageBreak(60);
-        doc.fillColor(INK_BLACK).fontSize(14).text('✍️ COMPLETE LECTURE CONCEPTS & BLACKBOARD DERIVATIONS', CONTENT_LEFT, doc.y, { underline: true });
+        doc.fillColor(INK_BLACK).fontSize(14).text('COMPLETE LECTURE CONCEPTS & BLACKBOARD DERIVATIONS', CONTENT_LEFT, doc.y, { underline: true });
         doc.moveDown(0.8);
 
         concepts.forEach((concept, idx) => {
@@ -260,7 +272,7 @@ export async function generateNotePdfBuffer(note) {
             checkPageBreak(35);
             doc.rect(CONTENT_LEFT + 10, doc.y, CONTENT_WIDTH - 20, 26).fillAndStroke('#ECFDF5', '#10B981');
             doc.fillColor(INK_GREEN).fontSize(9).text(
-              `💡 Teacher Memory Tip: ${cleanMathText(tips.join(' | '))}`,
+              `Teacher Memory Tip: ${cleanMathText(tips.join(' | '))}`,
               CONTENT_LEFT + 18,
               doc.y + 6,
               { width: CONTENT_WIDTH - 36 }
@@ -273,10 +285,10 @@ export async function generateNotePdfBuffer(note) {
             checkPageBreak(70);
             const ex = concept.solved_example;
             doc.rect(CONTENT_LEFT + 10, doc.y, CONTENT_WIDTH - 20, 58).fillAndStroke('#F8FAFC', '#94A3B8');
-            doc.fillColor(INK_BLACK).fontSize(9.5).text('📝 Solved Blackboard Example:', CONTENT_LEFT + 16, doc.y + 6);
+            doc.fillColor(INK_BLACK).fontSize(9.5).text('Solved Blackboard Example:', CONTENT_LEFT + 16, doc.y + 6);
             if (ex.given) doc.fillColor('#475569').fontSize(8.5).text(`Given: ${cleanMathText(ex.given)}`, CONTENT_LEFT + 16, doc.y + 20);
             if (Array.isArray(ex.steps)) {
-              doc.fillColor(INK_BLUE).fontSize(8.5).text(`Steps: ${cleanMathText(ex.steps.slice(0, 2).join(' ➔ '))}`, CONTENT_LEFT + 16, doc.y + 32);
+              doc.fillColor(INK_BLUE).fontSize(8.5).text(`Steps: ${cleanMathText(ex.steps.slice(0, 2).join(' -> '))}`, CONTENT_LEFT + 16, doc.y + 32);
             }
             if (ex.finalAnswer) {
               doc.fillColor(INK_RED).fontSize(9).text(`Answer: ${cleanMathText(ex.finalAnswer)}`, CONTENT_LEFT + 16, doc.y + 44);
@@ -299,7 +311,7 @@ export async function generateNotePdfBuffer(note) {
 
               // Diagram Header
               doc.fillColor(INK_BLACK).fontSize(9).text(
-                `📐 Blackboard Diagram: ${concept.diagram.heading || heading}`,
+                `Blackboard Diagram: ${concept.diagram.heading || heading}`,
                 CONTENT_LEFT + 25,
                 diagStartY + 8,
                 { width: CONTENT_WIDTH - 50 }
@@ -349,7 +361,7 @@ export async function generateNotePdfBuffer(note) {
       const formulas = Array.isArray(note.formulas) ? note.formulas : [];
       if (formulas.length > 0) {
         checkPageBreak(80);
-        doc.fillColor(INK_RED).fontSize(14).text('⚡ FORMULA CHEAT SHEET & GOVERNING EQUATIONS', CONTENT_LEFT, doc.y, { underline: true });
+        doc.fillColor(INK_RED).fontSize(14).text('FORMULA CHEAT SHEET & GOVERNING EQUATIONS', CONTENT_LEFT, doc.y, { underline: true });
         doc.moveDown(0.5);
 
         formulas.forEach((item, fIdx) => {
@@ -379,7 +391,7 @@ export async function generateNotePdfBuffer(note) {
 
       if (pyqs.length > 0) {
         checkPageBreak(90);
-        doc.fillColor(INK_BLACK).fontSize(14).text('🎯 EXAM PYQS (PREVIOUS YEAR QUESTIONS) WITH DETAILED SOLUTIONS', CONTENT_LEFT, doc.y, { underline: true });
+        doc.fillColor(INK_BLACK).fontSize(14).text('EXAM PYQS (PREVIOUS YEAR QUESTIONS) WITH DETAILED SOLUTIONS', CONTENT_LEFT, doc.y, { underline: true });
         doc.moveDown(0.6);
 
         pyqs.slice(0, 8).forEach((q, qIdx) => {
@@ -409,12 +421,12 @@ export async function generateNotePdfBuffer(note) {
             checkPageBreak(30);
             const ans = cleanMathText(q.correctAnswer || q.answer || '');
             if (ans) {
-              doc.fillColor(INK_GREEN).fontSize(9).text(`  ✅ Correct Answer: ${ans}`, CONTENT_LEFT + 6, doc.y);
+              doc.fillColor(INK_GREEN).fontSize(9).text(`  Correct Answer: ${ans}`, CONTENT_LEFT + 6, doc.y);
               doc.moveDown(0.2);
             }
             const sol = cleanMathText(q.explanation || q.solution || '');
             if (sol) {
-              doc.fillColor('#334155').fontSize(8.5).text(`  💡 Solution Steps: ${sol}`, CONTENT_LEFT + 6, doc.y, { width: CONTENT_WIDTH - 12 });
+              doc.fillColor('#334155').fontSize(8.5).text(`  Solution Steps: ${sol}`, CONTENT_LEFT + 6, doc.y, { width: CONTENT_WIDTH - 12 });
             }
           }
 
@@ -430,16 +442,16 @@ export async function generateNotePdfBuffer(note) {
 
       if (shortcuts.length > 0 || mistakes.length > 0) {
         checkPageBreak(70);
-        doc.fillColor(INK_BLACK).fontSize(12).text('⚡ SPEED TRICKS & COMMON MISTAKES TO AVOID', CONTENT_LEFT, doc.y, { underline: true });
+        doc.fillColor(INK_BLACK).fontSize(12).text('SPEED TRICKS & COMMON MISTAKES TO AVOID', CONTENT_LEFT, doc.y, { underline: true });
         doc.moveDown(0.4);
 
         if (shortcuts.length > 0) {
-          doc.fillColor(INK_GREEN).fontSize(9.5).text(`🚀 Pro Exam Shortcut: ${shortcuts.slice(0, 2).join(' | ')}`, CONTENT_LEFT + 6, doc.y, { width: CONTENT_WIDTH - 12 });
+          doc.fillColor(INK_GREEN).fontSize(9.5).text(`Pro Exam Shortcut: ${cleanMathText(shortcuts.slice(0, 2).join(' | '))}`, CONTENT_LEFT + 6, doc.y, { width: CONTENT_WIDTH - 12 });
           doc.moveDown(0.3);
         }
 
         if (mistakes.length > 0) {
-          doc.fillColor(INK_RED).fontSize(9.5).text(`⚠️ Student Mistake to Avoid: ${mistakes.slice(0, 2).join(' | ')}`, CONTENT_LEFT + 6, doc.y, { width: CONTENT_WIDTH - 12 });
+          doc.fillColor(INK_RED).fontSize(9.5).text(`Student Mistake to Avoid: ${cleanMathText(mistakes.slice(0, 2).join(' | '))}`, CONTENT_LEFT + 6, doc.y, { width: CONTENT_WIDTH - 12 });
           doc.moveDown(0.4);
         }
       }

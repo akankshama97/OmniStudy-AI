@@ -458,7 +458,7 @@ export async function getTranscript(videoId, videoDetails = {}) {
         ? lastItem.offsetSec
         : (lastItem?.offset > 10000 ? lastItem.offset / 1000 : (lastItem?.offset || videoDetails.durationSec || 1800));
 
-      const targetChunkCount = totalDurationSec > 7200 ? 12 : totalDurationSec > 3600 ? 10 : 8;
+      const targetChunkCount = totalDurationSec >= 7200 ? 16 : totalDurationSec >= 3600 ? 12 : 8;
       const chunkDurationSec = Math.max(240, Math.ceil(totalDurationSec / targetChunkCount));
       const overlapSec = Math.min(45, Math.ceil(chunkDurationSec * 0.08));
 
@@ -499,7 +499,7 @@ export async function getTranscript(videoId, videoDetails = {}) {
   } else {
     // Generate modular syllabus segments spanning the entire lecture duration from 00:00 to the end
     const totalSec = videoDetails.durationSec || 3600;
-    const segmentCount = totalSec > 7200 ? 10 : totalSec > 3600 ? 8 : 6;
+    const segmentCount = totalSec >= 7200 ? 14 : totalSec >= 3600 ? 10 : 7;
     const stepSec = Math.floor(totalSec / segmentCount);
     for (let i = 0; i < segmentCount; i++) {
       const startS = i * stepSec;

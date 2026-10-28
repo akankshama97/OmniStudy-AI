@@ -1064,30 +1064,73 @@ async function generateMasterNotesSinglePass(fullText, videoTitle, language, sel
     ? 'Use clear Hindi (Devanagari script) with standard technical English terminology where appropriate.'
     : 'Use clear, concise, academic English.';
 
-  let transcriptContext = (fullText || '').slice(0, 45000);
-  if (!transcriptContext && Array.isArray(chunks) && chunks.length > 0) {
-    transcriptContext = chunks.map(c => `[${c.startTime} - ${c.endTime}] ${c.text}`).join('\n\n').slice(0, 45000);
+  let totalDurationSec = videoDetails.durationSec || 0;
+  let startTime = '00:00';
+  let endTime = '';
+
+  if (Array.isArray(chunks) && chunks.length > 0) {
+    startTime = chunks[0].startTime || '00:00';
+    const lastChunk = chunks[chunks.length - 1];
+    endTime = lastChunk.endTime || '';
+    if (!totalDurationSec && lastChunk.endSec) {
+      totalDurationSec = lastChunk.endSec;
+    }
+  }
+
+  // Format full transcript context with timestamps across the ENTIRE duration (NO 45K truncation!)
+  let transcriptContext = '';
+  if (Array.isArray(chunks) && chunks.length > 0) {
+    transcriptContext = chunks.map(c => `[${c.startTime} - ${c.endTime}] ${c.text}`).join('\n\n');
+  } else if (fullText) {
+    transcriptContext = fullText;
+  }
+
+  // Allow up to 350,000 characters (sufficient for 3+ hours of exhaustive lecture transcript)
+  if (transcriptContext.length > 350000) {
+    transcriptContext = transcriptContext.slice(0, 350000);
   }
   if (!transcriptContext) {
-    transcriptContext = `Topic: "${videoTitle}". Educator: "${videoDetails.author || 'Educator'}". Description: ${(videoDetails.description || '').slice(0, 3000)}`;
+    transcriptContext = `Topic: "${videoTitle}". Educator: "${videoDetails.author || 'Educator'}". Description: ${(videoDetails.description || '').slice(0, 4000)}`;
+  }
+
+  const durationMin = Math.round(totalDurationSec / 60) || (chunks && Math.round(chunks.length * 6)) || 60;
+
+  // Dynamic Concept Count based on lecture length:
+  // For 2-hour lecture (>= 5400s or 90m): 14 to 20 concepts spanning whole lecture
+  // For 1-hour lecture (2700s - 5400s or 45-90m): 10 to 14 concepts
+  // For standard/short lecture (< 45m): 7 to 10 concepts
+  let targetConceptMin = 7;
+  let targetConceptMax = 10;
+  if (totalDurationSec >= 5400 || (chunks && chunks.length >= 10) || durationMin >= 90) {
+    targetConceptMin = 14;
+    targetConceptMax = 20;
+  } else if (totalDurationSec >= 2700 || (chunks && chunks.length >= 7) || durationMin >= 45) {
+    targetConceptMin = 10;
+    targetConceptMax = 14;
   }
 
   const prompt = `You are an elite academic professor and university gold-medalist tutor capturing COMPLETE, EXHAUSTIVE, UNABRIDGED student classroom notebook notes.
 Lecture Title: "${videoTitle}"
 Educator: "${videoDetails.author || 'Educator'}"
 Target Exam: ${selectedExam}
+Total Lecture Duration: ${durationMin} Minutes [Timeline: ${startTime} to ${endTime || `${durationMin}:00`}]
 Language Requirement: ${langInstruction}
 
-TRANSCRIPT & LECTURE SPOKEN CONTENT:
+TRANSCRIPT & LECTURE SPOKEN CONTENT (FULL LECTURE):
 "${transcriptContext}"
 
 CRITICAL INSTRUCTIONS (MUST MATCH THE EXACT DEPTH & QUALITY OF TOPPER DEMO NOTES):
 0. STRICT FIDELITY (LECTURE-ONLY GROUNDING): Cover ONLY topics, concepts, theorems, derivations, and examples ACTUALLY taught in this specific video lecture. Do NOT add outside fluff, unrelated background topics, or preamble before or after. The notes must represent 100% of what was taught in the video and NOTHING extraneous.
-0.1 ORIGINAL DETAILED TOPPER NOTES: Explain every step in crystal-clear detail with comprehensive explanations, step-by-step reasoning, mathematical clarity, and intuitive analogies. Do NOT quote verbatim transcript filler; synthesize high-yield classroom notes.
-1. PRODUCE 6 TO 10 COMPREHENSIVE KEY CONCEPTS covering the chronological flow of the lecture from start to finish.
+0.1 CHRONOLOGICAL FULL-DURATION COMPLETENESS (MANDATORY):
+   - This lecture spans ${durationMin} minutes from ${startTime} to ${endTime || 'conclusion'}.
+   - You MUST divide and cover the entire lecture proportionally from start to finish.
+   - DO NOT stop after the first 30-40 minutes!
+   - Systematically extract concepts across all phases: early foundational definitions (${startTime} - approx 30m), core theories & derivations (approx 30m - 75m), advanced mechanisms, circuit/system architectures (approx 75m - 100m), and final solved numericals & closing exam problems (approx 100m - ${endTime || 'conclusion'}).
+1. PRODUCE ${targetConceptMin} TO ${targetConceptMax} COMPREHENSIVE KEY CONCEPTS covering the chronological flow of the lecture from start to finish.
    - Headings must be exact, specific, scientific/academic sub-topics (e.g., "1. Principle of Operation & Working", "2. Mathematical Derivation of Governing Equation", "3. System Architecture & Block Diagram", "4. Step-by-Step Solved Problem").
    - NEVER use generic placeholders like "Topic 1" or repeat the lecture title.
-2. 6 TO 10 DETAILED POINTS PER CONCEPT combining theory, derivations, and reasoning with bold (**bold**) technical terms. Write all mathematical equations in clean, natural readable format (e.g., F = m * a, Work = Force * Displacement, v = u + a * t, KE = (1/2) * m * v^2). Do NOT use LaTeX conversion syntax (\frac, \sqrt, \vec, $...$, or $$...$$) so that notes display seamlessly on both Telegram bot and website without conversion artifacts.
+   - Every concept must have accurate timestamp_start and timestamp_end reflecting its actual position along the ${durationMin}-minute timeline.
+2. 6 TO 10 DETAILED POINTS PER CONCEPT combining theory, derivations, and reasoning with bold (**bold**) technical terms. Write all mathematical equations in clean, natural readable format (e.g., F = m * a, Work = Force * Displacement, v = u + a * t, KE = (1/2) * m * v^2). Do NOT use LaTeX conversion syntax (\\frac, \\sqrt, \\vec, $...$, or $$...$$) so that notes display seamlessly on both Telegram bot and website without conversion artifacts.
 3. INCLUDE SELF-CONTAINED SVG DIAGRAMS (<svg viewBox="0 0 540 220" xmlns="http://www.w3.org/2000/svg">...</svg>) for concepts with drawings, circuits, block diagrams, flowcharts, or plots. Ensure diagrams use high-contrast strokes and fills compatible with dark and light themes.
 4. EXTRACT 3 TO 8 OFFICIAL FORMULAS in clean, natural readable format with name, formula string (e.g. F = m * a), variables, and "whenToUse" in exams. Do NOT use raw LaTeX markup.
 5. CURATE 5 REAL PREVIOUS YEAR EXAM QUESTIONS (PYQs) with exam tag (e.g. AKTU, CBSE, GATE, JEE, DU, VTU), year, marks, 4 options (A, B, C, D), correct answer, and detailed step-by-step explanation!
@@ -1173,8 +1216,8 @@ Return STRICT JSON ONLY matching this schema:
   console.log(`[OmniStudy AI] 🚀 Running Master Single-Pass Generation for "${videoTitle}"...`);
   const res = await executeGeminiPrompt(prompt);
   const parsed = cleanAndParseJSON(res);
-  if (parsed && Array.isArray(parsed.keyConcepts) && parsed.keyConcepts.length >= 3) {
-    console.log(`✓ [OmniStudy AI] Master Single-Pass Succeeded with ${parsed.keyConcepts.length} concepts & ${parsed.importantPYQs?.length || 0} PYQs!`);
+  if (parsed && Array.isArray(parsed.keyConcepts) && parsed.keyConcepts.length >= Math.min(6, Math.floor(targetConceptMin * 0.7))) {
+    console.log(`✓ [OmniStudy AI] Master Single-Pass Succeeded with ${parsed.keyConcepts.length} concepts & ${parsed.importantPYQs?.length || 0} PYQs across ${durationMin} mins!`);
     return parsed;
   }
   throw new Error('Master single-pass produced insufficient concepts, falling back to chunk pipeline.');
