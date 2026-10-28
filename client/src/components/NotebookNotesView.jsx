@@ -587,7 +587,7 @@ export default function NotebookNotesView({
     }
   };
 
-  // Helper: Generates authentic, classroom notebook HTML matching the laptop screen experience 100%
+  // Helper: Generates authentic, classroom notebook HTML matching the laptop screen in normal Black & Blue pen writing
   const getAuthenticNotebookHtml = (n) => {
     if (!n) return '';
     const cleanChapter = formatNaturalMathHtml(n.chapter || n.title || 'Lecture Study Notes');
@@ -600,28 +600,28 @@ export default function NotebookNotesView({
     const mistakes = Array.isArray(n.commonMistakes) ? n.commonMistakes : [];
 
     return `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #0F172A; max-width: 820px; margin: 0 auto; padding: 20px 24px; background: #FFFFFF;">
+      <div style="font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #0F172A; max-width: 800px; margin: 0 auto; padding: 24px 28px; background: #FFFFFF;">
         
-        <!-- ── 1. TOPPER COVER HEADER (Identical to Laptop Screen) ── -->
-        <div class="topper-cover-header" style="background: #FFFFFF; border: 2.5px solid #1E3A8A; border-radius: 14px; padding: 18px 22px; margin-bottom: 22px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); page-break-inside: avoid; break-inside: avoid;">
+        <!-- ── 1. TOPPER COVER HEADER (Normal Black & Blue Pen Style) ── -->
+        <div class="topper-cover-header" style="background: #FFFFFF; border: 2px solid #0F172A; border-radius: 12px; padding: 18px 22px; margin-bottom: 22px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); page-break-inside: avoid; break-inside: avoid;">
           <!-- Brand & Attribution Row -->
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #E2E8F0; padding-bottom: 10px; margin-bottom: 12px; font-family: monospace;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #E2E8F0; padding-bottom: 8px; margin-bottom: 10px; font-family: monospace;">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #2563EB;"></span>
-              <span style="font-weight: 900; font-size: 13px; color: #1E3A8A; letter-spacing: 0.5px;">⚡ OMNISTUDY AI • TOPPER CLASSROOM COPY</span>
+              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #1E3A8A;"></span>
+              <span style="font-weight: 900; font-size: 13px; color: #0F172A; letter-spacing: 0.5px;">⚡ OMNISTUDY AI • TOPPER CLASSROOM COPY</span>
               <span style="background: #DCFCE7; color: #166534; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; border: 1px solid #86EFAC;">100% EXAM VERIFIED</span>
             </div>
-            <div style="font-size: 12px; font-weight: 800; color: #334155;">
-              Platform Developed by: <strong style="color: #2563EB; text-decoration: underline;">Akanksha Maurya</strong>
+            <div style="font-size: 12px; font-weight: 800; color: #0F172A;">
+              Platform Developed by: <strong style="color: #1E3A8A; text-decoration: underline;">Akanksha Maurya</strong>
             </div>
           </div>
 
           <!-- Metadata Row -->
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #475569; font-family: monospace; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #334155; font-family: monospace; margin-bottom: 10px;">
             <div>
-              <strong style="color: #DC2626;">SUBJECT:</strong> <span style="color: #0F172A; font-weight: bold;">${cleanSubject}</span>
+              <strong style="color: #991B1B;">SUBJECT:</strong> <span style="color: #0F172A; font-weight: bold;">${cleanSubject}</span>
               <span style="margin: 0 8px; color: #CBD5E1;">•</span>
-              <strong style="color: #2563EB;">NOTES TYPE:</strong> <span style="color: #0F172A; font-weight: bold;">CLASSROOM TOPPER COPY</span>
+              <strong style="color: #1E3A8A;">NOTES TYPE:</strong> <span style="color: #0F172A; font-weight: bold;">CLASSROOM TOPPER COPY</span>
             </div>
             <div>
               <span style="background: #FEF3C7; border: 1px solid #FCD34D; color: #92400E; font-weight: 800; padding: 2px 8px; border-radius: 6px; font-size: 11px;">
@@ -630,30 +630,30 @@ export default function NotebookNotesView({
             </div>
           </div>
 
-          <!-- Chapter / Lecture Title -->
-          <h1 style="color: #1E3A8A; font-size: 24px; font-weight: 900; margin: 0; line-height: 1.3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          <!-- Chapter / Lecture Title in Bold Black Pen -->
+          <h1 style="color: #0F172A; font-size: 23px; font-weight: 900; margin: 0; line-height: 1.3;">
             ${cleanChapter}
           </h1>
         </div>
 
         <!-- ── 2. CLICKABLE TOPIC INDEX (Table of Contents) ── -->
         ${concepts.length > 0 ? `
-          <div style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 12px; padding: 14px 18px; margin-bottom: 22px; page-break-inside: avoid; break-inside: avoid;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #BBF7D0; padding-bottom: 6px; margin-bottom: 10px;">
-              <span style="font-weight: 800; font-size: 12px; color: #166534; font-family: monospace; text-transform: uppercase; letter-spacing: 0.5px;">
+          <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 14px 18px; margin-bottom: 22px; page-break-inside: avoid; break-inside: avoid;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0; padding-bottom: 6px; margin-bottom: 10px;">
+              <span style="font-weight: 800; font-size: 12px; color: #0F172A; font-family: monospace; text-transform: uppercase; letter-spacing: 0.5px;">
                 📖 Complete Lecture Syllabus & Topic Index (${concepts.length} Topics Covering 100% Duration)
               </span>
-              <span style="background: #DCFCE7; color: #15803D; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 12px;">
+              <span style="background: #EFF6FF; color: #1E3A8A; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 12px; border: 1px solid #BFDBFE;">
                 ${concepts.length} Detailed Topics
               </span>
             </div>
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 14px; font-size: 11.5px;">
               ${concepts.map((c, idx) => `
-                <div style="background: #FFFFFF; border: 1px solid #DCFCE7; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-weight: 700; color: #1E3A8A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px;">
+                <div style="background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px;">
                     <strong>${idx + 1}.</strong> ${formatNaturalMathHtml(c.heading || `Topic ${idx + 1}`)}
                   </span>
-                  <span style="font-family: monospace; color: #64748B; font-size: 10.5px; font-weight: 600;">
+                  <span style="font-family: monospace; color: #1E3A8A; font-size: 10.5px; font-weight: 700;">
                     ${c.timestamp_start || '00:00'}
                   </span>
                 </div>
@@ -664,76 +664,76 @@ export default function NotebookNotesView({
 
         <!-- ── 3. CORE LECTURE OVERVIEW & HIGH-YIELD TAKEAWAYS ── -->
         ${(n.overview || (n.quickSummary && n.quickSummary.length > 0)) ? `
-          <div style="background: #EEF2FF; border: 1.5px solid #C7D2FE; border-radius: 12px; padding: 16px 18px; margin-bottom: 24px; page-break-inside: avoid; break-inside: avoid;">
-            <div style="font-weight: 800; font-size: 13px; color: #1E40AF; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-              <span>📌</span> <span>CORE CHAPTER SUMMARY & HIGH-YIELD TAKEAWAYS</span>
+          <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 24px; page-break-inside: avoid; break-inside: avoid;">
+            <div style="font-weight: 800; font-size: 13px; color: #0F172A; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <span>📌</span> <span style="color: #0F172A; font-weight: 900;">CORE CHAPTER SUMMARY & HIGH-YIELD TAKEAWAYS</span>
             </div>
             ${n.overview ? `
-              <p style="font-size: 12.5px; color: #1E293B; line-height: 1.6; margin: 0 0 10px 0; background: #FFFFFF; border: 1px solid #E0E7FF; padding: 10px 12px; border-radius: 8px;">
+              <p style="font-size: 13px; color: #1E3A8A; line-height: 1.65; margin: 0 0 10px 0; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 10px 12px; border-radius: 8px;">
                 ${formatNaturalMathHtml(n.overview)}
               </p>
             ` : ''}
             ${n.quickSummary && n.quickSummary.length > 0 ? `
-              <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: #1E293B;">
+              <ul style="margin: 0; padding-left: 20px; font-size: 12.5px; color: #1E3A8A; line-height: 1.6;">
                 ${n.quickSummary.map(s => `<li style="margin-bottom: 4px; font-weight: 600;">${formatNaturalMathHtml(s)}</li>`).join('')}
               </ul>
             ` : ''}
           </div>
         ` : ''}
 
-        <!-- ── 4. DETAILED CLASSROOM COPY CONCEPTS ── -->
+        <!-- ── 4. DETAILED CLASSROOM COPY CONCEPTS (BLACK & BLUE PEN) ── -->
         ${concepts.length > 0 ? `
-          <div style="margin-bottom: 16px; border-left: 4px solid #1E3A8A; padding-left: 10px;">
-            <h2 style="color: #1E3A8A; font-size: 18px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">
+          <div style="margin-bottom: 16px; border-left: 4px solid #0F172A; padding-left: 10px;">
+            <h2 style="color: #0F172A; font-size: 18px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">
               ✍️ COMPLETE LECTURE CONCEPTS & BLACKBOARD DERIVATIONS
             </h2>
           </div>
 
           ${concepts.map((c, idx) => `
-            <div class="concept-block" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 12px; padding: 16px 20px; margin-bottom: 22px; page-break-inside: avoid; break-inside: avoid; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+            <div class="concept-block" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 20px; margin-bottom: 22px; page-break-inside: avoid; break-inside: avoid; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
               
               <!-- Concept Header Bar -->
-              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #E2E8F0; padding-bottom: 8px; margin-bottom: 10px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1D4ED8; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 12px; font-family: monospace;">
+                  <span style="background: #0F172A; color: #FFFFFF; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 12px; font-family: monospace;">
                     TOPIC #${idx + 1}
                   </span>
-                  <span style="background: #F1F5F9; color: #475569; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 12px; font-family: monospace;">
+                  <span style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E3A8A; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 12px; font-family: monospace;">
                     ⏱️ [${c.timestamp_start || '00:00'} - ${c.timestamp_end || 'End'}]
                   </span>
                 </div>
-                <span style="font-size: 11px; font-weight: 700; color: #10B981;">
+                <span style="font-size: 11px; font-weight: 700; color: #15803D;">
                   100% Exam Verified ✓
                 </span>
               </div>
 
-              <!-- Topic Heading -->
-              <h3 style="color: #1E3A8A; font-size: 18px; font-weight: 800; margin: 0 0 4px 0; line-height: 1.3; border-bottom: 2px solid #3B82F6; padding-bottom: 4px;">
+              <!-- Topic Heading in Deep Black Pen with Blue Underline -->
+              <h3 style="color: #0F172A; font-size: 18px; font-weight: 900; margin: 0 0 4px 0; line-height: 1.3; border-bottom: 2px solid #1E3A8A; padding-bottom: 4px;">
                 ${idx + 1}. ${formatNaturalMathHtml(c.heading || `Concept ${idx + 1}`)}
               </h3>
 
               <!-- Subheading -->
               ${c.subheading ? `
-                <div style="font-size: 12.5px; color: #64748B; font-style: italic; margin-bottom: 10px;">
+                <div style="font-size: 12.5px; color: #475569; font-style: italic; margin-bottom: 10px;">
                   ▶ ${formatNaturalMathHtml(c.subheading)}
                 </div>
               ` : ''}
 
               <!-- Red Pen Definitions (with 📌) -->
               ${c.definitions && c.definitions.length > 0 ? `
-                <div style="background: #FEF2F2; border-left: 4px solid #EF4444; border-radius: 6px; padding: 9px 12px; margin: 10px 0;">
-                  <strong style="color: #B91C1C; font-size: 12px; display: block; margin-bottom: 2px;">📌 Core Definition:</strong>
-                  ${c.definitions.map(d => `<p style="color: #991B1B; font-size: 12.5px; font-weight: 600; margin: 3px 0; line-height: 1.5;">${formatNaturalMathHtml(d)}</p>`).join('')}
+                <div style="background: #FEF2F2; border-left: 4px solid #DC2626; border-radius: 6px; padding: 9px 12px; margin: 10px 0;">
+                  <strong style="color: #991B1B; font-size: 12px; display: block; margin-bottom: 2px;">📌 Core Definition:</strong>
+                  ${c.definitions.map(d => `<p style="color: #B91C1C; font-size: 12.5px; font-weight: 600; margin: 3px 0; line-height: 1.5;">${formatNaturalMathHtml(d)}</p>`).join('')}
                 </div>
               ` : ''}
 
-              <!-- Blue Pen Detailed Blackboard Points -->
+              <!-- Blue Pen Detailed Blackboard Points (with Black Bold terms) -->
               ${c.points && c.points.length > 0 ? `
                 <div style="margin: 10px 0;">
-                  <strong style="color: #1E3A8A; font-size: 12px; display: block; margin-bottom: 6px;">Blackboard Detailed Points & Reasoning:</strong>
-                  <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.6; color: #1E3A8A;">
+                  <strong style="color: #0F172A; font-size: 12.5px; display: block; margin-bottom: 6px;">Blackboard Detailed Points & Explanation:</strong>
+                  <ul style="margin: 0; padding-left: 20px; font-size: 13.5px; line-height: 1.7; color: #1E3A8A;">
                     ${c.points.map(p => `
-                      <li style="margin-bottom: 5px;">
+                      <li style="margin-bottom: 5px; color: #1E3A8A;">
                         ${formatNaturalMathHtml(p)}
                       </li>
                     `).join('')}
@@ -745,20 +745,20 @@ export default function NotebookNotesView({
               ${c.table && c.table.headers && c.table.headers.length > 0 ? `
                 <div class="table-container" style="margin: 12px 0; border: 1.5px solid #CBD5E1; border-radius: 8px; overflow: hidden; page-break-inside: avoid; break-inside: avoid;">
                   ${c.table.title ? `
-                    <div style="background: #F1F5F9; padding: 6px 10px; font-size: 11.5px; font-weight: 800; color: #1E293B; border-bottom: 1px solid #CBD5E1;">
+                    <div style="background: #F1F5F9; padding: 6px 10px; font-size: 11.5px; font-weight: 800; color: #0F172A; border-bottom: 1px solid #CBD5E1;">
                       📊 ${formatNaturalMathHtml(c.table.title)}
                     </div>
                   ` : ''}
                   <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                     <thead>
-                      <tr style="background: #1E3A8A; color: #FFFFFF;">
+                      <tr style="background: #0F172A; color: #FFFFFF;">
                         ${c.table.headers.map(h => `<th style="padding: 6px 10px; text-align: left; border: 1px solid #CBD5E1;">${formatNaturalMathHtml(h)}</th>`).join('')}
                       </tr>
                     </thead>
                     <tbody>
                       ${(c.table.rows || []).map((row, ri) => `
                         <tr style="background: ${ri % 2 === 0 ? '#FFFFFF' : '#F8FAFC'};">
-                          ${row.map(cell => `<td style="padding: 6px 10px; border: 1px solid #CBD5E1; color: #334155;">${formatNaturalMathHtml(cell)}</td>`).join('')}
+                          ${row.map(cell => `<td style="padding: 6px 10px; border: 1px solid #CBD5E1; color: #1E3A8A;">${formatNaturalMathHtml(cell)}</td>`).join('')}
                         </tr>
                       `).join('')}
                     </tbody>
@@ -769,7 +769,7 @@ export default function NotebookNotesView({
               <!-- Real Blackboard SVG Diagram -->
               ${c.diagram && (c.diagram.heading || c.diagram.description || c.diagram.svg_or_mermaid) ? `
                 <div class="diagram-box" style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 12px 14px; margin: 14px 0; text-align: center; page-break-inside: avoid; break-inside: avoid;">
-                  <div style="color: #1E3A8A; font-weight: 800; font-size: 12.5px; margin-bottom: 8px;">
+                  <div style="color: #0F172A; font-weight: 800; font-size: 12.5px; margin-bottom: 8px;">
                     📐 Blackboard Diagram: ${formatNaturalMathHtml(c.diagram.heading || 'Architecture & Process Schematic')}
                   </div>
                   ${c.diagram.svg_or_mermaid && c.diagram.svg_or_mermaid.includes('<svg') ? `
@@ -778,14 +778,14 @@ export default function NotebookNotesView({
                     </div>
                   ` : ''}
                   ${c.diagram.description ? `
-                    <p style="font-size: 11.5px; color: #64748B; font-style: italic; margin: 6px 0 0 0;">
+                    <p style="font-size: 11.5px; color: #475569; font-style: italic; margin: 6px 0 0 0;">
                       Caption: ${formatNaturalMathHtml(c.diagram.description)}
                     </p>
                   ` : ''}
                 </div>
               ` : ''}
 
-              <!-- Solved Blackboard Examples / Numericals -->
+              <!-- Solved Blackboard Examples / Numericals (Green Pen) -->
               ${c.solved_example && (c.solved_example.title || c.solved_example.steps || c.solved_example.solution) ? `
                 <div class="solved-example-box" style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 8px; padding: 12px 14px; margin: 12px 0; page-break-inside: avoid; break-inside: avoid;">
                   <div style="color: #15803D; font-weight: 800; font-size: 12.5px; margin-bottom: 6px;">
@@ -794,13 +794,13 @@ export default function NotebookNotesView({
                   ${c.solved_example.given ? `<p style="margin: 2px 0; font-size: 12px; color: #166534;"><strong>Given:</strong> ${formatNaturalMathHtml(c.solved_example.given)}</p>` : ''}
                   ${c.solved_example.formula ? `<p style="margin: 2px 0; font-size: 12px; color: #15803D; font-family: monospace;"><strong>Formula:</strong> ${formatNaturalMathHtml(c.solved_example.formula)}</p>` : ''}
                   ${c.solved_example.steps && Array.isArray(c.solved_example.steps) ? `
-                    <div style="margin: 4px 0; font-size: 12px; color: #1F2937;">
+                    <div style="margin: 4px 0; font-size: 12px; color: #0F172A;">
                       <strong>Derivation Steps:</strong>
-                      <ol style="margin: 2px 0; padding-left: 20px;">
+                      <ol style="margin: 2px 0; padding-left: 20px; color: #1E3A8A;">
                         ${c.solved_example.steps.map(st => `<li style="margin-bottom: 2px;">${formatNaturalMathHtml(st)}</li>`).join('')}
                       </ol>
                     </div>
-                  ` : (c.solved_example.solution ? `<p style="margin: 3px 0; font-size: 12px; color: #1F2937;"><strong>Solution:</strong> ${formatNaturalMathHtml(c.solved_example.solution).replace(/\n/g, '<br/>')}</p>` : '')}
+                  ` : (c.solved_example.solution ? `<p style="margin: 3px 0; font-size: 12px; color: #1E3A8A;"><strong>Solution:</strong> ${formatNaturalMathHtml(c.solved_example.solution).replace(/\n/g, '<br/>')}</p>` : '')}
                   ${c.solved_example.finalAnswer || c.solved_example.answer ? `
                     <p style="margin: 4px 0 0 0; font-size: 12.5px; color: #14532D; font-weight: 800; background: #DCFCE7; padding: 4px 8px; border-radius: 4px; display: inline-block;">
                       Answer: ${formatNaturalMathHtml(c.solved_example.finalAnswer || c.solved_example.answer)}
@@ -830,17 +830,17 @@ export default function NotebookNotesView({
           `).join('')}
         ` : ''}
 
-        <!-- ── 5. ESSENTIAL FORMULA CHEAT SHEET ── -->
+        <!-- ── 5. ESSENTIAL FORMULA CHEAT SHEET (Black & Blue Pen) ── -->
         ${formulas.length > 0 ? `
           <div class="formula-box" style="margin-top: 30px; margin-bottom: 24px; page-break-inside: avoid; break-inside: avoid;">
-            <div style="border-left: 4px solid #DC2626; padding-left: 10px; margin-bottom: 12px;">
-              <h2 style="color: #991B1B; font-size: 18px; font-weight: 900; margin: 0; text-transform: uppercase;">
+            <div style="border-left: 4px solid #0F172A; padding-left: 10px; margin-bottom: 12px;">
+              <h2 style="color: #0F172A; font-size: 18px; font-weight: 900; margin: 0; text-transform: uppercase;">
                 ⚡ ESSENTIAL FORMULA CHEAT SHEET & GOVERNING EQUATIONS
               </h2>
             </div>
             <table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1.5px solid #CBD5E1; border-radius: 8px; overflow: hidden;">
               <thead>
-                <tr style="background: #1E3A8A; color: #FFFFFF;">
+                <tr style="background: #0F172A; color: #FFFFFF;">
                   <th style="padding: 8px 10px; text-align: left; width: 28%; border: 1px solid #CBD5E1;">Formula Name</th>
                   <th style="padding: 8px 10px; text-align: left; width: 38%; border: 1px solid #CBD5E1;">Mathematical Equation</th>
                   <th style="padding: 8px 10px; text-align: left; width: 34%; border: 1px solid #CBD5E1;">When to Use / Variables</th>
@@ -851,7 +851,7 @@ export default function NotebookNotesView({
                   <tr style="background: ${fi % 2 === 0 ? '#FFFFFF' : '#F8FAFC'};">
                     <td style="padding: 8px 10px; border: 1px solid #CBD5E1; font-weight: 800; color: #0F172A;">${formatNaturalMathHtml(f.name || `Formula #${fi + 1}`)}</td>
                     <td style="padding: 8px 10px; border: 1px solid #CBD5E1; font-family: monospace; font-weight: 900; color: #1E3A8A; font-size: 12.5px;">${formatNaturalMathHtml(f.formula || '')}</td>
-                    <td style="padding: 8px 10px; border: 1px solid #CBD5E1; color: #475569; font-size: 11.5px;">${formatNaturalMathHtml(f.whenToUse || f.variables || '')}</td>
+                    <td style="padding: 8px 10px; border: 1px solid #CBD5E1; color: #334155; font-size: 11.5px;">${formatNaturalMathHtml(f.whenToUse || f.variables || '')}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -859,12 +859,12 @@ export default function NotebookNotesView({
           </div>
         ` : ''}
 
-        <!-- ── 6. PREVIOUS YEAR EXAM QUESTIONS (PYQs) WITH COMPLETE SOLUTIONS ── -->
+        <!-- ── 6. PREVIOUS YEAR EXAM QUESTIONS (PYQs) (Black Question, Blue Solution) ── -->
         ${pyqs.length > 0 ? `
           <div style="margin-top: 30px; margin-bottom: 24px;">
             <div style="border-left: 4px solid #7C3AED; padding-left: 10px; margin-bottom: 14px;">
-              <h2 style="color: #6D28D9; font-size: 18px; font-weight: 900; margin: 0; text-transform: uppercase;">
-                🎯 EXAM PREVIOUS YEAR QUESTIONS (PYQs) WITH COMPLETE STEP-BY-STEP SOLUTIONS
+              <h2 style="color: #0F172A; font-size: 18px; font-weight: 900; margin: 0; text-transform: uppercase;">
+                🎯 EXAM PREVIOUS YEAR QUESTIONS (PYQs) WITH COMPLETE SOLUTIONS
               </h2>
             </div>
             ${pyqs.slice(0, 8).map((q, qIdx) => `
@@ -883,8 +883,8 @@ export default function NotebookNotesView({
                 ${q.options && q.options.length > 0 ? `
                   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 10px; margin: 6px 0; font-size: 12px;">
                     ${q.options.map((opt, oIdx) => `
-                      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 8px; border-radius: 4px; color: #334155;">
-                        <strong>${['A', 'B', 'C', 'D'][oIdx] || `(${oIdx + 1})`})</strong> ${formatNaturalMathHtml(opt)}
+                      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 8px; border-radius: 4px; color: #1E3A8A;">
+                        <strong style="color: #0F172A;">${['A', 'B', 'C', 'D'][oIdx] || `(${oIdx + 1})`})</strong> ${formatNaturalMathHtml(opt)}
                       </div>
                     `).join('')}
                   </div>
@@ -895,7 +895,7 @@ export default function NotebookNotesView({
                   </div>
                 ` : ''}
                 ${q.solution || q.explanation ? `
-                  <div style="background: #F8FAFC; border-left: 3px solid #64748B; padding: 6px 10px; margin-top: 6px; font-size: 12px; color: #334155;">
+                  <div style="background: #F8FAFC; border-left: 3px solid #1E3A8A; padding: 6px 10px; margin-top: 6px; font-size: 12px; color: #1E3A8A;">
                     <strong style="color: #0F172A;">Detailed Solution:</strong> ${formatNaturalMathHtml(q.solution || q.explanation).replace(/\n/g, '<br/>')}
                   </div>
                 ` : ''}
@@ -904,32 +904,7 @@ export default function NotebookNotesView({
           </div>
         ` : ''}
 
-        <!-- ── 7. SPEED TRICKS & COMMON MISTAKES SUMMARY ── -->
-        ${(shortcuts.length > 0 || mistakes.length > 0) ? `
-          <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 14px 16px; margin: 24px 0; page-break-inside: avoid; break-inside: avoid;">
-            <div style="font-weight: 800; font-size: 13px; color: #0F172A; margin-bottom: 8px;">
-              ⚡ EXAM SPEED TRICKS & COMMON MISTAKES
-            </div>
-            ${shortcuts.length > 0 ? `
-              <div style="margin-bottom: 6px; font-size: 12px; color: #065F46;">
-                <strong>🚀 Pro Speed Shortcuts:</strong>
-                <ul style="margin: 2px 0; padding-left: 18px;">
-                  ${shortcuts.map(s => `<li>${formatNaturalMathHtml(s)}</li>`).join('')}
-                </ul>
-              </div>
-            ` : ''}
-            ${mistakes.length > 0 ? `
-              <div style="font-size: 12px; color: #991B1B;">
-                <strong>⚠️ Traps to Avoid:</strong>
-                <ul style="margin: 2px 0; padding-left: 18px;">
-                  ${mistakes.map(m => `<li>${formatNaturalMathHtml(m)}</li>`).join('')}
-                </ul>
-              </div>
-            ` : ''}
-          </div>
-        ` : ''}
-
-        <!-- ── 8. OFFICIAL SIGNATURE & WATERMARK FOOTER ── -->
+        <!-- ── 7. OFFICIAL SIGNATURE & WATERMARK FOOTER ── -->
         <div style="background: #0F172A; color: #FFFFFF; border: 2px solid #1E293B; border-radius: 12px; padding: 14px 18px; margin-top: 32px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; page-break-inside: avoid; break-inside: avoid;">
           <div>
             <span style="font-weight: 900; font-size: 12px; color: #60A5FA; letter-spacing: 0.5px;">⚡ OMNISTUDY AI DIGITAL NOTEBOOK</span>
@@ -941,7 +916,7 @@ export default function NotebookNotesView({
           </div>
         </div>
 
-        <div style="text-align: center; color: #94A3B8; font-size: 10px; margin-top: 8px;">
+        <div style="text-align: center; color: #64748B; font-size: 10px; margin-top: 8px;">
           Generated with OmniStudy AI • Interactive Web App: https://omni-study-ai-lilac.vercel.app/
         </div>
 
@@ -961,13 +936,13 @@ export default function NotebookNotesView({
     }, 150);
   };
 
-  // Direct 1-Click PDF Download (ALWAYS directly downloads 100% visible, fully-styled file matching the laptop screen)
+  // Direct 1-Click PDF Download (ALWAYS directly downloads 100% visible, fully-styled file matching the laptop screen in normal black & blue pen)
   const handleDownloadPDF = async () => {
     if (!note) return;
     const cleanTitle = (note.title || note.chapter || 'Lecture_Notes').replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_');
     setIsExportingPDF(true);
 
-    // Primary Method: Direct Client-Side High-Fidelity PDF Generation (100% matches laptop screen styling & colors)
+    // Primary Method: Direct Client-Side High-Fidelity PDF Generation (Full-height layout, normal black & blue pen)
     try {
       if (typeof window !== 'undefined') {
         const html2pdfModule = await import('html2pdf.js');
@@ -975,35 +950,40 @@ export default function NotebookNotesView({
 
         const printContainer = document.createElement('div');
         printContainer.id = 'omnistudy-pdf-export-container';
-        printContainer.style.position = 'fixed';
-        printContainer.style.top = '0';
+        // Position absolute at current scroll position to allow full natural height rendering without viewport truncation
+        printContainer.style.position = 'absolute';
+        printContainer.style.top = `${window.scrollY || 0}px`;
         printContainer.style.left = '0';
-        printContainer.style.width = '820px';
+        printContainer.style.width = '800px';
         printContainer.style.backgroundColor = '#FFFFFF';
         printContainer.style.color = '#0F172A';
-        printContainer.style.zIndex = '99999';
+        printContainer.style.zIndex = '999999';
         printContainer.style.opacity = '1';
         printContainer.style.pointerEvents = 'none';
         printContainer.innerHTML = getAuthenticNotebookHtml(note);
         document.body.appendChild(printContainer);
 
-        // Allow DOM to compute bounding boxes and render SVGs properly
-        await new Promise(r => setTimeout(r, 200));
+        // Allow DOM to compute bounding boxes, styles and render SVGs properly
+        await new Promise(r => setTimeout(r, 250));
 
         const opt = {
           margin: [8, 8, 10, 8],
-          filename: `${cleanTitle}_Topper_Notes.pdf`,
+          filename: `${cleanTitle}_Notes.pdf`,
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: {
             scale: 2,
             useCORS: true,
             logging: false,
             backgroundColor: '#FFFFFF',
-            windowWidth: 840,
-            scrollY: 0
+            windowWidth: 800,
+            scrollY: 0,
+            scrollX: 0
           },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['css', 'legacy'], avoid: ['.concept-block', '.diagram-box', '.solved-example-box', '.formula-box', '.pyq-item', '.topper-cover-header'] }
+          pagebreak: {
+            mode: ['css', 'legacy'],
+            avoid: ['.concept-block', '.diagram-box', '.solved-example-box', '.formula-box', '.pyq-item', '.topper-cover-header', '.table-container', '.teacher-tip-box']
+          }
         };
 
         try {
@@ -1017,41 +997,8 @@ export default function NotebookNotesView({
         }
       }
     } catch (clientPdfErr) {
-      console.warn('[NotebookNotesView] Client html2pdf notice, attempting server PDF vector export:', clientPdfErr);
-    }
-
-    // Secondary Method: Server Vector PDF fallback
-    try {
-      const pdfBlob = await downloadNotePdfApi(note);
-      if (pdfBlob && (pdfBlob.size > 500 || pdfBlob.byteLength > 500)) {
-        const blobUrl = window.URL.createObjectURL(new Blob([pdfBlob], { type: 'application/pdf' }));
-        const downloadLink = document.createElement('a');
-        downloadLink.href = blobUrl;
-        downloadLink.download = `${cleanTitle}_Topper_Notes.pdf`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 2000);
-        setIsExportingPDF(false);
-        return;
-      }
-    } catch (apiErr) {
-      console.warn('[NotebookNotesView] Server PDF export notice:', apiErr);
-    }
-
-    // Tertiary Fallback: Guaranteed Direct File Download (.doc)
-    try {
-      const docHeader = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>${note.title || 'Notes'}</title></head><body>${getAuthenticNotebookHtml(note)}</body></html>`;
-      const blob = new Blob(['\ufeff', docHeader], { type: 'application/msword' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${cleanTitle}_Notes.doc`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (finalErr) {
-      console.error('[NotebookNotesView] Export failed:', finalErr);
+      console.warn('[NotebookNotesView] Client html2pdf notice, engaging browser print fallback:', clientPdfErr);
+      handlePrintNotes();
     } finally {
       setIsExportingPDF(false);
     }
