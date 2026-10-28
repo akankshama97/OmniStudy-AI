@@ -9,7 +9,8 @@ import AuthPage from './components/AuthPage';
 import { useAuth } from './context/useAuth';
 import { processYouTubeVideo, translateNoteApi } from './services/api';
 import { SAMPLE_NOTES, SAMPLE_NOTES_MAP, getSampleNote } from './services/sampleNotes';
-import { Sparkles, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Sparkles, RefreshCw, AlertTriangle, X, Shield, Info, Mail, ExternalLink } from 'lucide-react';
+import HomepageSections from './components/HomepageSections';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -60,11 +61,24 @@ export default function App() {
     typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false
   );
   
-  // Default to COA Unit 1 sample notes so sample notes are always visible on load
-  const [currentNote,  setCurrentNote]  = useState(() => getSampleNote('coa-unit-1', 'Hinglish'));
+  // Default null so the rich homepage sections & sample cards are visible on landing
+  const [currentNote,  setCurrentNote]  = useState(null);
   const [isLoading,    setIsLoading]    = useState(false);
   const [error,        setError]        = useState(null);
   const [timestampTutorPrefill, setTimestampTutorPrefill] = useState(null);
+  const [footerModal, setFooterModal] = useState(null); // 'about' | 'privacy' | 'contact' | null
+
+  // Close modals on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (footerModal) setFooterModal(null);
+        if (showAuthModal) setShowAuthModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [footerModal, showAuthModal, setShowAuthModal]);
 
   const handleOpenGeneralDoubt = () => {
     setTimestampTutorPrefill(null);
@@ -203,7 +217,7 @@ export default function App() {
               <div className="max-w-6xl mx-auto px-4 mb-3 flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-xs font-bold text-[#475569] dark:text-[#CBD5E1] font-mono uppercase tracking-wider">
+                  <span className="text-xs font-bold text-[#475569] dark:text-[#94A3B8] uppercase tracking-wider">
                     Active Notes: <strong className="text-[#0F172A] dark:text-white font-sans text-xs sm:text-sm">{currentNote.chapter || currentNote.title}</strong>
                   </span>
                 </div>
@@ -219,7 +233,7 @@ export default function App() {
                   >
                     <span>Close Notes</span>
                   </button>
-                  <span className="text-[11px] font-mono text-[#2563EB] dark:text-[#60A5FA] bg-[#EFF6FF] dark:bg-[#3B82F6]/20 px-3 py-1 rounded-full border border-[#2563EB]/20 font-bold hidden sm:inline">
+                  <span className="text-[11px] font-sans text-[#2563EB] dark:text-[#60A5FA] bg-[#EFF6FF] dark:bg-[#3B82F6]/20 px-3 py-1 rounded-full border border-[#2563EB]/20 font-bold hidden sm:inline">
                     Classroom Copy Canvas
                   </span>
                 </div>
@@ -257,9 +271,11 @@ export default function App() {
               </div>
             </div>
           ) : (
-            <div className="max-w-4xl mx-auto px-4 text-center pb-12 pt-2 text-xs text-slate-400 dark:text-slate-500 font-mono">
-              💡 Choose any example lecture card above or paste your YouTube video URL to generate instant Topper Notes.
-            </div>
+            <HomepageSections onScrollToInput={() => {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              const inputEl = document.querySelector('input[type="url"]');
+              if (inputEl) inputEl.focus();
+            }} />
           )}
         </div>
 
@@ -297,25 +313,223 @@ export default function App() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className={`border-t py-6 text-center text-xs mt-12 mb-14 md:mb-0 transition-colors ${
-        isDark ? 'border-[#23314F] bg-[#131B2E] text-[#94A3B8]' : 'border-[#E2E8F0] bg-white text-[#64748B]'
+      {/* Footer with High-Contrast Readable Text and Accessible About / Privacy / Contact Links */}
+      <footer className={`border-t py-8 mt-10 mb-16 md:mb-0 transition-colors w-full overflow-hidden ${
+        isDark ? 'border-[#23314F] bg-[#131B2E] text-[#E2E8F0]' : 'border-[#E2E8F0] bg-white text-[#1E293B]'
       }`}>
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-[#EFF6FF] dark:bg-[#3B82F6]/20 flex items-center justify-center">
-              <Sparkles className="w-3.5 h-3.5 text-[#2563EB] dark:text-[#60A5FA]" />
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
+          {/* Brand */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-[#2563EB] text-white flex items-center justify-center shadow-xs shrink-0">
+              <Sparkles className="w-4 h-4 fill-white" aria-hidden="true" />
             </div>
-            <span className={`font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>OmniStudy AI</span>
-            <span className="text-slate-400">• YouTube Lecture to Student Copy Notes</span>
+            <div className="flex flex-col text-center sm:text-left">
+              <span className={`font-extrabold text-sm sm:text-base font-sans ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+                OmniStudy AI
+              </span>
+              <span className="text-xs sm:text-[13px] text-slate-900 dark:text-slate-100 font-semibold font-sans break-words">
+                YouTube Lecture to Student Copy Notes
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-4 text-[11px] text-[#64748B] dark:text-[#94A3B8]">
-            <span>JEE • NEET • CBSE • GATE • College</span>
-            <span>•</span>
-            <span>Made for Students</span>
+
+          {/* Right: Accessible Links + Exam badges (Wraps gracefully on 360px mobile) */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 w-full sm:w-auto">
+            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap justify-center font-sans" aria-label="Footer navigation">
+              <button
+                type="button"
+                onClick={() => setFooterModal('about')}
+                aria-label="About OmniStudy AI"
+                className="text-slate-900 dark:text-slate-100 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors font-bold text-xs sm:text-[13px] min-h-[44px] px-2.5 py-2 rounded-lg font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] cursor-pointer"
+              >
+                About
+              </button>
+              <span className="text-slate-400 select-none font-bold" aria-hidden="true">·</span>
+              <button
+                type="button"
+                onClick={() => setFooterModal('privacy')}
+                aria-label="Privacy Policy"
+                className="text-slate-900 dark:text-slate-100 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors font-bold text-xs sm:text-[13px] min-h-[44px] px-2.5 py-2 rounded-lg font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] cursor-pointer"
+              >
+                Privacy
+              </button>
+              <span className="text-slate-400 select-none font-bold" aria-hidden="true">·</span>
+              <button
+                type="button"
+                onClick={() => setFooterModal('contact')}
+                aria-label="Contact and Support"
+                className="text-slate-900 dark:text-slate-100 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors font-bold text-xs sm:text-[13px] min-h-[44px] px-2.5 py-2 rounded-lg font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] cursor-pointer"
+              >
+                Contact
+              </button>
+            </nav>
+
+            {/* Exam and Students Badges: flex-wrap so it never cuts off on mobile */}
+            <div className="flex flex-wrap items-center justify-center gap-1.5 text-xs sm:text-[13px] text-slate-900 dark:text-slate-100 font-semibold font-sans max-w-full">
+              <span className="bg-slate-100 dark:bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700">JEE</span>
+              <span className="text-slate-400 select-none">•</span>
+              <span className="bg-slate-100 dark:bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700">NEET</span>
+              <span className="text-slate-400 select-none">•</span>
+              <span className="bg-slate-100 dark:bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700">CBSE</span>
+              <span className="text-slate-400 select-none">•</span>
+              <span className="bg-slate-100 dark:bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700">GATE</span>
+              <span className="text-slate-400 select-none">•</span>
+              <span className="bg-slate-100 dark:bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700">College</span>
+              <span className="text-slate-400 select-none">•</span>
+              <span className="text-[#2563EB] dark:text-[#60A5FA] font-bold px-1">Made for Students</span>
+            </div>
           </div>
         </div>
+
+        <p className="text-center text-xs sm:text-[13px] text-slate-800 dark:text-slate-200 mt-4 font-semibold font-sans break-words px-4">
+          Made with ❤️ for students · Developed by <strong className="text-slate-950 dark:text-white font-extrabold">Akanksha Maurya</strong>
+        </p>
       </footer>
+
+      {/* Accessible Footer Info Modal (About / Privacy / Contact) */}
+      {footerModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="footer-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-sm animate-fade-in"
+          onClick={() => setFooterModal(null)}
+        >
+          <div
+            className="relative w-full max-w-lg p-5 sm:p-7 rounded-3xl bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-700 shadow-2xl text-slate-800 dark:text-slate-200 animate-fade-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-2.5">
+                {footerModal === 'about' && (
+                  <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-[#2563EB] dark:text-[#60A5FA] flex items-center justify-center">
+                    <Info className="w-4 h-4" aria-hidden="true" />
+                  </div>
+                )}
+                {footerModal === 'privacy' && (
+                  <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <Shield className="w-4 h-4" aria-hidden="true" />
+                  </div>
+                )}
+                {footerModal === 'contact' && (
+                  <div className="w-8 h-8 rounded-xl bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                    <Mail className="w-4 h-4" aria-hidden="true" />
+                  </div>
+                )}
+                <h3 id="footer-modal-title" className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-['Plus_Jakarta_Sans']">
+                  {footerModal === 'about' && 'About OmniStudy AI'}
+                  {footerModal === 'privacy' && 'Privacy Policy'}
+                  {footerModal === 'contact' && 'Contact & Support'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFooterModal(null)}
+                aria-label="Close modal"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              >
+                <X className="w-5 h-5" aria-hidden="true" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="py-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-3 leading-relaxed">
+              {footerModal === 'about' && (
+                <>
+                  <p>
+                    <strong>OmniStudy AI</strong> transforms any YouTube educational lecture or full playlist into comprehensive student-copy notes with blackboard SVG diagrams, mathematical equations, teacher tips, and top previous year exam questions (PYQs).
+                  </p>
+                  <div className="bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
+                    <div className="font-semibold text-slate-900 dark:text-white text-xs">Key Highlights:</div>
+                    <ul className="list-disc pl-4 space-y-1 text-xs">
+                      <li>Automated blackboard text &amp; diagram extraction</li>
+                      <li>KaTeX-formatted mathematical derivations</li>
+                      <li>Multilingual toggle: English, हिंदी &amp; Hinglish</li>
+                      <li>Integrated Telegram Bot for mobile revision</li>
+                    </ul>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 pt-1">
+                    Developed with dedication by <strong>Akanksha Maurya</strong> for students preparing for JEE, NEET, GATE, CBSE, and University Engineering exams.
+                  </p>
+                </>
+              )}
+
+              {footerModal === 'privacy' && (
+                <>
+                  <p>
+                    Your privacy and academic integrity are our utmost priority. Here is how OmniStudy AI handles your data:
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-500 font-bold shrink-0">✓</span>
+                      <span><strong>Zero Data Selling:</strong> We never sell, rent, or monetize your study materials or search history.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-500 font-bold shrink-0">✓</span>
+                      <span><strong>Local-First Storage:</strong> Generated notes, bookmarks, and theme preferences are stored locally in your browser.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-500 font-bold shrink-0">✓</span>
+                      <span><strong>Public URLs Only:</strong> OmniStudy only processes public educational YouTube video URLs submitted by you.</span>
+                    </li>
+                  </ul>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 pt-2">
+                    For privacy queries or data removal requests, contact us anytime at <span className="font-mono text-slate-700 dark:text-slate-300">privacy@omnistudy.ai</span>.
+                  </p>
+                </>
+              )}
+
+              {footerModal === 'contact' && (
+                <>
+                  <p>
+                    Need assistance, want to suggest an exam syllabus, or report an issue? Reach out through any of our channels:
+                  </p>
+                  <div className="space-y-2.5 pt-1">
+                    <a
+                      href="mailto:contact@omnistudy.ai"
+                      className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 bg-slate-50 dark:bg-slate-900/60 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-all font-semibold text-xs sm:text-sm text-slate-900 dark:text-white"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Mail className="w-4 h-4 text-[#2563EB]" aria-hidden="true" />
+                        <span>Email: contact@omnistudy.ai</span>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-slate-400" aria-hidden="true" />
+                    </a>
+
+                    <a
+                      href="https://t.me/omnistudy_notes_bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 rounded-xl border border-sky-200 dark:border-sky-800 hover:border-sky-400 bg-sky-50/50 dark:bg-sky-950/30 hover:bg-sky-50 dark:hover:bg-sky-950/50 transition-all font-semibold text-xs sm:text-sm text-[#0088cc] dark:text-sky-300"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className="font-bold">✈</span>
+                        <span>Telegram Bot: @omnistudy_notes_bot</span>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-sky-400" aria-hidden="true" />
+                    </a>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 pt-2">
+                    Lead Developer: <strong>Akanksha Maurya</strong>
+                  </p>
+                </>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setFooterModal(null)}
+                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs cursor-pointer min-h-[44px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Auth Modal Overlay when user clicks Login / Sign Up */}
       {showAuthModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-sm animate-fade-in overflow-y-auto">

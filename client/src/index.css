@@ -98,6 +98,15 @@
 
 @layer utilities {
 
+  /* ── Hide scrollbars while preserving horizontal/vertical scrolling ── */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   /* ── 4 Handwritten Copy Pen Classes ── */
   .pen-blue   { color: var(--pen-blue); }
   .pen-red    { color: var(--pen-red); }
