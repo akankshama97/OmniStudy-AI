@@ -123,146 +123,7 @@ export function HowItWorks() {
 }
 
 /* ─────────────────────────────────────────────
-   2. OUTPUT PREVIEW – Sample Notes Mockup
-   Caption: "Aisa dikhenge tumhare notes"
-───────────────────────────────────────────── */
-export function OutputPreview() {
-  return (
-    <section aria-labelledby="output-preview-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-6 sm:my-8">
-      <div className="text-center mb-4">
-        <h2
-          id="output-preview-heading"
-          className="text-lg sm:text-xl font-bold text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']"
-        >
-          Output Preview
-        </h2>
-        <p className="text-xs sm:text-sm font-semibold text-[#2563EB] dark:text-[#60A5FA] mt-1 font-sans">
-          Aisa dikhenge tumhare notes
-        </p>
-      </div>
-
-      {/* Mini Notes Mockup Card */}
-      <div
-        className="bg-white dark:bg-[#0D1526] border border-[#E2E8F0] dark:border-[#23314F] rounded-2xl overflow-hidden shadow-sm"
-        role="region"
-        aria-label="Sample notes preview mockup"
-      >
-        {/* Fake toolbar */}
-        <div className="bg-[#F1F5F9] dark:bg-[#131B2E] border-b border-[#E2E8F0] dark:border-[#23314F] px-4 py-2.5 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1.5" aria-hidden="true">
-              <span className="w-3 h-3 rounded-full bg-red-400" />
-              <span className="w-3 h-3 rounded-full bg-amber-400" />
-              <span className="w-3 h-3 rounded-full bg-emerald-400" />
-            </div>
-            <span className="text-[11px] font-semibold text-[#475569] dark:text-[#94A3B8] ml-1">
-              📖 COA Unit 1 — Computer Organization &amp; Architecture
-            </span>
-          </div>
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#EFF6FF] dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#60A5FA] border border-[#2563EB]/20">
-            Topper Copy
-          </span>
-        </div>
-
-        <div className="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Left Column: Heading + Blackboard Diagram Placeholder */}
-          <div className="rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#090E1A] p-4 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-[#2563EB] dark:text-[#60A5FA] uppercase tracking-wider">
-                  📐 Blackboard Diagram
-                </span>
-                <span className="text-[10px] text-slate-500 font-sans">SVG Vector</span>
-              </div>
-              <h4 className="font-bold text-xs text-[#0F172A] dark:text-white mb-2 font-sans">
-                Basic Computer System &amp; CPU Architecture
-              </h4>
-              
-              {/* CPU block diagram SVG */}
-              <svg viewBox="0 0 200 100" className="w-full h-24 sm:h-28 my-1" aria-hidden="true">
-                <rect x="8" y="32" width="46" height="36" rx="4" fill="none" stroke="#2563EB" strokeWidth="1.5"/>
-                <text x="31" y="48" textAnchor="middle" fontSize="7" fill="#2563EB" fontWeight="bold">Input</text>
-                <text x="31" y="58" textAnchor="middle" fontSize="6.5" fill="#2563EB">Unit</text>
-
-                <rect x="74" y="16" width="52" height="68" rx="4" fill="none" stroke="#7C3AED" strokeWidth="1.5"/>
-                <text x="100" y="44" textAnchor="middle" fontSize="7" fill="#7C3AED" fontWeight="bold">CPU</text>
-                <text x="100" y="54" textAnchor="middle" fontSize="6" fill="#7C3AED">(ALU + CU)</text>
-
-                <rect x="146" y="32" width="46" height="36" rx="4" fill="none" stroke="#059669" strokeWidth="1.5"/>
-                <text x="169" y="48" textAnchor="middle" fontSize="7" fill="#059669" fontWeight="bold">Output</text>
-                <text x="169" y="58" textAnchor="middle" fontSize="6.5" fill="#059669">Unit</text>
-
-                <rect x="74" y="88" width="52" height="10" rx="2" fill="none" stroke="#D97706" strokeWidth="1.2"/>
-                <text x="100" y="96" textAnchor="middle" fontSize="6" fill="#D97706" fontWeight="bold">Memory Bus</text>
-
-                <line x1="54" y1="50" x2="74" y2="50" stroke="#94A3B8" strokeWidth="1"/>
-                <line x1="126" y1="50" x2="146" y2="50" stroke="#94A3B8" strokeWidth="1"/>
-              </svg>
-            </div>
-
-            <p className="text-[10px] text-[#64748B] dark:text-[#94A3B8] text-center mt-2 font-sans">
-              Auto-generated clean vector diagram from lecture blackboard
-            </p>
-          </div>
-
-          {/* Right Column: Formula + Solved PYQ Snippet + Teacher Tip */}
-          <div className="space-y-3">
-            {/* 1. Formula Box */}
-            <div className="rounded-xl border border-teal-300 dark:border-teal-700/60 bg-teal-50/70 dark:bg-teal-950/25 p-3">
-              <span className="text-[10px] font-bold text-teal-800 dark:text-teal-400 uppercase tracking-wider block mb-1">
-                📐 Formula Snippet
-              </span>
-              <p className="text-xs font-bold text-[#0F172A] dark:text-[#F8FAFC] font-sans">
-                CPI = (Total Clock Cycles) / (Total Instructions)
-              </p>
-              <p className="text-[10px] text-teal-900 dark:text-teal-300 mt-1 font-sans">
-                MIPS = Clock Rate / (CPI × 10⁶)
-              </p>
-            </div>
-
-            {/* 2. Solved PYQ Snippet */}
-            <div className="rounded-xl border border-amber-300 dark:border-amber-700/60 bg-amber-50/70 dark:bg-amber-950/25 p-3">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">
-                  🎯 Solved PYQ Snippet · GATE
-                </span>
-                <span className="text-[9px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 px-1.5 py-0.5 rounded">
-                  2 Marks
-                </span>
-              </div>
-              <p className="text-[11px] font-semibold text-[#0F172A] dark:text-[#F8FAFC] leading-snug font-sans">
-                Q: A processor has 8 general purpose registers. How many bits are needed to address all registers?
-              </p>
-              <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold mt-1.5 font-sans">
-                ✅ Solution: 3 bits (because 2³ = 8 registers)
-              </p>
-            </div>
-
-            {/* 3. Teacher Tip */}
-            <div className="rounded-xl border border-indigo-200 dark:border-indigo-800/60 bg-indigo-50/50 dark:bg-indigo-950/20 p-2.5">
-              <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider block mb-0.5">
-                💡 Teacher Exam Tip
-              </span>
-              <p className="text-[10px] text-[#475569] dark:text-[#CBD5E1] font-sans">
-                "Register addressing fastest hota hai — speed hierarchy me Registers &gt; Cache &gt; RAM yaad rakhein."
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer Caption */}
-        <div className="bg-[#F8FAFC] dark:bg-[#131B2E] border-t border-[#E2E8F0] dark:border-[#23314F] px-4 py-2.5 text-center">
-          <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 font-sans">
-            Aisa dikhenge tumhare notes — complete with formulas, diagrams, PYQs &amp; explanations
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   3. FEATURES GRID – 4 Cards
+   2. FEATURES GRID – 4 Cards
 ───────────────────────────────────────────── */
 export function FeaturesGrid() {
   const features = [
@@ -414,7 +275,7 @@ export function FinalCTAStrip({ onScrollToInput }) {
 }
 
 /* ─────────────────────────────────────────────
-   COMBINED EXPORT (In exact requested order)
+   COMBINED EXPORT
 ───────────────────────────────────────────── */
 export default function HomepageSections({ onScrollToInput }) {
   return (
@@ -423,13 +284,11 @@ export default function HomepageSections({ onScrollToInput }) {
       <TelegramBanner />
       {/* 1. "How it works" */}
       <HowItWorks />
-      {/* 2. Output Preview ("Aisa dikhenge tumhare notes") */}
-      <OutputPreview />
-      {/* 3. Features Grid (4 cards) */}
+      {/* 2. Features Grid (4 cards) */}
       <FeaturesGrid />
-      {/* 4. Stats Line (Placeholder) */}
+      {/* 3. Stats Line (Placeholder) */}
       <StatsLine />
-      {/* 5. Final CTA Strip ("Apna pehla lecture paste karo") */}
+      {/* 4. Final CTA Strip ("Apna pehla lecture paste karo") */}
       <FinalCTAStrip onScrollToInput={onScrollToInput} />
       {/* Bottom spacer for mobile navbar */}
       <div className="h-6 sm:h-8" aria-hidden="true" />
