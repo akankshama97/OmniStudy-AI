@@ -7,9 +7,7 @@ import {
   Award,
   Globe2,
   Send,
-  ArrowRight,
-  ArrowUp,
-  Sparkles
+  ArrowRight
 } from 'lucide-react';
 
 /* ─────────────────────────────────────────────
@@ -234,50 +232,9 @@ export function StatsLine() {
 }
 
 /* ─────────────────────────────────────────────
-   5. FINAL CTA STRIP – "Apna pehla lecture paste karo" + Smooth Scroll
-───────────────────────────────────────────── */
-export function FinalCTAStrip({ onScrollToInput }) {
-  return (
-    <section aria-labelledby="final-cta-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-6 sm:my-8">
-      <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-[#2563EB] via-[#1D4ED8] to-[#1E3A8A] text-white shadow-xl relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
-        
-        {/* Glow effects */}
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-xl pointer-events-none" aria-hidden="true" />
-
-        <div className="relative z-10 max-w-xl space-y-1.5">
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/15 text-white text-[11px] font-bold border border-white/20 font-sans">
-            <Sparkles className="w-3.5 h-3.5 fill-white" aria-hidden="true" />
-            <span>100% Free · Instant Topper Notes</span>
-          </div>
-          <h2 id="final-cta-heading" className="text-xl sm:text-2xl font-extrabold font-['Plus_Jakarta_Sans'] tracking-tight leading-tight">
-            Apna pehla lecture paste karo
-          </h2>
-          <p className="text-xs sm:text-sm text-blue-100 font-sans leading-relaxed">
-            Kisi bhi educational YouTube video ka URL daalo aur instant handwritten style notes pao.
-          </p>
-        </div>
-
-        <div className="relative z-10 flex flex-col sm:flex-row items-center gap-2.5 w-full sm:w-auto shrink-0">
-          <button
-            type="button"
-            onClick={onScrollToInput}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white text-[#1D4ED8] hover:bg-blue-50 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95 min-h-[46px] font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          >
-            <span>⬆️ Apna Pehla Lecture Paste Karo</span>
-            <ArrowUp className="w-4 h-4" aria-hidden="true" />
-          </button>
-        </div>
-
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────────────────────
    COMBINED EXPORT
 ───────────────────────────────────────────── */
-export default function HomepageSections({ onScrollToInput }) {
+export default function HomepageSections() {
   return (
     <div className="space-y-1">
       {/* 0. Telegram Banner directly below sample cards */}
@@ -288,8 +245,6 @@ export default function HomepageSections({ onScrollToInput }) {
       <FeaturesGrid />
       {/* 3. Stats Line (Placeholder) */}
       <StatsLine />
-      {/* 4. Final CTA Strip ("Apna pehla lecture paste karo") */}
-      <FinalCTAStrip onScrollToInput={onScrollToInput} />
       {/* Bottom spacer for mobile navbar */}
       <div className="h-6 sm:h-8" aria-hidden="true" />
     </div>

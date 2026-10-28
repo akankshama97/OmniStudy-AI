@@ -271,11 +271,7 @@ export default function App() {
               </div>
             </div>
           ) : (
-            <HomepageSections onScrollToInput={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              const inputEl = document.querySelector('input[type="url"]');
-              if (inputEl) inputEl.focus();
-            }} />
+            <HomepageSections />
           )}
         </div>
 
