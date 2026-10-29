@@ -33,17 +33,17 @@ export default function Navbar({
           tabIndex={0}
           aria-label="OmniStudy AI Homepage"
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('generator'); } }}
-          className="flex items-center gap-2 sm:gap-2.5 cursor-pointer select-none group shrink-0 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] rounded-lg px-1 -ml-1"
+          className="flex items-center gap-2 sm:gap-2.5 cursor-pointer select-none group shrink-0 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg px-1 -ml-1"
           onClick={() => setActiveTab('generator')}
         >
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
             <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white" aria-hidden="true" />
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-sm sm:text-base tracking-tight text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans'] leading-tight">
               OmniStudy AI
             </span>
-            <span className="text-[9px] sm:text-[10px] text-[#2563EB] dark:text-[#60A5FA] font-semibold leading-none hidden xs:inline">
+            <span className="text-[9px] sm:text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold leading-none hidden xs:inline">
               by Akanksha Maurya
             </span>
           </div>
@@ -66,13 +66,13 @@ export default function Navbar({
                 aria-controls={`tab-content-${id}`}
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer min-h-[38px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#131B2E] ${
+                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer min-h-[38px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#131B2E] ${
                   isActive
                     ? 'bg-white dark:bg-[#1B2640] text-[#0F172A] dark:text-[#F8FAFC] shadow-sm border border-slate-200/80 dark:border-slate-700'
                     : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/50'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#2563EB] dark:text-[#60A5FA]' : 'text-slate-400 dark:text-slate-500'}`} aria-hidden="true" />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'}`} aria-hidden="true" />
                 <span>{label}</span>
               </button>
             );
@@ -86,7 +86,7 @@ export default function Navbar({
           <button
             type="button"
             onClick={() => setTheme(isDark ? 'light' : 'dark')}
-            className="sm:hidden p-2.5 rounded-full bg-[#F1F5F9] dark:bg-[#0B0F17] border border-[#E2E8F0] dark:border-[#23314F] text-[#64748B] dark:text-[#94A3B8] hover:text-[#2563EB] transition-all min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+            className="sm:hidden p-2.5 rounded-full bg-[#F1F5F9] dark:bg-[#0B0F17] border border-[#E2E8F0] dark:border-[#23314F] text-[#64748B] dark:text-[#94A3B8] hover:text-indigo-600 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             aria-label={`Switch to ${isDark ? 'Light' : 'Dark'} mode`}
             title={`Switch to ${isDark ? 'Light' : 'Dark'} mode`}
           >
@@ -110,9 +110,9 @@ export default function Navbar({
                 onClick={() => setTheme(id)}
                 aria-pressed={theme === id}
                 aria-label={`Theme: ${label}`}
-                className={`p-2 rounded-full text-xs transition-all duration-150 min-h-[36px] min-w-[36px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+                className={`p-2 rounded-full text-xs transition-all duration-150 min-h-[36px] min-w-[36px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                   theme === id
-                    ? 'bg-white dark:bg-[#1B2640] text-[#2563EB] dark:text-[#60A5FA] shadow-sm'
+                    ? 'bg-white dark:bg-[#1B2640] text-indigo-600 dark:text-indigo-400 shadow-sm'
                     : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-[#F8FAFC]'
                 }`}
                 title={`Theme: ${label}`}
@@ -147,9 +147,9 @@ export default function Navbar({
                   onClick={() => setSelectedLang(id)}
                   aria-pressed={isSelected}
                   aria-label={title}
-                  className={`px-2 sm:px-3 py-1.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold transition-all duration-150 cursor-pointer min-h-[36px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+                  className={`px-2 sm:px-3 py-1.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold transition-all duration-150 cursor-pointer min-h-[36px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                     isSelected
-                      ? 'bg-[#2563EB] text-white shadow-xs font-extrabold'
+                      ? 'bg-indigo-600 dark:bg-indigo-500 text-white shadow-xs font-extrabold'
                       : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-[#F8FAFC] hover:bg-slate-200/50 dark:hover:bg-slate-800/50'
                   }`}
                   title={title}
@@ -166,7 +166,7 @@ export default function Navbar({
               type="button"
               onClick={onOpenAuth}
               aria-label="Login or create a free account"
-              className="flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] dark:bg-[#3B82F6] dark:hover:bg-[#2563EB] text-white text-xs sm:text-sm font-bold transition-all shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#131B2E] min-h-[44px] cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-xs sm:text-sm font-bold transition-all shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#131B2E] min-h-[44px] cursor-pointer"
               title="Login or Create Account — Free to start"
             >
               <LogIn className="w-4 h-4 shrink-0" aria-hidden="true" />
@@ -175,7 +175,7 @@ export default function Navbar({
           ) : user ? (
             <div className="flex items-center gap-1.5 sm:gap-2 ml-0.5 sm:ml-1">
               <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-1.5 rounded-full bg-[#F1F5F9] dark:bg-[#0B0F17] border border-[#E2E8F0] dark:border-[#23314F] min-h-[44px]">
-                <div className="w-6 h-6 rounded-full bg-[#2563EB] flex items-center justify-center text-white font-bold text-[10px] shrink-0" aria-hidden="true">
+                <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-[10px] shrink-0" aria-hidden="true">
                   {user.name ? user.name.charAt(0).toUpperCase() : '?'}
                 </div>
                 <span className="text-xs font-semibold text-[#0F172A] dark:text-[#F8FAFC] hidden sm:inline max-w-[80px] truncate">
@@ -212,9 +212,9 @@ export default function Navbar({
                 aria-selected={isActive}
                 aria-controls={`tab-content-${id}`}
                 onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap min-h-[44px] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap min-h-[44px] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                   isActive
-                    ? 'bg-[#2563EB] text-white shadow-xs font-bold'
+                    ? 'bg-indigo-600 dark:bg-indigo-500 text-white shadow-xs font-bold'
                     : 'bg-[#F1F5F9] dark:bg-[#0B0F17] text-[#475569] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white border border-[#E2E8F0] dark:border-[#23314F]'
                 }`}
               >
@@ -243,13 +243,13 @@ export default function Navbar({
             aria-selected={isActive}
             aria-label={label}
             onClick={() => setActiveTab(id)}
-            className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all cursor-pointer min-w-[64px] min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+            className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all cursor-pointer min-w-[64px] min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               isActive
-                ? 'text-[#2563EB] dark:text-[#60A5FA] bg-blue-50/90 dark:bg-blue-500/15 font-bold'
+                ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/90 dark:bg-indigo-500/15 font-bold'
                 : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white font-medium'
             }`}
           >
-            <Icon className={`w-4 h-4 mb-0.5 ${isActive ? 'text-[#2563EB] dark:text-[#60A5FA] scale-110' : 'text-slate-400 dark:text-slate-500'} transition-transform`} aria-hidden="true" />
+            <Icon className={`w-4 h-4 mb-0.5 ${isActive ? 'text-indigo-600 dark:text-indigo-400 scale-110' : 'text-slate-400 dark:text-slate-500'} transition-transform`} aria-hidden="true" />
             <span className="text-[10px] leading-tight font-medium">{label}</span>
           </button>
         );

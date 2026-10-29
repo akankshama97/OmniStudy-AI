@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Library, BookOpen, Clock, ChevronRight, RefreshCw,
   Search, Award, Zap, Sparkles, Trash2, AlertTriangle, FileText
@@ -154,7 +154,7 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Library className="w-6 h-6 text-[#2563EB] dark:text-[#60A5FA]" />
+              <Library className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
               <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']">
                 My Digital Study Library
               </h2>
@@ -204,7 +204,7 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[11px] font-semibold text-[#64748B] dark:text-[#94A3B8]">{stat.label}</span>
-                  <Icon className="w-4 h-4 text-[#2563EB] dark:text-[#60A5FA]" />
+                  <Icon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <div className="text-xl md:text-2xl font-bold text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']">{stat.value}</div>
               </div>
@@ -214,7 +214,7 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
 
         {/* Search Bar (Only shown if notes exist) */}
         {notes.length > 0 && (
-          <div className="p-2 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-[#2563EB] focus-within:ring-4 focus-within:ring-[#2563EB]/15 flex items-center gap-2.5 transition-all">
+          <div className="p-2 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 flex items-center gap-2.5 transition-all">
             <Search className="w-4 h-4 text-slate-400 ml-2 shrink-0" />
             <input
               type="text"
@@ -230,12 +230,12 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
       {/* Notes Grid */}
       {loading ? (
         <div className="text-center py-20 text-[#64748B] dark:text-[#94A3B8] text-xs flex items-center justify-center gap-2">
-          <RefreshCw className="w-4 h-4 animate-spin text-[#2563EB]" /> Loading saved lecture library...
+          <RefreshCw className="w-4 h-4 animate-spin text-indigo-600" /> Loading saved lecture library...
         </div>
       ) : notes.length === 0 ? (
         /* Empty State */
         <div className="rounded-2xl border border-dashed border-[#CBD5E1] dark:border-[#23314F] p-12 text-center bg-white/50 dark:bg-[#131B2E]/50">
-          <div className="w-16 h-16 rounded-2xl bg-[#EFF6FF] dark:bg-[#3B82F6]/10 border border-[#2563EB]/20 text-[#2563EB] dark:text-[#60A5FA] flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-8 h-8" />
           </div>
           <h3 className="text-lg font-bold text-[#0F172A] dark:text-[#F8FAFC] mb-1 font-['Plus_Jakarta_Sans']">
@@ -249,7 +249,7 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
               <button
                 type="button"
                 onClick={onGoToGenerator}
-                className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-2"
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Generate Notes from YouTube</span>
@@ -273,7 +273,7 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
           <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mb-4">No lecture matched "{searchQuery}". Try a different keyword.</p>
           <button
             onClick={() => setSearchQuery('')}
-            className="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-xs transition-all"
+            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-all cursor-pointer"
           >
             Clear Search
           </button>
@@ -289,12 +289,12 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
               <div
                 key={currentId || idx}
                 onClick={() => onSelectNote(noteItem)}
-                className="relative group rounded-2xl border border-[#E2E8F0] dark:border-[#23314F] p-5 cursor-pointer transition-all duration-150 flex flex-col justify-between hover:scale-[1.01] active:scale-[0.99] hover:border-[#2563EB] dark:hover:border-[#3B82F6] hover:shadow-md bg-white dark:bg-[#131B2E]"
+                className="relative group rounded-2xl border border-[#E2E8F0] dark:border-[#23314F] p-5 cursor-pointer transition-all duration-150 flex flex-col justify-between hover:scale-[1.01] active:scale-[0.99] hover:border-indigo-500 dark:hover:border-indigo-400 hover:shadow-md bg-white dark:bg-[#131B2E]"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2.5">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#EFF6FF] dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#60A5FA] border border-[#2563EB]/20">
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
                         {noteItem.language || 'English'}
                       </span>
                       {noteItem.subject && (
@@ -321,7 +321,7 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-sm leading-snug group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors line-clamp-2 mb-2 text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']">
+                  <h3 className="font-bold text-sm leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2 mb-2 text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']">
                     {noteItem.title}
                   </h3>
 

@@ -6,6 +6,7 @@ import {
   Mic, MicOff
 } from 'lucide-react';
 import { solveDoubt, solveTimestampTutorApi, fetchTranscriptSnippetApi } from '../services/api';
+import { FormattedText } from '../utils/formatText';
 
 const MULTILINGUAL_QUICK_PROMPTS = {
   English: [
@@ -120,7 +121,7 @@ function RichMessageContent({ text }) {
             </span>
           );
         }
-        return <span key={part.key}>{part.content}</span>;
+        return <FormattedText key={part.key} text={part.content} />;
       })}
     </div>
   );
@@ -552,7 +553,7 @@ export default function MultilingualChatbot({
       {/* ── Chatbot Header & Mode Switcher ── */}
       <div className="p-4 sm:p-5 rounded-2xl border shadow-sm mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-[#131B2E] border-[#E2E8F0] dark:border-[#23314F] transition-colors">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2563EB] dark:bg-[#3B82F6] flex items-center justify-center text-white font-bold shadow-sm shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white font-bold shadow-sm shrink-0">
             {activeMode === 'timestamp' ? <Clock className="w-5 h-5 text-white" /> : <Bot className="w-5 h-5 text-white" />}
           </div>
 
@@ -561,8 +562,8 @@ export default function MultilingualChatbot({
               <h3 className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']">
                 {activeMode === 'timestamp' ? 'YouTube Timestamp AI Tutor' : 'AI Multimodal Doubt Solver'}
               </h3>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#EFF6FF] dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#60A5FA] font-bold border border-[#2563EB]/20 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] dark:bg-[#3B82F6]" />
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-200 dark:border-indigo-800 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
                 {activeMode === 'timestamp' ? 'Timestamp Focused Why-Solver' : 'Text + Image Question Solver'}
               </span>
             </div>
@@ -581,7 +582,7 @@ export default function MultilingualChatbot({
               onClick={() => setActiveMode('general')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeMode === 'general'
-                  ? 'bg-white dark:bg-[#1B2640] text-[#2563EB] dark:text-[#60A5FA] shadow-xs'
+                  ? 'bg-white dark:bg-[#1B2640] text-indigo-600 dark:text-indigo-400 shadow-xs'
                   : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
               }`}
             >
@@ -751,7 +752,7 @@ export default function MultilingualChatbot({
                     ? 'bg-[#0F172A] dark:bg-slate-700 text-white font-bold'
                     : msg.isTimestampTutor
                     ? 'bg-amber-500 text-white font-bold'
-                    : 'bg-[#EFF6FF] dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#60A5FA]'
+                    : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'
                 }`}
               >
                 {msg.sender === 'user' ? (
@@ -767,7 +768,7 @@ export default function MultilingualChatbot({
               <div
                 className={`max-w-[85%] md:max-w-[80%] rounded-2xl p-4 text-xs md:text-sm leading-relaxed relative group shadow-sm ${
                   msg.sender === 'user'
-                    ? 'bg-[#2563EB] dark:bg-[#3B82F6] text-white font-medium rounded-tr-none'
+                    ? 'bg-indigo-600 dark:bg-indigo-600 text-white font-medium rounded-tr-none'
                     : 'bg-[#F8FAFC] dark:bg-[#0B0F17] border border-[#E2E8F0] dark:border-[#23314F] text-[#0F172A] dark:text-[#F8FAFC] rounded-tl-none'
                 }`}
               >
@@ -858,7 +859,7 @@ export default function MultilingualChatbot({
           <div className="pt-2 border-t border-[#E2E8F0] dark:border-[#23314F] my-2">
             <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
               <span className="text-[10px] uppercase font-bold text-slate-400 shrink-0 font-mono flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-[#2563EB]" />
+                <Sparkles className="w-3 h-3 text-indigo-500" />
                 <span>Suggested:</span>
               </span>
               {(MULTILINGUAL_QUICK_PROMPTS[selectedLang] || QUICK_PROMPTS).map((item, pIdx) => (
@@ -866,7 +867,7 @@ export default function MultilingualChatbot({
                   key={pIdx}
                   onClick={() => handleSendGeneral(item.prompt)}
                   disabled={loading}
-                  className="text-[11px] font-semibold px-3 py-1.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-white dark:bg-[#1B2640] hover:bg-[#EFF6FF] dark:hover:bg-[#2563EB]/20 text-[#334155] dark:text-[#CBD5E1] hover:text-[#2563EB] dark:hover:text-[#60A5FA] hover:border-[#2563EB]/40 transition-all whitespace-nowrap shrink-0 shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer"
+                  className="text-[11px] font-semibold px-3 py-1.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-white dark:bg-[#1B2640] hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-[#334155] dark:text-[#CBD5E1] hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-400 transition-all whitespace-nowrap shrink-0 shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer"
                 >
                   {item.label}
                 </button>
@@ -887,7 +888,7 @@ export default function MultilingualChatbot({
               handleSendGeneral();
             }
           }}
-          className="flex items-center gap-2 p-1.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-[#2563EB] focus-within:ring-4 focus-within:ring-[#2563EB]/15 transition-all mt-2"
+          className="flex items-center gap-2 p-1.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all mt-2"
         >
           {/* Hidden File Input */}
           <input
@@ -902,7 +903,7 @@ export default function MultilingualChatbot({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="p-2 rounded-lg text-slate-500 hover:text-[#2563EB] dark:hover:text-[#60A5FA] hover:bg-slate-100 dark:hover:bg-[#1B2640] transition-colors shrink-0"
+            className="p-2 rounded-lg text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-[#1B2640] transition-colors shrink-0"
             title="Upload photo of question from notebook/book"
           >
             <ImageIcon className="w-4 h-4" />
@@ -940,10 +941,10 @@ export default function MultilingualChatbot({
           <button
             type="submit"
             disabled={loading || (!input.trim() && !imagePreview && activeMode !== 'timestamp')}
-            className={`p-2.5 rounded-lg text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] shadow-sm shrink-0 ${
+            className={`p-2.5 rounded-lg text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] shadow-sm shrink-0 cursor-pointer ${
               activeMode === 'timestamp'
                 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600'
-                : 'bg-[#2563EB] hover:bg-[#1D4ED8] dark:bg-[#3B82F6] dark:hover:bg-[#2563EB]'
+                : 'bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600'
             }`}
           >
             <Send className="w-4 h-4" />

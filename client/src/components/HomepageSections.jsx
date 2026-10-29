@@ -7,110 +7,75 @@ import {
   Award,
   Globe2,
   Send,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  BookOpen,
+  CheckCircle2
 } from 'lucide-react';
 
 /* ─────────────────────────────────────────────
-   0. TELEGRAM BOT CONNECT BANNER
-───────────────────────────────────────────── */
-export function TelegramBanner() {
-  return (
-    <section aria-labelledby="telegram-banner-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-6 sm:my-8">
-      <div className="p-4 sm:p-5 rounded-2xl border border-sky-200/90 dark:border-sky-800/60 bg-gradient-to-r from-sky-50/80 via-blue-50/50 to-indigo-50/40 dark:from-[#0c1424] dark:via-[#111c33] dark:to-[#0f172a] shadow-xs hover:shadow-sm transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#229ED9] text-white flex items-center justify-center shadow-xs shrink-0" aria-hidden="true">
-            <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/>
-            </svg>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <h4 id="telegram-banner-heading" className="font-bold text-sm text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']">
-                Study Directly on Telegram Bot
-              </h4>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#229ED9]/15 text-[#0088cc] dark:text-sky-400 border border-sky-400/30">
-                @omnistudy_notes_bot
-              </span>
-            </div>
-            <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-0.5 font-sans">
-              Send any YouTube link on Telegram to get Topper PDF notes &amp; ask doubts anytime on your phone.
-            </p>
-          </div>
-        </div>
-
-        <a
-          href="https://t.me/omnistudy_notes_bot"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Open OmniStudy Telegram Bot (opens in new tab)"
-          className="w-full sm:w-auto px-5 py-2.5 rounded-xl border-2 border-[#0284C7] dark:border-sky-500 text-[#0284C7] dark:text-sky-300 bg-white/90 dark:bg-[#131B2E] hover:bg-sky-50 dark:hover:bg-sky-950/50 hover:border-[#0369A1] font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer shadow-xs active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 min-h-[44px] font-sans"
-        >
-          <span>Open Telegram Bot</span>
-          <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-        </a>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   1. HOW IT WORKS – 3 Step Cards with Icons
+   1. HOW IT WORKS – Clean, 3-Step Workflow
 ───────────────────────────────────────────── */
 export function HowItWorks() {
   const steps = [
     {
-      step: '1',
+      step: '01',
       icon: LinkIcon,
-      color: 'bg-blue-100 dark:bg-blue-900/40 text-[#2563EB] dark:text-[#60A5FA]',
-      title: '1. YouTube Link Paste Karo',
-      desc: 'Kisi bhi YouTube video, lecture ya playlist ka link copy karke upar input box me paste karo.',
+      title: 'Paste YouTube Lecture Link',
+      desc: 'Paste any single YouTube lecture, long one-shot video, or entire playlist link in the input above.',
     },
     {
-      step: '2',
+      step: '02',
       icon: Zap,
-      color: 'bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400',
-      title: '2. AI Blackboard Notes Banata Hai',
-      desc: 'AI blackboard notes, clear vector diagrams, formulas aur solved PYQs kuch hi seconds me taiyyar karta hai.',
+      title: 'AI Synthesizes Topper Notes',
+      desc: 'Blackboard writing, vector diagrams, derivations, math formulas, and exam PYQs are cleanly organized.',
     },
     {
-      step: '3',
+      step: '03',
       icon: Download,
-      color: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400',
-      title: '3. PDF Download Karo ya Doubt Pucho',
-      desc: 'PDF download karo, Hindi/Hinglish me concept doubts pucho, ya direct Telegram par revise karo.',
+      title: 'Study, Revise or Download PDF',
+      desc: 'Read structured notes, practice MCQs, ask doubt questions in Hindi/Hinglish, or export clean PDFs.',
     },
   ];
 
   return (
-    <section aria-labelledby="how-it-works-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-6 sm:my-8">
-      <div className="text-center mb-6">
+    <section aria-labelledby="how-it-works-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-10">
+      <div className="flex items-center gap-2 mb-2 justify-center">
+        <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400" />
+        <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono">
+          Simple 3-Step Process
+        </span>
+      </div>
+      <div className="text-center mb-8">
         <h2
           id="how-it-works-heading"
-          className="text-lg sm:text-xl font-bold text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']"
+          className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-['Plus_Jakarta_Sans']"
         >
-          How It Works
+          How OmniStudy AI Works
         </h2>
-        <p className="text-xs sm:text-sm text-[#475569] dark:text-[#94A3B8] mt-1 font-sans">
-          3 simple steps me lecture backlog ko Topper Notes me badlo
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-lg mx-auto">
+          Turn hours of unorganized lecture backlogs into concise, high-yield classroom revision notes.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {steps.map(({ step, icon: Icon, color, title, desc }) => (
+        {steps.map(({ step, icon: Icon, title, desc }) => (
           <div
             key={step}
-            className="relative bg-white dark:bg-[#131B2E] border border-[#E2E8F0] dark:border-[#23314F] rounded-2xl p-5 flex flex-col items-center text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+            className="bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col items-start text-left shadow-xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200"
           >
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-black flex items-center justify-center shadow">
-              {step}
-            </span>
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-3 mt-2 ${color}`}>
-              <Icon className="w-5 h-5" aria-hidden="true" />
+            <div className="flex items-center justify-between w-full mb-4">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                <Icon className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <span className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500">
+                {step}
+              </span>
             </div>
-            <h3 className="font-bold text-sm text-[#0F172A] dark:text-[#F8FAFC] mb-1.5 font-['Plus_Jakarta_Sans']">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-2 font-['Plus_Jakarta_Sans']">
               {title}
             </h3>
-            <p className="text-xs text-[#475569] dark:text-[#94A3B8] leading-relaxed font-sans">
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-sans">
               {desc}
             </p>
           </div>
@@ -121,68 +86,66 @@ export function HowItWorks() {
 }
 
 /* ─────────────────────────────────────────────
-   2. FEATURES GRID – 4 Cards
+   2. FEATURES GRID – 4 Focused Cards
 ───────────────────────────────────────────── */
 export function FeaturesGrid() {
   const features = [
     {
-      title: 'Blackboard SVG Diagrams',
-      desc: 'Lecture video ke board writing aur circuits se clean, scalable vector diagrams jo zoom karne par bhi blur nahi hote.',
+      title: 'Vector Blackboard Diagrams',
+      desc: 'Automatic extraction of board drawings, circuits, and flowcharts into crisp SVGs that stay sharp at any zoom level.',
       icon: FileText,
-      color: 'text-[#2563EB] dark:text-[#60A5FA]',
-      bg: 'bg-blue-50 dark:bg-blue-900/30',
     },
     {
-      title: 'Solved PYQs Included',
-      desc: 'Har topic ke top previous year questions with step-by-step solutions, elimination tricks aur exam weightage.',
+      title: 'Exam PYQs & Step-by-Step Solutions',
+      desc: 'Curated previous year questions matching exam weightage with detailed derivations and elimination shortcuts.',
       icon: Award,
-      color: 'text-amber-600 dark:text-amber-400',
-      bg: 'bg-amber-50 dark:bg-amber-900/30',
     },
     {
-      title: 'Hinglish / Hindi Support',
-      desc: 'English, हिंदी ya Hinglish me notes padho aur doubts pucho. Conceptual clarity apni bhasha me paayein.',
+      title: 'Multilingual Study & Explanations',
+      desc: 'Read notes and resolve doubts in English, Hindi, or conversational Hinglish for deeper conceptual clarity.',
       icon: Globe2,
-      color: 'text-emerald-600 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-900/30',
     },
     {
-      title: 'Telegram Bot — Study on Phone',
-      desc: '@omnistudy_notes_bot par direct link send karke instant PDF download karo aur phone par revision karo.',
-      icon: Send,
-      color: 'text-sky-600 dark:text-sky-400',
-      bg: 'bg-sky-50 dark:bg-sky-900/30',
+      title: 'Export to PDF & Markdown',
+      desc: 'Clean, print-friendly A4 PDF notes without conversion artifacts, plus clean Markdown export for personal knowledge bases.',
+      icon: Download,
     },
   ];
 
   return (
-    <section aria-labelledby="features-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-6 sm:my-8">
-      <div className="text-center mb-6">
+    <section aria-labelledby="features-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-10">
+      <div className="flex items-center gap-2 mb-2 justify-center">
+        <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400" />
+        <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono">
+          Academic Toolkit
+        </span>
+      </div>
+      <div className="text-center mb-8">
         <h2
           id="features-heading"
-          className="text-lg sm:text-xl font-bold text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']"
+          className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-['Plus_Jakarta_Sans']"
         >
-          Features
+          Built for Serious Exam Preparation
         </h2>
-        <p className="text-xs sm:text-sm text-[#475569] dark:text-[#94A3B8] mt-1 font-sans">
-          Har serious student ke liye purpose-built learning tools
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-lg mx-auto">
+          Every tool designed to maximize retention, formula accuracy, and exam recall speed.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {features.map(({ title, desc, icon: Icon, color, bg }) => (
+        {features.map(({ title, desc, icon: Icon }) => (
           <div
             key={title}
-            className="bg-white dark:bg-[#131B2E] border border-[#E2E8F0] dark:border-[#23314F] rounded-2xl p-4 sm:p-5 flex gap-3.5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+            className="bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex gap-4 shadow-xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200"
           >
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${bg}`}>
-              <Icon className={`w-5 h-5 ${color}`} aria-hidden="true" />
+            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+              <Icon className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-[#0F172A] dark:text-[#F8FAFC] mb-1 font-['Plus_Jakarta_Sans']">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-1.5 font-['Plus_Jakarta_Sans']">
                 {title}
               </h3>
-              <p className="text-xs text-[#475569] dark:text-[#94A3B8] leading-relaxed font-sans">
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-sans">
                 {desc}
               </p>
             </div>
@@ -194,38 +157,41 @@ export function FeaturesGrid() {
 }
 
 /* ─────────────────────────────────────────────
-   4. STATS LINE – Placeholder (e.g. 10,000+ notes generated)
+   3. TELEGRAM BOT REVISION CALLOUT
 ───────────────────────────────────────────── */
-export function StatsLine() {
-  const stats = [
-    { value: '10,000+', label: 'Notes Generated' },
-    { value: '500+', label: 'Lectures Processed' },
-    { value: '4', label: 'Major Exams Covered' },
-    { value: '3', label: 'Languages Supported' },
-  ];
-
+export function TelegramBanner() {
   return (
-    <section aria-labelledby="stats-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-6 sm:my-8">
-      <div className="bg-[#EFF6FF] dark:bg-[#131B2E] border border-[#BFDBFE] dark:border-[#23314F] rounded-2xl p-4 sm:p-5 shadow-xs">
-        <h3 id="stats-heading" className="sr-only">Community Statistics</h3>
-        
-        {/* Main Stats Line */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-          {stats.map(({ value, label }) => (
-            <div key={label} className="p-2">
-              <span className="text-xl sm:text-2xl font-black text-[#2563EB] dark:text-[#60A5FA] font-['Plus_Jakarta_Sans'] block">
-                {value}
-              </span>
-              <span className="text-xs text-[#475569] dark:text-[#94A3B8] font-semibold mt-0.5 font-sans block">
-                {label}
+    <section aria-labelledby="telegram-banner-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-10">
+      <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131B2E] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+        <div className="flex items-start gap-4">
+          <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700" aria-hidden="true">
+            <Send className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 id="telegram-banner-heading" className="font-bold text-sm sm:text-base text-slate-900 dark:text-white font-['Plus_Jakarta_Sans']">
+                Revise on Your Phone with Telegram Bot
+              </h3>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                @omnistudy_notes_bot
               </span>
             </div>
-          ))}
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md font-sans leading-relaxed">
+              Forward any YouTube lecture link directly to the bot on Telegram to receive study PDFs and ask doubts on mobile.
+            </p>
+          </div>
         </div>
 
-        <p className="text-center text-xs sm:text-[13px] text-slate-800 dark:text-slate-200 mt-2.5 font-bold font-sans">
-          🔥 10,000+ notes generated by students across India
-        </p>
+        <a
+          href="https://t.me/omnistudy_notes_bot"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open OmniStudy Telegram Bot (opens in new tab)"
+          className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer shadow-xs min-h-[44px] font-sans"
+        >
+          <span>Open Telegram Bot</span>
+          <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+        </a>
       </div>
     </section>
   );
@@ -236,16 +202,14 @@ export function StatsLine() {
 ───────────────────────────────────────────── */
 export default function HomepageSections() {
   return (
-    <div className="space-y-1">
-      {/* 0. Telegram Banner directly below sample cards */}
-      <TelegramBanner />
-      {/* 1. "How it works" */}
+    <div className="space-y-4">
+      {/* 1. How it works */}
       <HowItWorks />
-      {/* 2. Features Grid (4 cards) */}
+      {/* 2. Core Features */}
       <FeaturesGrid />
-      {/* 3. Stats Line (Placeholder) */}
-      <StatsLine />
-      {/* Bottom spacer for mobile navbar */}
+      {/* 3. Telegram Revision Bot */}
+      <TelegramBanner />
+      {/* Bottom spacer */}
       <div className="h-6 sm:h-8" aria-hidden="true" />
     </div>
   );

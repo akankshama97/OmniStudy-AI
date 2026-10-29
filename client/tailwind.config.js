@@ -25,30 +25,30 @@ export default {
           subtle: 'var(--text-muted)',
         },
         accent: {
-          DEFAULT: '#4A6CF7',
-          hover: '#3B5CE5',
+          DEFAULT: '#4F46E5',
+          hover: '#4338CA',
           light: '#EEF2FF',
-          dark: '#304FFE',
+          dark: '#3730A3',
         },
         charcoal: {
-          DEFAULT: '#1A1A1E',
-          secondary: '#374151',
-          muted: '#6B7280',
-          light: '#9CA3AF',
+          DEFAULT: '#0F172A',
+          secondary: '#334155',
+          muted: '#64748B',
+          light: '#94A3B8',
         },
         surface: {
           DEFAULT: '#FFFFFF',
-          secondary: '#F7F7F8',
-          subtle: '#F1F3F5',
-          border: '#E5E7EB',
+          secondary: '#F8FAFC',
+          subtle: '#F1F5F9',
+          border: '#E2E8F0',
         },
         notebook: {
-          paper: '#fcfcf7',
-          line: '#e1e8ed',
-          margin: '#ff6b6b',
-          highlight: '#fff3bf',
-          ink: '#1e293b',
-          blueink: '#1a365d'
+          paper: '#FFFFFF',
+          line: '#E2E8F0',
+          margin: '#E2E8F0',
+          highlight: '#FEF3C7',
+          ink: '#0F172A',
+          blueink: '#0F172A'
         }
       }
     },

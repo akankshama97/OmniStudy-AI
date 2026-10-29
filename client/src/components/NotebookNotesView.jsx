@@ -10,6 +10,7 @@ import {
 import DiagramRenderer from './DiagramRenderer';
 import MindMapViewer from './MindMapViewer';
 import { downloadNotePdfApi } from '../services/api';
+import { cleanMathSymbols, cleanNoteText, cleanNoteHtml, FormattedText } from '../utils/formatText';
 
 /**
  * Derives 20 high-yield practice MCQs from note concepts if not already persisted
@@ -277,75 +278,11 @@ function KaTeXFormula({ formula, displayMode = true }) {
 }
 
 /**
- * Formats mathematical expressions into clean, natural readable plain text.
- * Eliminates LaTeX conversion markup (\frac, \sqrt, \vec, $...$) so equations
- * are 100% visible and readable everywhere (Telegram, PDF, Website).
+ * Robust natural math and markdown cleaners from formatText utility
  */
-export function formatNaturalMath(str) {
-  if (!str || typeof str !== 'string') return '';
-  return str
-    .replace(/\$\$/g, '')
-    .replace(/\$/g, '')
-    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1 / $2)')
-    .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
-    .replace(/\\vec\{([^}]+)\}/g, '$1')
-    .replace(/\\mathbf\{([^}]+)\}/g, '$1')
-    .replace(/\\cdot/g, ' × ')
-    .replace(/\\times/g, ' × ')
-    .replace(/\\div/g, ' ÷ ')
-    .replace(/\\pm/g, ' ± ')
-    .replace(/\\leq/g, ' ≤ ')
-    .replace(/\\geq/g, ' ≥ ')
-    .replace(/\\theta/g, 'θ')
-    .replace(/\\pi/g, 'π')
-    .replace(/\\Delta/g, 'Δ')
-    .replace(/\\alpha/g, 'α')
-    .replace(/\\beta/g, 'β')
-    .replace(/\\lambda/g, 'λ')
-    .replace(/\\sigma/g, 'σ')
-    .replace(/\\omega/g, 'ω')
-    .replace(/\\rightarrow/g, ' → ')
-    .replace(/\\to/g, ' → ')
-    .replace(/\\left\(/g, '(')
-    .replace(/\\right\)/g, ')')
-    .replace(/\\left\[/g, '[')
-    .replace(/\\right\]/g, ']')
-    .replace(/\^2/g, '²')
-    .replace(/\^3/g, '³')
-    .replace(/\\/g, '');
-}
-
-/**
- * Converts natural math with markdown bold (**word**) to HTML string
- */
-export function formatNaturalMathHtml(str) {
-  if (!str) return '';
-  const plain = formatNaturalMath(String(str));
-  return plain.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #0F172A; font-weight: 700;">$1</strong>');
-}
-
-/**
- * Renders text with natural, clear mathematical formatting and highlighted bold terms
- */
-function MathText({ text, className = '' }) {
-  if (!text) return null;
-  const natural = formatNaturalMath(String(text));
-  const parts = natural.split(/(\*\*[^*]+\*\*)/g);
-  return (
-    <span className={className}>
-      {parts.map((part, i) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-          return (
-            <strong key={i} className="font-extrabold text-[#0F172A] dark:text-[#FFFFFF] underline decoration-blue-500/30 underline-offset-2">
-              {part.slice(2, -2)}
-            </strong>
-          );
-        }
-        return part;
-      })}
-    </span>
-  );
-}
+export const formatNaturalMath = cleanNoteText;
+export const formatNaturalMathHtml = cleanNoteHtml;
+const MathText = FormattedText;
 
 export default function NotebookNotesView({
   note,
@@ -593,14 +530,51 @@ export default function NotebookNotesView({
     const cleanChapter = formatNaturalMathHtml(n.chapter || n.title || 'Lecture Study Notes');
     const cleanSubject = formatNaturalMathHtml(n.subject || 'Academic Subject');
     const cleanTargetExam = formatNaturalMathHtml(n.targetExam && n.targetExam !== 'Auto-detect' ? n.targetExam : 'University & Board Exam Ready');
-    const concepts = Array.isArray(n.keyConcepts) ? n.keyConcepts : [];
-    const formulas = Array.isArray(n.formulas) ? n.formulas : [];
-    const pyqs = Array.isArray(n.importantPYQs) && n.importantPYQs.length > 0 ? n.importantPYQs : (Array.isArray(n.pyqs) ? n.pyqs : []);
+
+    let concepts = (Array.isArray(n.keyConcepts) && n.keyConcepts.length > 0)
+      ? n.keyConcepts
+      : ((Array.isArray(n.concepts) && n.concepts.length > 0)
+          ? n.concepts
+          : ((Array.isArray(n.topics) && n.topics.length > 0) ? n.topics : []));
+
+    // Fallback: If no structured concepts array exists, parse raw notes/content/markdown
+    if (concepts.length === 0 && (n.content || n.notes || n.markdown || n.text)) {
+      const rawText = String(n.content || n.notes || n.markdown || n.text || '');
+      const sections = rawText.split(/(?=^##\s+)/m).filter(s => s.trim());
+      if (sections.length > 0) {
+        concepts = sections.map((sec, idx) => {
+          const lines = sec.trim().split('\n');
+          const heading = lines[0].replace(/^#{1,6}\s*/, '').trim() || `Topic ${idx + 1}`;
+          const bodyLines = lines.slice(1).map(l => l.trim()).filter(Boolean);
+          const points = bodyLines.map(l => l.replace(/^[-*•]\s*/, ''));
+          return {
+            heading,
+            points: points.length > 0 ? points : [sec.trim()],
+            timestamp_start: `0${idx * 5}:00`
+          };
+        });
+      } else {
+        concepts = [{
+          heading: cleanChapter,
+          points: [rawText],
+          timestamp_start: '00:00'
+        }];
+      }
+    }
+
+    const formulas = (Array.isArray(n.formulas) && n.formulas.length > 0)
+      ? n.formulas
+      : ((Array.isArray(n.formulaSheet) && n.formulaSheet.length > 0) ? n.formulaSheet : []);
+    const pyqs = (Array.isArray(n.importantPYQs) && n.importantPYQs.length > 0)
+      ? n.importantPYQs
+      : ((Array.isArray(n.pyqs) && n.pyqs.length > 0)
+          ? n.pyqs
+          : ((Array.isArray(n.examQuestions) && n.examQuestions.length > 0) ? n.examQuestions : []));
     const shortcuts = Array.isArray(n.shortcutsAndTricks) ? n.shortcutsAndTricks : [];
     const mistakes = Array.isArray(n.commonMistakes) ? n.commonMistakes : [];
 
     return `
-      <div style="font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #0F172A; max-width: 800px; margin: 0 auto; padding: 24px 28px; background: #FFFFFF;">
+      <div style="font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; box-sizing: border-box; line-height: 1.6; color: #0F172A; width: 794px; max-width: 794px; margin: 0 auto; padding: 24px 28px; background: #FFFFFF;">
         
         <!-- ── 1. TOPPER COVER HEADER (Normal Black & Blue Pen Style) ── -->
         <div class="topper-cover-header" style="background: #FFFFFF; border: 2px solid #0F172A; border-radius: 12px; padding: 18px 22px; margin-bottom: 22px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); page-break-inside: avoid; break-inside: avoid;">
@@ -936,69 +910,346 @@ export default function NotebookNotesView({
     }, 150);
   };
 
-  // Direct 1-Click PDF Download (ALWAYS directly downloads 100% visible, fully-styled file matching the laptop screen in normal black & blue pen)
+  // Helper: Generates exhaustive, structured Markdown for notes (supports English, Hindi, Hinglish)
+  const generateMarkdownFromNote = (n = note) => {
+    if (!n) return '';
+    const title = n.chapter || n.title || 'Lecture Study Notes';
+    const subject = n.subject || 'Academic Subject';
+    const exam = n.targetExam || 'Competitive Exam';
+    const concepts = Array.isArray(n.keyConcepts) ? n.keyConcepts : [];
+    const formulas = Array.isArray(n.formulas) ? n.formulas : [];
+    const pyqs = Array.isArray(n.importantPYQs) && n.importantPYQs.length > 0 ? n.importantPYQs : (Array.isArray(n.pyqs) ? n.pyqs : []);
+
+    let md = `# ${title}\n\n`;
+    md += `**Subject:** ${subject} | **Target Exam:** ${exam} | **Verified:** 100% Exam Verified\n`;
+    md += `**Platform Developed by:** Akanksha Maurya • [OmniStudy AI](https://omni-study-ai-lilac.vercel.app/)\n\n`;
+    md += `---\n\n`;
+
+    if (n.overview) {
+      md += `## 📌 Core Chapter Summary & Overview\n\n${n.overview}\n\n`;
+    }
+    if (n.quickSummary && n.quickSummary.length > 0) {
+      md += `### High-Yield Key Takeaways\n\n`;
+      n.quickSummary.forEach(s => {
+        md += `- ${s}\n`;
+      });
+      md += `\n`;
+    }
+
+    if (concepts.length > 0) {
+      md += `## ✍️ Complete Lecture Concepts & Blackboard Derivations\n\n`;
+      concepts.forEach((c, idx) => {
+        md += `### Topic ${idx + 1}: ${c.heading || `Concept ${idx + 1}`} (${c.timestamp_start || '00:00'} - ${c.timestamp_end || 'End'})\n\n`;
+        if (c.subheading) md += `*${c.subheading}*\n\n`;
+
+        if (c.definitions && c.definitions.length > 0) {
+          md += `**📌 Core Definitions:**\n\n`;
+          c.definitions.forEach(d => {
+            md += `> ${d}\n\n`;
+          });
+        }
+
+        if (c.points && c.points.length > 0) {
+          md += `**Blackboard Detailed Points & Explanation:**\n\n`;
+          c.points.forEach(p => {
+            md += `- ${p}\n`;
+          });
+          md += `\n`;
+        }
+
+        if (c.solved_example && (c.solved_example.title || c.solved_example.steps || c.solved_example.solution)) {
+          md += `**🧮 Solved Blackboard Example: ${c.solved_example.title || 'Step-by-Step Problem'}**\n\n`;
+          if (c.solved_example.given) md += `- **Given:** ${c.solved_example.given}\n`;
+          if (c.solved_example.formula) md += `- **Formula:** \`${c.solved_example.formula}\`\n`;
+          if (c.solved_example.steps && Array.isArray(c.solved_example.steps)) {
+            md += `- **Steps:**\n`;
+            c.solved_example.steps.forEach(st => {
+              md += `  1. ${st}\n`;
+            });
+          } else if (c.solved_example.solution) {
+            md += `- **Solution:** ${c.solved_example.solution}\n`;
+          }
+          if (c.solved_example.finalAnswer || c.solved_example.answer) {
+            md += `- **Answer:** **${c.solved_example.finalAnswer || c.solved_example.answer}**\n`;
+          }
+          md += `\n`;
+        }
+
+        if ((c.teacher_tips && c.teacher_tips.length > 0) || c.memoryTip) {
+          const tips = c.teacher_tips || [c.memoryTip];
+          md += `> 💡 **Teacher Exam Tip:** ${tips.join(' | ')}\n\n`;
+        }
+
+        if (c.common_mistake && c.common_mistake.mistake) {
+          md += `> ⚠️ **Common Mistake:** ${c.common_mistake.mistake}\n`;
+          if (c.common_mistake.correction) {
+            md += `> **Correction:** ${c.common_mistake.correction}\n\n`;
+          }
+        }
+
+        md += `---\n\n`;
+      });
+    }
+
+    if (formulas.length > 0) {
+      md += `## ⚡ Essential Formula Cheat Sheet\n\n`;
+      md += `| Formula Name | Mathematical Equation | When to Use / Variables |\n`;
+      md += `| :--- | :--- | :--- |\n`;
+      formulas.forEach((f, fi) => {
+        md += `| ${f.name || `Formula ${fi + 1}`} | \`${f.formula || ''}\` | ${f.whenToUse || f.variables || ''} |\n`;
+      });
+      md += `\n---\n\n`;
+    }
+
+    if (pyqs.length > 0) {
+      md += `## 🎯 Exam Previous Year Questions (PYQs) & Solutions\n\n`;
+      pyqs.forEach((q, qIdx) => {
+        md += `### Q${qIdx + 1}: ${q.question || q.q || ''}\n`;
+        md += `*Exam: ${q.exam || q.targetExam || 'Exam'} ${q.year ? `(${q.year})` : ''}*\n\n`;
+        if (q.options && q.options.length > 0) {
+          q.options.forEach((opt, oIdx) => {
+            md += `- **(${['A', 'B', 'C', 'D'][oIdx] || oIdx + 1})** ${opt}\n`;
+          });
+          md += `\n`;
+        }
+        if (q.correctAnswer || q.answer) {
+          md += `**✅ Correct Answer:** ${q.correctAnswer || q.answer}\n\n`;
+        }
+        if (q.solution || q.explanation) {
+          md += `**Detailed Solution:**\n${q.solution || q.explanation}\n\n`;
+        }
+        md += `---\n\n`;
+      });
+    }
+
+    md += `\n*OmniStudy AI • Verified Handwritten Notes • Platform Developed by Akanksha Maurya*\n`;
+    return md;
+  };
+
+  // Direct Markdown (.md) 1-Click Download
+  const handleDownloadMarkdown = (n = note) => {
+    if (!n) return;
+    const cleanTitle = (n.chapter || n.title || 'Lecture_Notes').replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_');
+    const mdContent = generateMarkdownFromNote(n);
+    const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${cleanTitle}_Notes.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Direct 1-Click PDF Download (Reliable hidden-but-rendered container, multi-page A4 canvas slicing)
   const handleDownloadPDF = async () => {
     if (!note) return;
     const cleanTitle = (note.title || note.chapter || 'Lecture_Notes').replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_');
     setIsExportingPDF(true);
 
-    // Primary Method: Direct Client-Side High-Fidelity PDF Generation (Full-height layout, normal black & blue pen)
     try {
-      if (typeof window !== 'undefined') {
-        const html2pdfModule = await import('html2pdf.js');
-        const html2pdf = html2pdfModule.default || html2pdfModule;
+      if (typeof window === 'undefined') return;
 
-        const printContainer = document.createElement('div');
-        printContainer.id = 'omnistudy-pdf-export-container';
-        // Position absolute at current scroll position to allow full natural height rendering without viewport truncation
-        printContainer.style.position = 'absolute';
-        printContainer.style.top = `${window.scrollY || 0}px`;
-        printContainer.style.left = '0';
-        printContainer.style.width = '800px';
-        printContainer.style.backgroundColor = '#FFFFFF';
-        printContainer.style.color = '#0F172A';
-        printContainer.style.zIndex = '999999';
-        printContainer.style.opacity = '1';
-        printContainer.style.pointerEvents = 'none';
-        printContainer.innerHTML = getAuthenticNotebookHtml(note);
-        document.body.appendChild(printContainer);
+      // 1. Dynamic imports of html2canvas and jsPDF for zero-conflict code-splitting
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf')
+      ]);
 
-        // Allow DOM to compute bounding boxes, styles and render SVGs properly
-        await new Promise(r => setTimeout(r, 250));
+      // 2. Dedicated off-screen hidden-but-rendered print container
+      // Strictly avoid display:none, opacity:0, or negative z-index which cause blank canvas snapshots in html2canvas
+      const printContainer = document.createElement('div');
+      printContainer.id = 'omnistudy-pdf-export-container';
+      printContainer.className = 'omnistudy-pdf-container-root';
+      printContainer.setAttribute('data-pdf-export', 'true');
+      printContainer.style.position = 'absolute';
+      printContainer.style.left = '-9999px';
+      printContainer.style.top = '0px';
+      printContainer.style.width = '794px'; // 210mm at 96 DPI
+      printContainer.style.minHeight = '1123px'; // A4 height at 96 DPI
+      printContainer.style.backgroundColor = '#FFFFFF';
+      printContainer.style.color = '#0F172A';
+      printContainer.style.zIndex = '9999';
+      printContainer.style.opacity = '1';
+      printContainer.style.visibility = 'visible';
+      printContainer.style.display = 'block';
+      printContainer.style.pointerEvents = 'none';
+      printContainer.style.boxSizing = 'border-box';
+      printContainer.style.margin = '0';
+      printContainer.style.padding = '0';
 
-        const opt = {
-          margin: [8, 8, 10, 8],
-          filename: `${cleanTitle}_Notes.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#FFFFFF',
-            windowWidth: 800,
-            scrollY: 0,
-            scrollX: 0
-          },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: {
-            mode: ['css', 'legacy'],
-            avoid: ['.concept-block', '.diagram-box', '.solved-example-box', '.formula-box', '.pyq-item', '.topper-cover-header', '.table-container', '.teacher-tip-box']
-          }
-        };
+      // Insert authentic normal black & blue pen notebook HTML
+      printContainer.innerHTML = getAuthenticNotebookHtml(note);
+      document.body.appendChild(printContainer);
 
+      // 3. Await Unicode font loading (Noto Sans Devanagari, Plus Jakarta Sans) and layout paint cycle
+      if (document.fonts) {
         try {
-          await html2pdf().set(opt).from(printContainer).save();
-          setIsExportingPDF(false);
-          return;
-        } finally {
-          if (document.body.contains(printContainer)) {
-            document.body.removeChild(printContainer);
+          await Promise.all([
+            document.fonts.load('16px "Noto Sans Devanagari"'),
+            document.fonts.load('bold 18px "Noto Sans Devanagari"'),
+            document.fonts.load('16px "Plus Jakarta Sans"'),
+            document.fonts.ready
+          ]);
+        } catch (_) {}
+      }
+      await new Promise(r => setTimeout(r, 400));
+
+      // Measure true full-content height
+      const contentHeight = Math.max(
+        printContainer.scrollHeight,
+        printContainer.offsetHeight,
+        printContainer.clientHeight,
+        1123
+      );
+
+      // 4. High-resolution canvas capture using html2canvas with isolated clone positioning
+      const scale = contentHeight > 10000 ? 1.5 : 2;
+      let canvas;
+      try {
+        canvas = await html2canvas(printContainer, {
+          scale,
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+          backgroundColor: '#FFFFFF',
+          width: 794,
+          height: contentHeight,
+          windowWidth: 794,
+          windowHeight: contentHeight,
+          x: 0,
+          y: 0,
+          scrollX: 0,
+          scrollY: 0,
+          onclone: (clonedDoc) => {
+            const el = clonedDoc.getElementById('omnistudy-pdf-export-container');
+            if (el) {
+              el.style.position = 'static';
+              el.style.left = '0px';
+              el.style.top = '0px';
+              el.style.margin = '0 auto';
+              el.style.zIndex = '1';
+            }
           }
+        });
+      } finally {
+        // Clean up temporary DOM container
+        if (document.body.contains(printContainer)) {
+          document.body.removeChild(printContainer);
         }
       }
+
+      // 5. Validate canvas is valid and non-empty
+      if (!canvas || canvas.width === 0 || canvas.height === 0) {
+        throw new Error('html2canvas produced an empty canvas');
+      }
+
+      // 6. Multi-page A4 document slicing with jsPDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      const pageWidthMm = 210;
+      const pageHeightMm = 297;
+      const marginMm = 8;
+      const footerMarginMm = 10;
+      const printableWidthMm = pageWidthMm - (marginMm * 2); // 194 mm
+      const printableHeightMm = pageHeightMm - marginMm - footerMarginMm; // 279 mm
+
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+
+      const mmPerPx = printableWidthMm / canvasWidth;
+      const pageSliceHeightPx = Math.floor(printableHeightMm / mmPerPx);
+
+      const totalPages = Math.ceil(canvasHeight / pageSliceHeightPx);
+
+      for (let page = 0; page < totalPages; page++) {
+        if (page > 0) {
+          pdf.addPage('a4', 'portrait');
+        }
+
+        const sliceY = page * pageSliceHeightPx;
+        const sliceHeight = Math.min(pageSliceHeightPx, canvasHeight - sliceY);
+
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvasWidth;
+        pageCanvas.height = sliceHeight;
+        const pageCtx = pageCanvas.getContext('2d');
+
+        // Solid white background
+        pageCtx.fillStyle = '#FFFFFF';
+        pageCtx.fillRect(0, 0, canvasWidth, sliceHeight);
+
+        // Draw image slice from full canvas
+        pageCtx.drawImage(
+          canvas,
+          0, sliceY, canvasWidth, sliceHeight,
+          0, 0, canvasWidth, sliceHeight
+        );
+
+        const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.96);
+        const renderHeightMm = sliceHeight * mmPerPx;
+
+        pdf.addImage(
+          pageImgData,
+          'JPEG',
+          marginMm,
+          marginMm,
+          printableWidthMm,
+          renderHeightMm,
+          undefined,
+          'FAST'
+        );
+
+        // Footer with page numbering
+        pdf.setFontSize(8);
+        pdf.setTextColor(100, 116, 139);
+        pdf.text(
+          `Page ${page + 1} of ${totalPages}  •  ⚡ OmniStudy AI Verified Classroom Copy  •  Akanksha Maurya`,
+          pageWidthMm / 2,
+          pageHeightMm - 4,
+          { align: 'center' }
+        );
+      }
+
+      pdf.save(`${cleanTitle}_Notes.pdf`);
+      setIsExportingPDF(false);
+      return;
     } catch (clientPdfErr) {
-      console.warn('[NotebookNotesView] Client html2pdf notice, engaging browser print fallback:', clientPdfErr);
-      handlePrintNotes();
+      console.warn('[NotebookNotesView] Client-side PDF export error, engaging fallback ladder:', clientPdfErr);
+
+      // Fallback Level 1: Attempt server PDF generation endpoint
+      try {
+        const res = await downloadNotePdfApi(note);
+        const blob = res instanceof Blob ? res : (res?.data instanceof Blob ? res.data : (res ? new Blob([res], { type: 'application/pdf' }) : null));
+        if (blob && blob.size > 0) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${cleanTitle}_Notes.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          setIsExportingPDF(false);
+          return;
+        }
+      } catch (serverPdfErr) {
+        console.warn('[NotebookNotesView] Server PDF export error:', serverPdfErr);
+      }
+
+      // Fallback Level 2: Native browser print dialog
+      try {
+        handlePrintNotes();
+      } catch (printErr) {
+        // Fallback Level 3: Guaranteed Markdown (.md) raw notes download
+        handleDownloadMarkdown(note);
+      }
     } finally {
       setIsExportingPDF(false);
     }
@@ -1199,50 +1450,125 @@ export default function NotebookNotesView({
 
     try {
       if (typeof window !== 'undefined') {
-        const html2pdfModule = await import('html2pdf.js');
-        const html2pdf = html2pdfModule.default || html2pdfModule;
+        const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+          import('html2canvas'),
+          import('jspdf')
+        ]);
 
         const printContainer = document.createElement('div');
         printContainer.id = 'omnistudy-progress-report-container';
-        printContainer.style.position = 'fixed';
-        printContainer.style.top = '0';
-        printContainer.style.left = '0';
-        printContainer.style.width = '820px';
+        printContainer.className = 'omnistudy-pdf-container-root';
+        printContainer.style.position = 'absolute';
+        printContainer.style.left = '-9999px';
+        printContainer.style.top = '0px';
+        printContainer.style.width = '794px';
+        printContainer.style.minHeight = '1123px';
         printContainer.style.backgroundColor = '#FFFFFF';
         printContainer.style.color = '#0F172A';
-        printContainer.style.zIndex = '99999';
+        printContainer.style.zIndex = '9999';
         printContainer.style.opacity = '1';
+        printContainer.style.visibility = 'visible';
+        printContainer.style.display = 'block';
         printContainer.style.pointerEvents = 'none';
+        printContainer.style.boxSizing = 'border-box';
+        printContainer.style.margin = '0';
+        printContainer.style.padding = '0';
         printContainer.innerHTML = getCleanProgressReportHtml(note);
         document.body.appendChild(printContainer);
 
-        await new Promise(r => setTimeout(r, 120));
+        if (document.fonts && document.fonts.ready) {
+          try { await document.fonts.ready; } catch (_) {}
+        }
+        await new Promise(r => setTimeout(r, 300));
 
-        const opt = {
-          margin: [8, 8, 10, 8],
-          filename: `${cleanTitle}_Progress_Report.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: {
+        const contentHeight = Math.max(printContainer.scrollHeight, printContainer.offsetHeight, 1123);
+
+        let canvas;
+        try {
+          canvas = await html2canvas(printContainer, {
             scale: 2,
             useCORS: true,
+            allowTaint: true,
             logging: false,
             backgroundColor: '#FFFFFF',
-            windowWidth: 820,
-            scrollY: 0
-          },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['css', 'legacy'] }
-        };
-
-        try {
-          await html2pdf().set(opt).from(printContainer).save();
-          setIsExportingReport(false);
-          return;
+            width: 794,
+            height: contentHeight,
+            windowWidth: 794,
+            windowHeight: contentHeight,
+            x: 0,
+            y: 0,
+            scrollX: 0,
+            scrollY: 0,
+            onclone: (clonedDoc) => {
+              const el = clonedDoc.getElementById('omnistudy-progress-report-container');
+              if (el) {
+                el.style.position = 'static';
+                el.style.left = '0px';
+                el.style.top = '0px';
+                el.style.margin = '0 auto';
+                el.style.zIndex = '1';
+              }
+            }
+          });
         } finally {
           if (document.body.contains(printContainer)) {
             document.body.removeChild(printContainer);
           }
         }
+
+        if (!canvas || canvas.width === 0 || canvas.height === 0) {
+          throw new Error('html2canvas produced an empty progress report canvas');
+        }
+
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+          compress: true
+        });
+
+        const pageWidthMm = 210;
+        const pageHeightMm = 297;
+        const marginMm = 8;
+        const printableWidthMm = pageWidthMm - (marginMm * 2);
+        const printableHeightMm = pageHeightMm - (marginMm * 2);
+
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const mmPerPx = printableWidthMm / canvasWidth;
+        const pageSliceHeightPx = Math.floor(printableHeightMm / mmPerPx);
+
+        const totalPages = Math.ceil(canvasHeight / pageSliceHeightPx);
+
+        for (let page = 0; page < totalPages; page++) {
+          if (page > 0) pdf.addPage('a4', 'portrait');
+
+          const sliceY = page * pageSliceHeightPx;
+          const sliceHeight = Math.min(pageSliceHeightPx, canvasHeight - sliceY);
+
+          const pageCanvas = document.createElement('canvas');
+          pageCanvas.width = canvasWidth;
+          pageCanvas.height = sliceHeight;
+          const pageCtx = pageCanvas.getContext('2d');
+
+          pageCtx.fillStyle = '#FFFFFF';
+          pageCtx.fillRect(0, 0, canvasWidth, sliceHeight);
+
+          pageCtx.drawImage(
+            canvas,
+            0, sliceY, canvasWidth, sliceHeight,
+            0, 0, canvasWidth, sliceHeight
+          );
+
+          const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.95);
+          const renderHeightMm = sliceHeight * mmPerPx;
+
+          pdf.addImage(pageImgData, 'JPEG', marginMm, marginMm, printableWidthMm, renderHeightMm, undefined, 'FAST');
+        }
+
+        pdf.save(`${cleanTitle}_Progress_Report.pdf`);
+        setIsExportingReport(false);
+        return;
       }
     } catch (err) {
       console.warn('[NotebookNotesView] Progress report PDF generation fallback:', err);
@@ -1481,6 +1807,16 @@ export default function NotebookNotesView({
               <span>{copiedDocx ? 'Downloaded DOC!' : 'Download DOC'}</span>
             </button>
 
+            {/* Markdown (.md) Export Button */}
+            <button
+              onClick={() => handleDownloadMarkdown(note)}
+              className="px-3.5 py-2 rounded-xl border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs hover:shadow-sm active:scale-95 cursor-pointer"
+              title="Download Notes as clean Markdown (.md) file"
+            >
+              <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Download MD</span>
+            </button>
+
             {/* Share Notes Modal Trigger Button */}
             <button
               onClick={() => setIsShareModalOpen(true)}
@@ -1511,7 +1847,7 @@ export default function NotebookNotesView({
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-[#2563EB] text-white shadow-sm font-bold'
+                  ? 'bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm font-bold'
                   : 'bg-[#F1F5F9] dark:bg-[#1B2640] text-[#334155] dark:text-[#CBD5E1] hover:text-[#0F172A] dark:hover:text-white border border-[#E2E8F0] dark:border-[#23314F]'
               }`}
             >
@@ -1561,7 +1897,7 @@ export default function NotebookNotesView({
                     onClick={() => setHandwritingStyle('clean')}
                     className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
                       handwritingStyle === 'clean'
-                        ? 'bg-[#2563EB] text-white shadow-xs'
+                        ? 'bg-indigo-600 text-white shadow-xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                     }`}
                   >
@@ -1686,31 +2022,31 @@ export default function NotebookNotesView({
 
               {/* Row 3: Chapter Title */}
               <div className="pt-2">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-[#1E3A8A] dark:text-[#93C5FD] leading-tight font-['Plus_Jakarta_Sans']">
-                  {note.chapter || note.title}
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight font-['Plus_Jakarta_Sans']">
+                  <FormattedText text={note.chapter || note.title} />
                 </h1>
               </div>
             </div>
 
             {/* ── Clickable Topic Index (Table of Contents) ── */}
-            <div className="rounded-2xl p-4 bg-emerald-500/5 dark:bg-emerald-950/20 border border-emerald-500/20 shadow-xs">
-              <div className="flex items-center justify-between pb-2 mb-2 border-b border-emerald-500/20">
+            <div className="rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-xs">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5">
-                    <Bookmark className="w-3.5 h-3.5" />
-                    <span>Clickable Topic Index (Jump to Section)</span>
+                  <span className="text-slate-700 dark:text-slate-300 font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5">
+                    <Bookmark className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>Topic Index (Jump to Section)</span>
                   </span>
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold">
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">
                     {(note.keyConcepts || []).length} Topics
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsTOCCollapsed(!isTOCCollapsed)}
-                  className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
                   title="Collapse Table of Contents"
                 >
-                  <span>Collapse</span>
+                  <span>{isTOCCollapsed ? 'Expand' : 'Collapse'}</span>
                   {isTOCCollapsed ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
                 </button>
               </div>
@@ -1726,15 +2062,15 @@ export default function NotebookNotesView({
                         const el = document.getElementById(`concept-card-${idx}`);
                         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
-                      className="text-left p-2 rounded-xl bg-white dark:bg-[#131B2E] border border-emerald-500/20 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 text-xs text-slate-800 dark:text-slate-200 transition-all flex items-center justify-between gap-1 group"
+                      className="text-left p-2 rounded-xl bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-xs text-slate-800 dark:text-slate-200 transition-all flex items-center justify-between gap-1 group"
                     >
-                      <span className="font-semibold truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 flex items-center gap-1">
+                      <span className="font-semibold truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center gap-1">
                         {c.unitNumber && (
-                          <span className="text-[9px] px-1.5 py-0.5 rounded font-mono font-black bg-purple-500/15 text-purple-700 dark:text-purple-300 shrink-0">
+                          <span className="text-[9px] px-1.5 py-0.5 rounded font-mono font-black bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
                             U{c.unitNumber}
                           </span>
                         )}
-                        <span><strong>{idx + 1}.</strong> {c.heading}</span>
+                        <span><strong>{idx + 1}.</strong> <FormattedText text={c.heading} /></span>
                       </span>
                       <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 shrink-0">
                         {c.timestamp_start || '00:00'}
@@ -1745,59 +2081,26 @@ export default function NotebookNotesView({
               )}
             </div>
 
-            {/* ── 🔥 AKTU Exam: Most Important 10-Mark Sure-Shot Topics ── */}
-            <div className="rounded-2xl p-4 bg-amber-500/10 dark:bg-amber-950/20 border-2 border-amber-500/30 shadow-xs">
-              <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-amber-500/20">
-                <div className="flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
-                  <span className="font-extrabold text-xs font-mono text-amber-800 dark:text-amber-300 uppercase tracking-wider">
-                    AKTU EXAM: MOST REPEATED & 10-MARK SURE-SHOT TOPICS
-                  </span>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-800 dark:text-amber-200 border border-amber-500/30 font-mono">
-                  SECTION B & C GUARANTEE
-                </span>
-              </div>
-              <ul className="space-y-1.5 text-xs text-amber-900 dark:text-amber-200 font-sans">
-                {(note.keyConcepts || []).slice(0, 4).map((c, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <span className="text-amber-600 font-bold shrink-0">🎯</span>
-                    <span className="leading-snug">
-                      <strong>[AKTU 10 Marks / Section C]:</strong> Detailed Derivation, Architecture Diagram &amp; Solved Case on <strong className="text-blue-700 dark:text-blue-300">{c.heading}</strong>.
-                    </span>
-                  </li>
-                ))}
-                {(note.keyConcepts || []).length > 4 && (
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-600 font-bold shrink-0">📌</span>
-                    <span className="leading-snug">
-                      <strong>[AKTU 2 Marks / Section A]:</strong> Definitions &amp; Real-life Examples of all {(note.keyConcepts || []).length} key concepts.
-                    </span>
-                  </li>
-                )}
-              </ul>
-            </div>
-
             {/* Overview & Quick Highlights */}
-            <div className="space-y-3">
-              <div className="text-xs font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 font-mono">
-                01. LECTURE OVERVIEW & CONTEXT
+            <div className="space-y-3 pt-2">
+              <div className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 font-mono">
+                01. LECTURE OVERVIEW &amp; CONTEXT
               </div>
-              <p className="text-sm md:text-base leading-relaxed handwritten-font break-words text-[#1E3A8A] dark:text-[#93C5FD]">
-                {note.overview}
+              <p className="text-sm md:text-base leading-relaxed break-words text-slate-800 dark:text-slate-100">
+                <FormattedText text={note.overview} />
               </p>
 
               {/* High-yield highlights list */}
               {note.quickSummary && note.quickSummary.length > 0 && (
-                <div className="p-3.5 rounded-2xl bg-amber-500/5 border border-amber-500/20 my-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 mb-1.5 font-mono flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" /> High-Yield Key Takeaways
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 my-2">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2 font-mono flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" /> High-Yield Key Takeaways
                   </h4>
-                  <ul className="space-y-1">
+                  <ul className="space-y-1.5">
                     {note.quickSummary.map((item, idx) => (
-                      <li key={idx} className="text-xs md:text-sm handwritten-font flex items-start gap-2 break-words text-[#1E3A8A] dark:text-[#93C5FD]">
+                      <li key={idx} className="text-xs md:text-sm flex items-start gap-2 break-words text-slate-800 dark:text-slate-100">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                        <span className="flex-1 min-w-0">{item}</span>
+                        <span className="flex-1 min-w-0"><FormattedText text={item} /></span>
                       </li>
                     ))}
                   </ul>
@@ -1806,9 +2109,9 @@ export default function NotebookNotesView({
             </div>
 
             {/* ── Key Concepts (Student Copy Layout) ── */}
-            <div className="space-y-5 pt-3 border-t border-dashed border-slate-300 dark:border-slate-800">
-              <div className="text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 font-mono">
-                02. TOPIC-WISE CONCEPT COPY & DERIVATIONS
+            <div className="space-y-5 pt-3 border-t border-dashed border-slate-200 dark:border-slate-800">
+              <div className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 font-mono">
+                02. TOPIC-WISE CONCEPT COPY &amp; DERIVATIONS
               </div>
 
               {filteredConcepts.map((concept, idx) => {
@@ -1842,8 +2145,8 @@ export default function NotebookNotesView({
                               SUBJECT MODULE • UNIT {concept.unitNumber}
                             </span>
                           </div>
-                          <h3 className="text-lg sm:text-xl font-extrabold text-[#1E3A8A] dark:text-[#93C5FD] mt-0.5 font-['Plus_Jakarta_Sans']">
-                            {unitTitleFromList || `Unit ${concept.unitNumber} Detailed Syllabus`}
+                          <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-0.5 font-['Plus_Jakarta_Sans']">
+                            <FormattedText text={unitTitleFromList || `Unit ${concept.unitNumber} Detailed Syllabus`} />
                           </h3>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
@@ -1906,23 +2209,23 @@ export default function NotebookNotesView({
                       </div>
                     </div>
 
-                    {/* Underlined Topic Heading */}
+                    {/* Topic Heading */}
                     <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
-                      <h3 className="text-xl md:text-2xl font-bold handwritten-title break-words flex-1 min-w-0 text-[#1E3A8A] dark:text-[#93C5FD] topic-underline">
-                        {concept.heading}
+                      <h3 className="text-xl md:text-2xl font-bold break-words flex-1 min-w-0 text-slate-900 dark:text-white">
+                        <FormattedText text={concept.heading} />
                       </h3>
                     </div>
 
                     {/* Sub-heading */}
                     {concept.subheading && (
                       <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-2 italic">
-                        ▶ {concept.subheading}
+                        ▶ <FormattedText text={concept.subheading} />
                       </div>
                     )}
 
                     {/* Concept Connections (Prerequisite & Next Steps in Syllabus) */}
                     <div className="my-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[11px] font-sans flex items-center gap-2 flex-wrap text-slate-600 dark:text-slate-300">
-                      <span className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                      <span className="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
                         <Link2 className="w-3 h-3" /> Syllabus Link:
                       </span>
                       <span>Requires: <strong className="text-slate-700 dark:text-slate-200">{prevTopic.slice(0, 32)}</strong></span>
@@ -1934,7 +2237,7 @@ export default function NotebookNotesView({
                     {concept.definitions && concept.definitions.length > 0 && (
                       <div className="my-3 space-y-1.5">
                         {concept.definitions.map((def, dIdx) => (
-                          <div key={dIdx} className="p-3 rounded-xl bg-red-500/5 border-l-4 border-red-500 text-xs sm:text-sm font-bold text-[#B91C1C] dark:text-[#FCA5A5] handwritten-font flex items-start gap-1.5">
+                          <div key={dIdx} className="p-3 rounded-xl bg-red-500/5 border-l-4 border-red-500 text-xs sm:text-sm font-bold text-[#B91C1C] dark:text-[#FCA5A5] flex items-start gap-1.5">
                             <span>📌</span>
                             <MathText text={def} className="flex-1" />
                           </div>
@@ -1942,12 +2245,12 @@ export default function NotebookNotesView({
                       </div>
                     )}
 
-                  {/* Blue Pen Numbered / Bulleted Points */}
+                  {/* Bulleted Concept Points */}
                   {concept.points && concept.points.length > 0 && (
                     <ul className="space-y-2 my-3 pl-2">
                       {concept.points.map((pt, pIdx) => (
-                        <li key={pIdx} className="text-sm md:text-base handwritten-font flex items-start gap-2.5 text-[#1E3A8A] dark:text-[#93C5FD]">
-                          <span className="text-blue-500 font-bold">•</span>
+                        <li key={pIdx} className="text-sm md:text-base flex items-start gap-2.5 text-slate-800 dark:text-slate-100">
+                          <span className="text-indigo-500 font-bold">•</span>
                           <MathText text={pt} className="flex-1 min-w-0 leading-relaxed" />
                         </li>
                       ))}
@@ -2013,13 +2316,13 @@ export default function NotebookNotesView({
                         <span>Common Student Exam Mistake / Blunder:</span>
                       </div>
                       <p className="text-slate-700 dark:text-slate-300 font-sans">
-                        <strong>Mistake:</strong> {concept.common_mistake.mistake}
+                        <strong>Mistake:</strong> <FormattedText text={concept.common_mistake.mistake} />
                       </p>
                       <p className="text-red-600 dark:text-red-400 font-sans mt-0.5">
-                        <strong>Why it loses marks:</strong> {concept.common_mistake.whyWrong}
+                        <strong>Why it loses marks:</strong> <FormattedText text={concept.common_mistake.whyWrong} />
                       </p>
                       <p className="text-emerald-700 dark:text-emerald-400 font-bold font-sans mt-1">
-                        ✓ <strong>Correct Approach:</strong> {concept.common_mistake.correction}
+                        ✓ <strong>Correct Approach:</strong> <FormattedText text={concept.common_mistake.correction} />
                       </p>
                     </div>
                   )}
@@ -2037,12 +2340,12 @@ export default function NotebookNotesView({
                       </div>
 
                       <h4 className="font-bold text-sm text-[#0F172A] dark:text-[#F8FAFC] mb-2 font-['Plus_Jakarta_Sans']">
-                        {concept.solved_example.title}
+                        <FormattedText text={concept.solved_example.title} />
                       </h4>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-sans mb-2">
-                        <p><strong className="text-emerald-700 dark:text-emerald-400">Given:</strong> {concept.solved_example.given}</p>
-                        <p><strong className="text-emerald-700 dark:text-emerald-400">To Find:</strong> {concept.solved_example.toFind}</p>
+                        <p><strong className="text-emerald-700 dark:text-emerald-400">Given:</strong> <FormattedText text={concept.solved_example.given} /></p>
+                        <p><strong className="text-emerald-700 dark:text-emerald-400">To Find:</strong> <FormattedText text={concept.solved_example.toFind} /></p>
                       </div>
 
                       {concept.solved_example.formula && (
@@ -2051,15 +2354,15 @@ export default function NotebookNotesView({
                         </div>
                       )}
 
-                      <div className="text-xs text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap leading-relaxed my-2 bg-slate-100/60 dark:bg-slate-900/60 p-2.5 rounded-lg">
-                        {concept.solved_example.solution}
+                      <div className="text-xs text-slate-700 dark:text-slate-300 font-sans whitespace-pre-wrap leading-relaxed my-2 bg-slate-100/60 dark:bg-slate-900/60 p-2.5 rounded-lg">
+                        <FormattedText text={concept.solved_example.solution} />
                       </div>
 
                       <div className="flex items-center justify-between text-xs font-bold text-[#15803D] dark:text-[#86EFAC] pt-1">
-                        <span>Answer: {concept.solved_example.answer}</span>
+                        <span>Answer: <FormattedText text={concept.solved_example.answer} /></span>
                         {concept.solved_example.short_trick && (
                           <span className="text-[11px] font-mono text-orange-600 dark:text-orange-400 font-semibold">
-                            ⚡ Shortcut: {concept.solved_example.short_trick}
+                            ⚡ Shortcut: <FormattedText text={concept.solved_example.short_trick} />
                           </span>
                         )}
                       </div>

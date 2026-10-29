@@ -202,39 +202,26 @@ export default function App() {
       <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 md:pb-0">
         {/* Tab 1: Notes Generator & Classroom Copy (Persistent, Never Unmounts) */}
         <div className={activeTab === 'generator' ? 'block animate-fade-slide-up w-full max-w-full overflow-x-hidden' : 'hidden'}>
-          <YouTubeInput
-            onProcessVideo={handleProcessVideo}
-            isLoading={isLoading}
-            error={error}
-            theme={theme}
-            isDark={isDark}
-            selectedLang={selectedLang}
-            onChangeLanguage={handleChangeLanguage}
-          />
-
           {currentNote ? (
-            <div id="student-notes-section" className="relative animate-fade-slide-up mt-6">
-              <div className="max-w-6xl mx-auto px-4 mb-3 flex items-center justify-between flex-wrap gap-2">
+            <div id="student-notes-section" className="relative animate-fade-slide-up">
+              {/* Clean Top Workspace Navigation Bar */}
+              <div className="max-w-6xl mx-auto px-4 my-4 flex items-center justify-between flex-wrap gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentNote(null);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="px-4 py-2 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#131B2E] text-slate-700 dark:text-slate-300 hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                  title="Return to Lecture Input and Sample Lectures"
+                >
+                  <span>← Back to Video Input / New Lecture</span>
+                </button>
+
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-xs font-bold text-[#475569] dark:text-[#94A3B8] uppercase tracking-wider">
-                    Active Notes: <strong className="text-[#0F172A] dark:text-white font-sans text-xs sm:text-sm">{currentNote.chapter || currentNote.title}</strong>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCurrentNote(null);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#131B2E] text-slate-700 dark:text-slate-300 hover:text-red-600 hover:border-red-400 dark:hover:border-red-500/50 transition-all shadow-xs cursor-pointer active:scale-95"
-                    title="Close notes and return to example cards"
-                  >
-                    <span>Close Notes</span>
-                  </button>
-                  <span className="text-[11px] font-sans text-[#2563EB] dark:text-[#60A5FA] bg-[#EFF6FF] dark:bg-[#3B82F6]/20 px-3 py-1 rounded-full border border-[#2563EB]/20 font-bold hidden sm:inline">
-                    Classroom Copy Canvas
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    Active Study Notes: <strong className="text-slate-900 dark:text-white font-bold">{currentNote.chapter || currentNote.title}</strong>
                   </span>
                 </div>
               </div>
@@ -249,29 +236,20 @@ export default function App() {
                 isDark={isDark}
                 isLoading={isLoading}
               />
-
-              {/* Bottom Sticky Dismiss Bar for Clean UX */}
-              <div className="sticky bottom-4 z-30 max-w-sm mx-auto px-4 my-6 pointer-events-auto">
-                <div className="bg-slate-900/90 dark:bg-[#131B2E]/95 backdrop-blur-md text-white p-2.5 px-4 rounded-2xl shadow-xl border border-slate-700/60 flex items-center justify-between gap-3 text-xs">
-                  <span className="truncate text-slate-300 font-medium">
-                    📖 <strong className="text-white">{currentNote.chapter || currentNote.title}</strong>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCurrentNote(null);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shrink-0 cursor-pointer shadow-sm active:scale-95 transition-all"
-                    title="Close notes and return to clean view"
-                  >
-                    <span>Close Notes</span>
-                  </button>
-                </div>
-              </div>
             </div>
           ) : (
-            <HomepageSections />
+            <>
+              <YouTubeInput
+                onProcessVideo={handleProcessVideo}
+                isLoading={isLoading}
+                error={error}
+                theme={theme}
+                isDark={isDark}
+                selectedLang={selectedLang}
+                onChangeLanguage={handleChangeLanguage}
+              />
+              <HomepageSections />
+            </>
           )}
         </div>
 

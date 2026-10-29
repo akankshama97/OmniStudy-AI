@@ -5,6 +5,7 @@ import {
   ChevronUp, Printer, BookOpen, Flame
 } from 'lucide-react';
 import { searchPYQs } from '../services/api';
+import { FormattedText } from '../utils/formatText';
 
 const POPULAR_SUBJECTS = [
   { name: "Newton's Laws of Motion & Friction", exam: "JEE Main / Class 11", icon: "⚛️" },
@@ -170,13 +171,13 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
 
       {/* Header */}
       <div className="text-center mb-6 sm:mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFF6FF] dark:bg-[#3B82F6]/20 border border-[#2563EB]/20 text-[#2563EB] dark:text-[#60A5FA] text-xs font-semibold mb-2.5">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 text-xs font-semibold mb-2.5">
           <GraduationCap className="w-4 h-4" />
           <span>TOP 5 Exam Questions & Formula Engine</span>
         </div>
 
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-2 text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans']">
-          Search Exam PYQs & Formulas
+          Search Exam PYQs &amp; Formulas
         </h2>
 
         <p className="text-[#334155] dark:text-[#CBD5E1] text-xs sm:text-sm md:text-base max-w-xl mx-auto">
@@ -190,7 +191,7 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
         className="p-4 sm:p-5 rounded-2xl border shadow-sm mb-6 space-y-3 sm:space-y-4 bg-white dark:bg-[#131B2E] border-[#E2E8F0] dark:border-[#23314F]"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-[#2563EB]">
+          <div className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-indigo-500">
             <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] dark:text-[#94A3B8] block mb-1">
               Subject or Topic Name *
             </label>
@@ -204,7 +205,7 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
             />
           </div>
 
-          <div className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-[#2563EB]">
+          <div className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-indigo-500">
             <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] dark:text-[#94A3B8] block mb-1">
               Target Exam / University
             </label>
@@ -228,7 +229,7 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
               onClick={() => setExam(item)}
               className={`text-xs px-2.5 py-1 rounded-full border transition-all shrink-0 ${
                 exam === item
-                  ? 'bg-[#EFF6FF] dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#60A5FA] border-[#2563EB]/40 font-semibold'
+                  ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border-indigo-400/40 font-semibold'
                   : 'bg-[#F1F5F9] dark:bg-[#1B2640] border-[#E2E8F0] dark:border-[#23314F] text-[#334155] dark:text-[#CBD5E1] hover:text-[#0F172A]'
               }`}
             >
@@ -241,7 +242,7 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
           <button
             type="submit"
             disabled={loading || !topic.trim()}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] dark:bg-[#3B82F6] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 transition-all"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 transition-all cursor-pointer"
           >
             {loading ? (
               <>
@@ -251,7 +252,7 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
             ) : (
               <>
                 <Search className="w-4 h-4" />
-                <span>Search TOP 5 PYQs & Formulas</span>
+                <span>Search TOP 5 PYQs &amp; Formulas</span>
               </>
             )}
           </button>
@@ -401,7 +402,7 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
                         </div>
 
                         <h4 className="font-bold text-sm md:text-base leading-snug mb-3 text-[#0F172A] dark:text-[#F8FAFC]">
-                          Q{idx + 1}. {pyq.question}
+                          Q{idx + 1}. <FormattedText text={pyq.question} />
                         </h4>
 
                         {/* 4 Options */}
@@ -425,7 +426,7 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
                                   <span className="w-5 h-5 rounded-full border flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
                                     {String.fromCharCode(65 + oi)}
                                   </span>
-                                  <span className="flex-1 min-w-0">{opt}</span>
+                                  <span className="flex-1 min-w-0"><FormattedText text={opt} /></span>
                                 </button>
                               );
                             })}
@@ -438,7 +439,7 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
                           </span>
                           <button
                             onClick={() => toggleSolution(idx)}
-                            className="text-xs font-bold text-[#2563EB] dark:text-[#60A5FA] flex items-center gap-1"
+                            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 cursor-pointer"
                           >
                             <span>{isExpanded ? 'Hide Solution' : 'View Solution'}</span>
                             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -452,13 +453,13 @@ export default function PYQFormulaHub({ selectedLang = 'English', onChangeLangua
                           <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 block mb-2">
                             Step-by-Step Marking Scheme Solution:
                           </span>
-                          <div className="text-xs sm:text-sm font-mono whitespace-pre-wrap leading-relaxed bg-[#F8FAFC] dark:bg-[#0B0F17] p-3 rounded-xl border border-slate-200 dark:border-slate-800">
-                            {pyq.solution}
+                          <div className="text-xs sm:text-sm font-sans whitespace-pre-wrap leading-relaxed bg-[#F8FAFC] dark:bg-[#0B0F17] p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">
+                            <FormattedText text={pyq.solution} />
                           </div>
 
                           {pyq.shortTrick && (
                             <div className="mt-2.5 p-3 rounded-xl bg-orange-500/10 border border-orange-500/30 text-xs font-semibold text-orange-700 dark:text-orange-400">
-                              ⚡ <strong>Short Trick / Elimination:</strong> {pyq.shortTrick}
+                              ⚡ <strong>Short Trick / Elimination:</strong> <FormattedText text={pyq.shortTrick} />
                             </div>
                           )}
                         </div>
