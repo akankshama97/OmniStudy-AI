@@ -574,92 +574,131 @@ export default function NotebookNotesView({
     const mistakes = Array.isArray(n.commonMistakes) ? n.commonMistakes : [];
 
     return `
-      <div style="font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; box-sizing: border-box; line-height: 1.6; color: #0F172A; width: 794px; max-width: 794px; margin: 0 auto; padding: 24px 28px; background: #FFFFFF;">
+      <div style="font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; box-sizing: border-box; line-height: 1.65; color: #0F172A; width: 794px; max-width: 794px; margin: 0 auto; padding: 24px 28px; background: #FFFFFF;">
         
-        <!-- ── 1. TOPPER COVER HEADER (Normal Black & Blue Pen Style) ── -->
-        <div class="topper-cover-header" style="background: #FFFFFF; border: 2px solid #0F172A; border-radius: 12px; padding: 18px 22px; margin-bottom: 22px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); page-break-inside: avoid; break-inside: avoid;">
-          <!-- Brand & Attribution Row -->
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #E2E8F0; padding-bottom: 8px; margin-bottom: 10px; font-family: monospace;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #1E3A8A;"></span>
-              <span style="font-weight: 900; font-size: 13px; color: #0F172A; letter-spacing: 0.5px;">⚡ OMNISTUDY AI • TOPPER CLASSROOM COPY</span>
-              <span style="background: #DCFCE7; color: #166534; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; border: 1px solid #86EFAC;">100% EXAM VERIFIED</span>
-            </div>
-            <div style="font-size: 12px; font-weight: 800; color: #0F172A;">
-              Platform Developed by: <strong style="color: #1E3A8A; text-decoration: underline;">Akanksha Maurya</strong>
-            </div>
-          </div>
+        <!-- ── 1. TOPPER COVER HEADER (Classic Blue & Black Pen Notebook Style) ── -->
+        <!-- All rows use strict <table> to completely eliminate flexbox overlapping in html2canvas -->
+        <div class="topper-cover-header" style="background: #FFFFFF; border: 2px solid #0F172A; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; page-break-inside: avoid; break-inside: avoid;">
+          <!-- Top Branding Row -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px; border-bottom: 1.5px solid #CBD5E1; padding-bottom: 6px;">
+            <tr>
+              <td style="vertical-align: middle; text-align: left;">
+                <span style="font-weight: 900; font-size: 13px; color: #0F172A; letter-spacing: 0.5px; font-family: monospace;">
+                  ⚡ OMNISTUDY AI • TOPPER CLASSROOM COPY
+                </span>
+              </td>
+              <td style="vertical-align: middle; text-align: right; width: 230px;">
+                <span style="font-size: 11px; font-weight: 700; color: #334155; font-family: monospace;">
+                  Platform: <strong style="color: #1E3A8A; text-decoration: underline;">Akanksha Maurya</strong>
+                </span>
+              </td>
+            </tr>
+          </table>
 
           <!-- Metadata Row -->
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #334155; font-family: monospace; margin-bottom: 10px;">
-            <div>
-              <strong style="color: #991B1B;">SUBJECT:</strong> <span style="color: #0F172A; font-weight: bold;">${cleanSubject}</span>
-              <span style="margin: 0 8px; color: #CBD5E1;">•</span>
-              <strong style="color: #1E3A8A;">NOTES TYPE:</strong> <span style="color: #0F172A; font-weight: bold;">CLASSROOM TOPPER COPY</span>
-            </div>
-            <div>
-              <span style="background: #FEF3C7; border: 1px solid #FCD34D; color: #92400E; font-weight: 800; padding: 2px 8px; border-radius: 6px; font-size: 11px;">
-                🎯 ${cleanTargetExam}
-              </span>
-            </div>
-          </div>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 11.5px; font-family: monospace;">
+            <tr>
+              <td style="vertical-align: middle; text-align: left; color: #334155;">
+                <strong style="color: #0F172A;">SUBJECT:</strong> <span style="color: #1E3A8A; font-weight: bold;">${cleanSubject}</span>
+                <span style="margin: 0 6px; color: #94A3B8;">|</span>
+                <strong style="color: #0F172A;">TARGET EXAM:</strong> <span style="color: #1E3A8A; font-weight: bold;">${cleanTargetExam}</span>
+              </td>
+              <td style="vertical-align: middle; text-align: right; width: 140px;">
+                <span style="border: 1px solid #0F172A; color: #0F172A; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; display: inline-block;">
+                  VERIFIED NOTES ✓
+                </span>
+              </td>
+            </tr>
+          </table>
 
           <!-- Chapter / Lecture Title in Bold Black Pen -->
-          <h1 style="color: #0F172A; font-size: 23px; font-weight: 900; margin: 0; line-height: 1.3;">
+          <h1 style="color: #0F172A; font-size: 21px; font-weight: 900; margin: 6px 0 0 0; line-height: 1.35; border-top: 1px dashed #CBD5E1; padding-top: 8px;">
             ${cleanChapter}
           </h1>
         </div>
 
-        <!-- ── 2. CLICKABLE TOPIC INDEX (Table of Contents) ── -->
+        <!-- ── 2. SYLLABUS & TOPIC INDEX ── -->
         ${concepts.length > 0 ? `
-          <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 14px 18px; margin-bottom: 22px; page-break-inside: avoid; break-inside: avoid;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0; padding-bottom: 6px; margin-bottom: 10px;">
-              <span style="font-weight: 800; font-size: 12px; color: #0F172A; font-family: monospace; text-transform: uppercase; letter-spacing: 0.5px;">
-                📖 Complete Lecture Syllabus & Topic Index (${concepts.length} Topics Covering 100% Duration)
-              </span>
-              <span style="background: #EFF6FF; color: #1E3A8A; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 12px; border: 1px solid #BFDBFE;">
-                ${concepts.length} Detailed Topics
-              </span>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 14px; font-size: 11.5px;">
-              ${concepts.map((c, idx) => `
-                <div style="background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px;">
-                    <strong>${idx + 1}.</strong> ${formatNaturalMathHtml(c.heading || `Topic ${idx + 1}`)}
+          <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; page-break-inside: avoid; break-inside: avoid;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px; border-bottom: 1px solid #E2E8F0; padding-bottom: 6px;">
+              <tr>
+                <td style="font-weight: 800; font-size: 12px; color: #0F172A; font-family: monospace; text-transform: uppercase;">
+                  📖 Lecture Syllabus &amp; Topic Index (${concepts.length} Topics Covering 100% Duration)
+                </td>
+                <td style="text-align: right; width: 110px;">
+                  <span style="border: 1px solid #0F172A; color: #0F172A; font-size: 10px; font-weight: bold; padding: 2px 7px; border-radius: 4px; display: inline-block;">
+                    ${concepts.length} Topics
                   </span>
-                  <span style="font-family: monospace; color: #1E3A8A; font-size: 10.5px; font-weight: 700;">
-                    ${c.timestamp_start || '00:00'}
-                  </span>
-                </div>
-              `).join('')}
-            </div>
+                </td>
+              </tr>
+            </table>
+            <table style="width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 11.5px;">
+              ${Array.from({ length: Math.ceil(concepts.length / 2) }).map((_, rIdx) => {
+                const c1 = concepts[rIdx * 2];
+                const c2 = concepts[rIdx * 2 + 1];
+                return `
+                  <tr>
+                    <td style="width: 50%; padding: 4px 6px; vertical-align: top;">
+                      <div style="background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 8px; border-radius: 4px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                          <tr>
+                            <td style="font-weight: 700; color: #0F172A; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                              <strong>${rIdx * 2 + 1}.</strong> ${formatNaturalMathHtml(c1.heading || `Topic ${rIdx * 2 + 1}`)}
+                            </td>
+                            <td style="font-family: monospace; color: #1E3A8A; font-size: 10.5px; font-weight: 700; width: 55px; text-align: right; white-space: nowrap;">
+                              ${c1.timestamp_start || '00:00'}
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                    </td>
+                    <td style="width: 50%; padding: 4px 6px; vertical-align: top;">
+                      ${c2 ? `
+                        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 8px; border-radius: 4px;">
+                          <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                              <td style="font-weight: 700; color: #0F172A; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <strong>${rIdx * 2 + 2}.</strong> ${formatNaturalMathHtml(c2.heading || `Topic ${rIdx * 2 + 2}`)}
+                              </td>
+                              <td style="font-family: monospace; color: #1E3A8A; font-size: 10.5px; font-weight: 700; width: 55px; text-align: right; white-space: nowrap;">
+                                ${c2.timestamp_start || '00:00'}
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
+                      ` : ''}
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </table>
           </div>
         ` : ''}
 
         <!-- ── 3. CORE LECTURE OVERVIEW & HIGH-YIELD TAKEAWAYS ── -->
         ${(n.overview || (n.quickSummary && n.quickSummary.length > 0)) ? `
-          <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 24px; page-break-inside: avoid; break-inside: avoid;">
-            <div style="font-weight: 800; font-size: 13px; color: #0F172A; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-              <span>📌</span> <span style="color: #0F172A; font-weight: 900;">CORE CHAPTER SUMMARY & HIGH-YIELD TAKEAWAYS</span>
+          <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 14px 18px; margin-bottom: 22px; page-break-inside: avoid; break-inside: avoid;">
+            <div style="font-weight: 900; font-size: 12.5px; color: #0F172A; margin-bottom: 8px; font-family: monospace; text-transform: uppercase;">
+              📌 Core Chapter Summary &amp; High-Yield Takeaways
             </div>
             ${n.overview ? `
-              <p style="font-size: 13px; color: #1E3A8A; line-height: 1.65; margin: 0 0 10px 0; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 10px 12px; border-radius: 8px;">
+              <p style="font-size: 13px; color: #1E3A8A; line-height: 1.65; margin: 0 0 10px 0; background: #FFFFFF; border: 1px solid #CBD5E1; padding: 10px 12px; border-radius: 6px;">
                 ${formatNaturalMathHtml(n.overview)}
               </p>
             ` : ''}
             ${n.quickSummary && n.quickSummary.length > 0 ? `
-              <ul style="margin: 0; padding-left: 20px; font-size: 12.5px; color: #1E3A8A; line-height: 1.6;">
+              <ul style="margin: 0; padding-left: 20px; font-size: 12.5px; color: #1E3A8A; line-height: 1.65;">
                 ${n.quickSummary.map(s => `<li style="margin-bottom: 4px; font-weight: 600;">${formatNaturalMathHtml(s)}</li>`).join('')}
               </ul>
             ` : ''}
           </div>
         ` : ''}
 
-        <!-- ── 4. DETAILED CLASSROOM COPY CONCEPTS (BLACK & BLUE PEN) ── -->
+        <!-- ── 4. COMPLETE LECTURE CONCEPTS & DERIVATIONS (Classic Blue & Black Pen) ── -->
         ${concepts.length > 0 ? `
-          <div style="margin-bottom: 16px; border-left: 4px solid #0F172A; padding-left: 10px;">
-            <h2 style="color: #0F172A; font-size: 18px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">
-              ✍️ COMPLETE LECTURE CONCEPTS & BLACKBOARD DERIVATIONS
+          <div style="margin-bottom: 14px; border-left: 4px solid #0F172A; padding-left: 10px;">
+            <h2 style="color: #0F172A; font-size: 17px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">
+              ✍️ COMPLETE LECTURE CONCEPTS &amp; BLACKBOARD DERIVATIONS
             </h2>
           </div>
 
@@ -674,58 +713,60 @@ export default function NotebookNotesView({
 
             return `
             ${showUnitDivider ? `
-              <div class="unit-divider-banner" style="background: #F5F3FF; border-left: 5px solid #7C3AED; border-radius: 8px; padding: 12px 18px; margin: 24px 0 16px 0; page-break-inside: avoid; break-inside: avoid;">
-                <div style="font-size: 11px; font-weight: 800; color: #6D28D9; text-transform: uppercase; font-family: monospace; letter-spacing: 0.5px;">
-                  ⚡ SUBJECT MODULE • UNIT ${c.unitNumber}
+              <div class="unit-divider-banner" style="background: #F8FAFC; border-left: 5px solid #0F172A; border: 1px solid #CBD5E1; border-left-width: 5px; border-radius: 6px; padding: 10px 16px; margin: 22px 0 14px 0; page-break-inside: avoid; break-inside: avoid;">
+                <div style="font-size: 10.5px; font-weight: 800; color: #0F172A; text-transform: uppercase; font-family: monospace; letter-spacing: 0.5px;">
+                  SUBJECT MODULE • UNIT ${c.unitNumber}
                 </div>
-                <div style="font-size: 16px; font-weight: 900; color: #0F172A; margin-top: 3px;">
+                <div style="font-size: 15px; font-weight: 900; color: #1E3A8A; margin-top: 2px;">
                   ${formatNaturalMathHtml(unitTitleFromList || `Unit ${c.unitNumber}`)}
                 </div>
               </div>
             ` : ''}
 
-            <div class="concept-block" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 20px; margin-bottom: 22px; page-break-inside: avoid; break-inside: avoid; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+            <div class="concept-block" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; page-break-inside: avoid; break-inside: avoid;">
               
-              <!-- Concept Header Bar -->
-              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #E2E8F0; padding-bottom: 8px; margin-bottom: 10px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="background: #0F172A; color: #FFFFFF; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 12px; font-family: monospace;">
-                    TOPIC #${idx + 1}
-                  </span>
-                  <span style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E3A8A; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 12px; font-family: monospace;">
-                    ⏱️ [${c.timestamp_start || '00:00'} - ${c.timestamp_end || 'End'}]
-                  </span>
-                </div>
-                <span style="font-size: 11px; font-weight: 700; color: #15803D;">
-                  100% Exam Verified ✓
-                </span>
-              </div>
+              <!-- Concept Header Row (Immune to Overlapping via Table) -->
+              <table style="width: 100%; border-collapse: collapse; border-bottom: 1.5px solid #E2E8F0; padding-bottom: 6px; margin-bottom: 8px;">
+                <tr>
+                  <td style="vertical-align: middle; text-align: left;">
+                    <span style="background: #0F172A; color: #FFFFFF; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; font-family: monospace; display: inline-block; margin-right: 6px;">
+                      TOPIC #${idx + 1}
+                    </span>
+                    <span style="color: #1E3A8A; font-size: 11px; font-weight: 700; font-family: monospace;">
+                      ⏱️ [${c.timestamp_start || '00:00'} - ${c.timestamp_end || 'End'}]
+                    </span>
+                  </td>
+                  <td style="vertical-align: middle; text-align: right; width: 120px; font-size: 11px; font-weight: 700; color: #0F172A; font-family: monospace;">
+                    Verified Topic ✓
+                  </td>
+                </tr>
+              </table>
 
               <!-- Topic Heading in Deep Black Pen with Blue Underline -->
-              <h3 style="color: #0F172A; font-size: 18px; font-weight: 900; margin: 0 0 4px 0; line-height: 1.3; border-bottom: 2px solid #1E3A8A; padding-bottom: 4px;">
+              <h3 style="color: #0F172A; font-size: 17px; font-weight: 900; margin: 0 0 4px 0; line-height: 1.35; border-bottom: 2px solid #0F172A; padding-bottom: 4px;">
                 ${idx + 1}. ${formatNaturalMathHtml(c.heading || `Concept ${idx + 1}`)}
               </h3>
 
               <!-- Subheading -->
               ${c.subheading ? `
-                <div style="font-size: 12.5px; color: #475569; font-style: italic; margin-bottom: 10px;">
+                <div style="font-size: 12px; color: #475569; font-style: italic; margin-bottom: 8px;">
                   ▶ ${formatNaturalMathHtml(c.subheading)}
                 </div>
               ` : ''}
 
-              <!-- Red Pen Definitions (with 📌) -->
+              <!-- Definitions (Classic Black & Blue Pen: Clean Slate Box) -->
               ${c.definitions && c.definitions.length > 0 ? `
-                <div style="background: #FEF2F2; border-left: 4px solid #DC2626; border-radius: 6px; padding: 9px 12px; margin: 10px 0;">
-                  <strong style="color: #991B1B; font-size: 12px; display: block; margin-bottom: 2px;">📌 Core Definition:</strong>
-                  ${c.definitions.map(d => `<p style="color: #B91C1C; font-size: 12.5px; font-weight: 600; margin: 3px 0; line-height: 1.5;">${formatNaturalMathHtml(d)}</p>`).join('')}
+                <div style="background: #F8FAFC; border-left: 3.5px solid #0F172A; border-radius: 4px; padding: 8px 12px; margin: 10px 0;">
+                  <strong style="color: #0F172A; font-size: 11.5px; display: block; margin-bottom: 2px;">📌 Core Definition:</strong>
+                  ${c.definitions.map(d => `<p style="color: #1E3A8A; font-size: 12.5px; font-weight: 600; margin: 2px 0; line-height: 1.55;">${formatNaturalMathHtml(d)}</p>`).join('')}
                 </div>
               ` : ''}
 
-              <!-- Blue Pen Detailed Blackboard Points (with Black Bold terms) -->
+              <!-- Blue Pen Detailed Blackboard Points -->
               ${c.points && c.points.length > 0 ? `
                 <div style="margin: 10px 0;">
-                  <strong style="color: #0F172A; font-size: 12.5px; display: block; margin-bottom: 6px;">Blackboard Detailed Points & Explanation:</strong>
-                  <ul style="margin: 0; padding-left: 20px; font-size: 13.5px; line-height: 1.7; color: #1E3A8A;">
+                  <strong style="color: #0F172A; font-size: 12px; display: block; margin-bottom: 4px;">Blackboard Detailed Points &amp; Explanation:</strong>
+                  <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.7; color: #1E3A8A;">
                     ${c.points.map(p => `
                       <li style="margin-bottom: 5px; color: #1E3A8A;">
                         ${formatNaturalMathHtml(p)}
@@ -737,13 +778,13 @@ export default function NotebookNotesView({
 
               <!-- Comparison Table if Present -->
               ${c.table && c.table.headers && c.table.headers.length > 0 ? `
-                <div class="table-container" style="margin: 12px 0; border: 1.5px solid #CBD5E1; border-radius: 8px; overflow: hidden; page-break-inside: avoid; break-inside: avoid;">
+                <div class="table-container" style="margin: 12px 0; border: 1.5px solid #CBD5E1; border-radius: 6px; overflow: hidden; page-break-inside: avoid; break-inside: avoid;">
                   ${c.table.title ? `
                     <div style="background: #F1F5F9; padding: 6px 10px; font-size: 11.5px; font-weight: 800; color: #0F172A; border-bottom: 1px solid #CBD5E1;">
                       📊 ${formatNaturalMathHtml(c.table.title)}
                     </div>
                   ` : ''}
-                  <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                  <table style="width: 100%; border-collapse: collapse; font-size: 11.5px;">
                     <thead>
                       <tr style="background: #0F172A; color: #FFFFFF;">
                         ${c.table.headers.map(h => `<th style="padding: 6px 10px; text-align: left; border: 1px solid #CBD5E1;">${formatNaturalMathHtml(h)}</th>`).join('')}
@@ -762,9 +803,9 @@ export default function NotebookNotesView({
 
               <!-- Real Blackboard SVG Diagram -->
               ${c.diagram && (c.diagram.heading || c.diagram.description || c.diagram.svg_or_mermaid) ? `
-                <div class="diagram-box" style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 12px 14px; margin: 14px 0; text-align: center; page-break-inside: avoid; break-inside: avoid;">
-                  <div style="color: #0F172A; font-weight: 800; font-size: 12.5px; margin-bottom: 8px;">
-                    📐 Blackboard Diagram: ${formatNaturalMathHtml(c.diagram.heading || 'Architecture & Process Schematic')}
+                <div class="diagram-box" style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 12px 14px; margin: 12px 0; text-align: center; page-break-inside: avoid; break-inside: avoid;">
+                  <div style="color: #0F172A; font-weight: 800; font-size: 12px; margin-bottom: 6px;">
+                    📐 Blackboard Diagram: ${formatNaturalMathHtml(c.diagram.heading || 'Architecture &amp; Schematic')}
                   </div>
                   ${c.diagram.svg_or_mermaid && c.diagram.svg_or_mermaid.includes('<svg') ? `
                     <div style="max-width: 540px; margin: 6px auto; text-align: center;">
@@ -772,21 +813,21 @@ export default function NotebookNotesView({
                     </div>
                   ` : ''}
                   ${c.diagram.description ? `
-                    <p style="font-size: 11.5px; color: #475569; font-style: italic; margin: 6px 0 0 0;">
+                    <p style="font-size: 11px; color: #475569; font-style: italic; margin: 4px 0 0 0;">
                       Caption: ${formatNaturalMathHtml(c.diagram.description)}
                     </p>
                   ` : ''}
                 </div>
               ` : ''}
 
-              <!-- Solved Blackboard Examples / Numericals (Green Pen) -->
+              <!-- Solved Blackboard Examples (Black & Blue Pen) -->
               ${c.solved_example && (c.solved_example.title || c.solved_example.steps || c.solved_example.solution) ? `
-                <div class="solved-example-box" style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 8px; padding: 12px 14px; margin: 12px 0; page-break-inside: avoid; break-inside: avoid;">
-                  <div style="color: #15803D; font-weight: 800; font-size: 12.5px; margin-bottom: 6px;">
-                    🧮 Solved Blackboard Example: ${formatNaturalMathHtml(c.solved_example.title || 'Step-by-Step Problem')}
+                <div class="solved-example-box" style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-left: 4px solid #0F172A; border-radius: 6px; padding: 12px 14px; margin: 12px 0; page-break-inside: avoid; break-inside: avoid;">
+                  <div style="color: #0F172A; font-weight: 900; font-size: 12.5px; margin-bottom: 4px;">
+                    🧮 Solved Example: ${formatNaturalMathHtml(c.solved_example.title || 'Step-by-Step Problem')}
                   </div>
-                  ${c.solved_example.given ? `<p style="margin: 2px 0; font-size: 12px; color: #166534;"><strong>Given:</strong> ${formatNaturalMathHtml(c.solved_example.given)}</p>` : ''}
-                  ${c.solved_example.formula ? `<p style="margin: 2px 0; font-size: 12px; color: #15803D; font-family: monospace;"><strong>Formula:</strong> ${formatNaturalMathHtml(c.solved_example.formula)}</p>` : ''}
+                  ${c.solved_example.given ? `<p style="margin: 2px 0; font-size: 12px; color: #0F172A;"><strong>Given:</strong> <span style="color: #1E3A8A;">${formatNaturalMathHtml(c.solved_example.given)}</span></p>` : ''}
+                  ${c.solved_example.formula ? `<p style="margin: 2px 0; font-size: 12px; color: #0F172A; font-family: monospace;"><strong>Formula:</strong> <code style="color: #1E3A8A;">${formatNaturalMathHtml(c.solved_example.formula)}</code></p>` : ''}
                   ${c.solved_example.steps && Array.isArray(c.solved_example.steps) ? `
                     <div style="margin: 4px 0; font-size: 12px; color: #0F172A;">
                       <strong>Derivation Steps:</strong>
@@ -796,27 +837,29 @@ export default function NotebookNotesView({
                     </div>
                   ` : (c.solved_example.solution ? `<p style="margin: 3px 0; font-size: 12px; color: #1E3A8A;"><strong>Solution:</strong> ${formatNaturalMathHtml(c.solved_example.solution).replace(/\n/g, '<br/>')}</p>` : '')}
                   ${c.solved_example.finalAnswer || c.solved_example.answer ? `
-                    <p style="margin: 4px 0 0 0; font-size: 12.5px; color: #14532D; font-weight: 800; background: #DCFCE7; padding: 4px 8px; border-radius: 4px; display: inline-block;">
-                      Answer: ${formatNaturalMathHtml(c.solved_example.finalAnswer || c.solved_example.answer)}
-                    </p>
+                    <div style="margin-top: 6px;">
+                      <span style="font-size: 11.5px; font-weight: 800; border: 1px solid #0F172A; background: #FFFFFF; color: #0F172A; padding: 3px 8px; border-radius: 4px; display: inline-block;">
+                        Answer: ${formatNaturalMathHtml(c.solved_example.finalAnswer || c.solved_example.answer)}
+                      </span>
+                    </div>
                   ` : ''}
                 </div>
               ` : ''}
 
-              <!-- Teacher Memory Tip in Warm Orange (💡) -->
+              <!-- Teacher Memory Tip (Clean Black & Blue Accent) -->
               ${(c.teacher_tips && c.teacher_tips.length > 0) || c.memoryTip ? `
-                <div class="teacher-tip-box" style="background: #FFF7ED; border-left: 4px solid #F97316; border-radius: 6px; padding: 8px 12px; margin: 10px 0; page-break-inside: avoid; break-inside: avoid;">
-                  <strong style="color: #C2410C; font-size: 11.5px; display: block; margin-bottom: 2px;">💡 Teacher Exam Tip ("Ye Exam me Aata Hai"):</strong>
-                  ${(c.teacher_tips || [c.memoryTip]).map(t => `<p style="color: #9A3412; margin: 2px 0; font-size: 12px; font-weight: 600;">${formatNaturalMathHtml(t)}</p>`).join('')}
+                <div class="teacher-tip-box" style="background: #F8FAFC; border-left: 3.5px solid #1E3A8A; border-radius: 4px; padding: 8px 12px; margin: 10px 0; page-break-inside: avoid; break-inside: avoid;">
+                  <strong style="color: #0F172A; font-size: 11.5px; display: block; margin-bottom: 2px;">💡 Teacher Exam Tip:</strong>
+                  ${(c.teacher_tips || [c.memoryTip]).map(t => `<p style="color: #1E3A8A; margin: 2px 0; font-size: 12px; font-weight: 600;">${formatNaturalMathHtml(t)}</p>`).join('')}
                 </div>
               ` : ''}
 
-              <!-- Student Mistakes to Avoid (⚠️) -->
+              <!-- Common Mistakes to Avoid (Clean Black Accent) -->
               ${c.common_mistake && c.common_mistake.mistake ? `
-                <div style="background: #FEF2F2; border-left: 4px solid #EF4444; border-radius: 6px; padding: 8px 12px; margin: 10px 0; font-size: 12px; page-break-inside: avoid; break-inside: avoid;">
-                  <strong style="color: #B91C1C; font-size: 11.5px;">⚠️ Common Student Mistake to Avoid:</strong>
-                  <p style="color: #991B1B; margin: 2px 0;"><strong>Blunder:</strong> ${formatNaturalMathHtml(c.common_mistake.mistake)}</p>
-                  ${c.common_mistake.correction ? `<p style="color: #15803D; margin: 2px 0; font-weight: bold;"><strong>Correction:</strong> ${formatNaturalMathHtml(c.common_mistake.correction)}</p>` : ''}
+                <div style="background: #F8FAFC; border-left: 3.5px solid #0F172A; border-radius: 4px; padding: 8px 12px; margin: 10px 0; font-size: 12px; page-break-inside: avoid; break-inside: avoid;">
+                  <strong style="color: #0F172A; font-size: 11.5px;">⚠️ Common Student Mistake to Avoid:</strong>
+                  <p style="color: #334155; margin: 2px 0;"><strong>Blunder:</strong> ${formatNaturalMathHtml(c.common_mistake.mistake)}</p>
+                  ${c.common_mistake.correction ? `<p style="color: #1E3A8A; margin: 2px 0; font-weight: bold;"><strong>Correction:</strong> ${formatNaturalMathHtml(c.common_mistake.correction)}</p>` : ''}
                 </div>
               ` : ''}
 
@@ -827,26 +870,26 @@ export default function NotebookNotesView({
 
         <!-- ── 5. ESSENTIAL FORMULA CHEAT SHEET (Black & Blue Pen) ── -->
         ${formulas.length > 0 ? `
-          <div class="formula-box" style="margin-top: 30px; margin-bottom: 24px; page-break-inside: avoid; break-inside: avoid;">
-            <div style="border-left: 4px solid #0F172A; padding-left: 10px; margin-bottom: 12px;">
-              <h2 style="color: #0F172A; font-size: 18px; font-weight: 900; margin: 0; text-transform: uppercase;">
-                ⚡ ESSENTIAL FORMULA CHEAT SHEET & GOVERNING EQUATIONS
+          <div class="formula-box" style="margin-top: 24px; margin-bottom: 20px; page-break-inside: avoid; break-inside: avoid;">
+            <div style="border-left: 4px solid #0F172A; padding-left: 10px; margin-bottom: 10px;">
+              <h2 style="color: #0F172A; font-size: 17px; font-weight: 900; margin: 0; text-transform: uppercase;">
+                ⚡ ESSENTIAL FORMULA CHEAT SHEET &amp; GOVERNING EQUATIONS
               </h2>
             </div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1.5px solid #CBD5E1; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 11.5px; border: 1.5px solid #CBD5E1; border-radius: 6px; overflow: hidden;">
               <thead>
                 <tr style="background: #0F172A; color: #FFFFFF;">
-                  <th style="padding: 8px 10px; text-align: left; width: 28%; border: 1px solid #CBD5E1;">Formula Name</th>
-                  <th style="padding: 8px 10px; text-align: left; width: 38%; border: 1px solid #CBD5E1;">Mathematical Equation</th>
-                  <th style="padding: 8px 10px; text-align: left; width: 34%; border: 1px solid #CBD5E1;">When to Use / Variables</th>
+                  <th style="padding: 7px 10px; text-align: left; width: 28%; border: 1px solid #CBD5E1;">Formula Name</th>
+                  <th style="padding: 7px 10px; text-align: left; width: 38%; border: 1px solid #CBD5E1;">Mathematical Equation</th>
+                  <th style="padding: 7px 10px; text-align: left; width: 34%; border: 1px solid #CBD5E1;">When to Use / Variables</th>
                 </tr>
               </thead>
               <tbody>
                 ${formulas.map((f, fi) => `
                   <tr style="background: ${fi % 2 === 0 ? '#FFFFFF' : '#F8FAFC'};">
-                    <td style="padding: 8px 10px; border: 1px solid #CBD5E1; font-weight: 800; color: #0F172A;">${formatNaturalMathHtml(f.name || `Formula #${fi + 1}`)}</td>
-                    <td style="padding: 8px 10px; border: 1px solid #CBD5E1; font-family: monospace; font-weight: 900; color: #1E3A8A; font-size: 12.5px;">${formatNaturalMathHtml(f.formula || '')}</td>
-                    <td style="padding: 8px 10px; border: 1px solid #CBD5E1; color: #334155; font-size: 11.5px;">${formatNaturalMathHtml(f.whenToUse || f.variables || '')}</td>
+                    <td style="padding: 7px 10px; border: 1px solid #CBD5E1; font-weight: 800; color: #0F172A;">${formatNaturalMathHtml(f.name || `Formula #${fi + 1}`)}</td>
+                    <td style="padding: 7px 10px; border: 1px solid #CBD5E1; font-family: monospace; font-weight: 900; color: #1E3A8A; font-size: 12px;">${formatNaturalMathHtml(f.formula || '')}</td>
+                    <td style="padding: 7px 10px; border: 1px solid #CBD5E1; color: #334155; font-size: 11px;">${formatNaturalMathHtml(f.whenToUse || f.variables || '')}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -854,43 +897,74 @@ export default function NotebookNotesView({
           </div>
         ` : ''}
 
-        <!-- ── 6. PREVIOUS YEAR EXAM QUESTIONS (PYQs) (Black Question, Blue Solution) ── -->
+        <!-- ── 6. PREVIOUS YEAR EXAM QUESTIONS (PYQs) WITH COMPLETE SOLUTIONS ── -->
         ${pyqs.length > 0 ? `
-          <div style="margin-top: 30px; margin-bottom: 24px;">
-            <div style="border-left: 4px solid #7C3AED; padding-left: 10px; margin-bottom: 14px;">
-              <h2 style="color: #0F172A; font-size: 18px; font-weight: 900; margin: 0; text-transform: uppercase;">
+          <div style="margin-top: 24px; margin-bottom: 20px;">
+            <div style="border-left: 4px solid #0F172A; padding-left: 10px; margin-bottom: 12px;">
+              <h2 style="color: #0F172A; font-size: 17px; font-weight: 900; margin: 0; text-transform: uppercase;">
                 🎯 EXAM PREVIOUS YEAR QUESTIONS (PYQs) WITH COMPLETE SOLUTIONS
               </h2>
             </div>
             ${pyqs.map((q, qIdx) => `
-              <div class="pyq-item" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; page-break-inside: avoid; break-inside: avoid; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <span style="color: #7C3AED; font-weight: 800; font-size: 12px; font-family: monospace;">
-                    Q${qIdx + 1} • [${formatNaturalMathHtml(q.exam || q.targetExam || 'University Exam')} ${q.year ? `(${q.year})` : ''} ${q.marks ? `[${q.marks} Marks]` : ''}]
-                  </span>
-                  <span style="background: #F5F3FF; color: #6D28D9; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px;">
-                    Repeated Exam Question
-                  </span>
-                </div>
-                <p style="font-weight: 800; color: #0F172A; font-size: 13px; margin: 4px 0 8px 0; line-height: 1.4;">
+              <div class="pyq-item" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; page-break-inside: avoid; break-inside: avoid;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px;">
+                  <tr>
+                    <td style="vertical-align: middle; text-align: left; color: #0F172A; font-weight: 800; font-size: 11.5px; font-family: monospace;">
+                      Q${qIdx + 1} • [${formatNaturalMathHtml(q.exam || q.targetExam || 'University Exam')} ${q.year ? `(${q.year})` : ''} ${q.marks ? `[${q.marks} Marks]` : ''}]
+                    </td>
+                    <td style="vertical-align: middle; text-align: right; width: 130px;">
+                      <span style="border: 1px solid #CBD5E1; background: #F8FAFC; color: #334155; font-size: 9.5px; font-weight: bold; padding: 2px 6px; border-radius: 4px; display: inline-block;">
+                        Exam Question
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+                <p style="font-weight: 800; color: #0F172A; font-size: 12.5px; margin: 4px 0 8px 0; line-height: 1.45;">
                   ${formatNaturalMathHtml(q.question || q.q || '')}
                 </p>
                 ${q.options && q.options.length > 0 ? `
-                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 10px; margin: 6px 0; font-size: 12px;">
-                    ${q.options.map((opt, oIdx) => `
-                      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 8px; border-radius: 4px; color: #1E3A8A;">
-                        <strong style="color: #0F172A;">${['A', 'B', 'C', 'D'][oIdx] || `(${oIdx + 1})`})</strong> ${formatNaturalMathHtml(opt)}
-                      </div>
-                    `).join('')}
-                  </div>
+                  <table style="width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 11.5px;">
+                    <tr>
+                      <td style="width: 50%; padding: 3px 4px; vertical-align: top;">
+                        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 8px; border-radius: 4px; color: #1E3A8A;">
+                          <strong style="color: #0F172A;">A)</strong> ${formatNaturalMathHtml(q.options[0] || '')}
+                        </div>
+                      </td>
+                      <td style="width: 50%; padding: 3px 4px; vertical-align: top;">
+                        ${q.options[1] ? `
+                          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 8px; border-radius: 4px; color: #1E3A8A;">
+                            <strong style="color: #0F172A;">B)</strong> ${formatNaturalMathHtml(q.options[1])}
+                          </div>
+                        ` : ''}
+                      </td>
+                    </tr>
+                    ${q.options.length > 2 ? `
+                      <tr>
+                        <td style="width: 50%; padding: 3px 4px; vertical-align: top;">
+                          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 8px; border-radius: 4px; color: #1E3A8A;">
+                            <strong style="color: #0F172A;">C)</strong> ${formatNaturalMathHtml(q.options[2])}
+                          </div>
+                        </td>
+                        <td style="width: 50%; padding: 3px 4px; vertical-align: top;">
+                          ${q.options[3] ? `
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 8px; border-radius: 4px; color: #1E3A8A;">
+                              <strong style="color: #0F172A;">D)</strong> ${formatNaturalMathHtml(q.options[3])}
+                            </div>
+                          ` : ''}
+                        </td>
+                      </tr>
+                    ` : ''}
+                  </table>
                 ` : ''}
                 ${q.correctAnswer || q.answer ? `
-                  <div style="background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 800; margin: 6px 0; display: inline-block;">
-                    ✅ Correct Answer: ${formatNaturalMathHtml(q.correctAnswer || q.answer)}
+                  <div style="margin: 6px 0;">
+                    <span style="background: #F8FAFC; border: 1px solid #0F172A; color: #0F172A; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; display: inline-block;">
+                      ✅ Correct Answer: ${formatNaturalMathHtml(q.correctAnswer || q.answer)}
+                    </span>
                   </div>
                 ` : ''}
                 ${q.solution || q.explanation ? `
-                  <div style="background: #F8FAFC; border-left: 3px solid #1E3A8A; padding: 6px 10px; margin-top: 6px; font-size: 12px; color: #1E3A8A;">
+                  <div style="background: #F8FAFC; border-left: 3px solid #1E3A8A; padding: 6px 10px; margin-top: 6px; font-size: 11.5px; color: #1E3A8A;">
                     <strong style="color: #0F172A;">Detailed Solution:</strong> ${formatNaturalMathHtml(q.solution || q.explanation).replace(/\n/g, '<br/>')}
                   </div>
                 ` : ''}
@@ -900,16 +974,18 @@ export default function NotebookNotesView({
         ` : ''}
 
         <!-- ── 7. OFFICIAL SIGNATURE & WATERMARK FOOTER ── -->
-        <div style="background: #0F172A; color: #FFFFFF; border: 2px solid #1E293B; border-radius: 12px; padding: 14px 18px; margin-top: 32px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; page-break-inside: avoid; break-inside: avoid;">
-          <div>
-            <span style="font-weight: 900; font-size: 12px; color: #60A5FA; letter-spacing: 0.5px;">⚡ OMNISTUDY AI DIGITAL NOTEBOOK</span>
-            <span style="margin: 0 6px; color: #64748B;">•</span>
-            <span style="color: #E2E8F0;">VERIFIED TOPPER CLASSROOM COPY</span>
-          </div>
-          <div style="font-weight: 800;">
-            Platform Developed by: <strong style="color: #FBBF24; text-decoration: underline;">Akanksha Maurya</strong>
-          </div>
-        </div>
+        <table style="width: 100%; border-collapse: collapse; background: #0F172A; color: #FFFFFF; border-radius: 8px; margin-top: 26px; page-break-inside: avoid; break-inside: avoid;">
+          <tr>
+            <td style="vertical-align: middle; text-align: left; padding: 12px 16px;">
+              <span style="font-weight: 900; font-size: 11px; color: #93C5FD; letter-spacing: 0.5px;">⚡ OMNISTUDY AI DIGITAL NOTEBOOK</span>
+              <span style="margin: 0 6px; color: #64748B;">•</span>
+              <span style="color: #E2E8F0; font-size: 11px;">VERIFIED TOPPER CLASSROOM COPY</span>
+            </td>
+            <td style="vertical-align: middle; text-align: right; padding: 12px 16px; font-size: 11px;">
+              Platform Developed by: <strong style="color: #FFFFFF; text-decoration: underline;">Akanksha Maurya</strong>
+            </td>
+          </tr>
+        </table>
 
         <div style="text-align: center; color: #64748B; font-size: 10px; margin-top: 8px;">
           Generated with OmniStudy AI • Interactive Web App: https://omni-study-ai-lilac.vercel.app/
