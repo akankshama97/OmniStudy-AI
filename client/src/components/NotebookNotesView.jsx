@@ -663,7 +663,27 @@ export default function NotebookNotesView({
             </h2>
           </div>
 
-          ${concepts.map((c, idx) => `
+          ${concepts.map((c, idx) => {
+            const showUnitDivider = Boolean(
+              c.unitNumber &&
+              (idx === 0 || concepts[idx - 1]?.unitNumber !== c.unitNumber)
+            );
+            const unitTitleFromList = n.units && Array.isArray(n.units)
+              ? n.units.find(u => Number(u.unitNumber) === Number(c.unitNumber))?.unitTitle
+              : `Unit ${c.unitNumber} Syllabus`;
+
+            return `
+            ${showUnitDivider ? `
+              <div class="unit-divider-banner" style="background: #F5F3FF; border-left: 5px solid #7C3AED; border-radius: 8px; padding: 12px 18px; margin: 24px 0 16px 0; page-break-inside: avoid; break-inside: avoid;">
+                <div style="font-size: 11px; font-weight: 800; color: #6D28D9; text-transform: uppercase; font-family: monospace; letter-spacing: 0.5px;">
+                  ⚡ SUBJECT MODULE • UNIT ${c.unitNumber}
+                </div>
+                <div style="font-size: 16px; font-weight: 900; color: #0F172A; margin-top: 3px;">
+                  ${formatNaturalMathHtml(unitTitleFromList || `Unit ${c.unitNumber}`)}
+                </div>
+              </div>
+            ` : ''}
+
             <div class="concept-block" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 20px; margin-bottom: 22px; page-break-inside: avoid; break-inside: avoid; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
               
               <!-- Concept Header Bar -->
@@ -801,7 +821,8 @@ export default function NotebookNotesView({
               ` : ''}
 
             </div>
-          `).join('')}
+            `;
+          }).join('')}
         ` : ''}
 
         <!-- ── 5. ESSENTIAL FORMULA CHEAT SHEET (Black & Blue Pen) ── -->
@@ -841,7 +862,7 @@ export default function NotebookNotesView({
                 🎯 EXAM PREVIOUS YEAR QUESTIONS (PYQs) WITH COMPLETE SOLUTIONS
               </h2>
             </div>
-            ${pyqs.slice(0, 8).map((q, qIdx) => `
+            ${pyqs.map((q, qIdx) => `
               <div class="pyq-item" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; page-break-inside: avoid; break-inside: avoid; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                   <span style="color: #7C3AED; font-weight: 800; font-size: 12px; font-family: monospace;">
@@ -1104,8 +1125,37 @@ export default function NotebookNotesView({
         1123
       );
 
-      // 4. High-resolution canvas capture using html2canvas with isolated clone positioning
-      const scale = contentHeight > 10000 ? 1.5 : 2;
+      // Scale selection to keep canvas crisp and within browser limits
+      const scale = contentHeight > 25000 ? 1.0 : (contentHeight > 12000 ? 1.5 : 2);
+
+      // 4. Record natural break boundaries from DOM elements (before destroying container)
+      // This guarantees the PDF cuts ONLY at natural margins and NEVER cuts through text lines or boxes
+      const containerRect = printContainer.getBoundingClientRect();
+      const breakableSelectors = [
+        '.topper-cover-header',
+        '.unit-divider-banner',
+        '.concept-block',
+        '.formula-box',
+        '.pyq-item',
+        '.table-container',
+        '.diagram-box',
+        '.solved-example-box',
+        '.teacher-tip-box',
+        'h1', 'h2', 'h3', 'h4',
+        'p', 'li', 'tr'
+      ];
+      const elements = Array.from(printContainer.querySelectorAll(breakableSelectors.join(', ')));
+      const blockTops = [];
+      elements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        const topInContainer = rect.top - containerRect.top;
+        if (topInContainer > 10) {
+          blockTops.push(Math.round(topInContainer * scale));
+        }
+      });
+      const sortedTops = Array.from(new Set(blockTops)).sort((a, b) => a - b);
+
+      // 5. High-resolution canvas capture using html2canvas with isolated clone positioning
       let canvas;
       try {
         canvas = await html2canvas(printContainer, {
@@ -1140,12 +1190,12 @@ export default function NotebookNotesView({
         }
       }
 
-      // 5. Validate canvas is valid and non-empty
+      // 6. Validate canvas is valid and non-empty
       if (!canvas || canvas.width === 0 || canvas.height === 0) {
         throw new Error('html2canvas produced an empty canvas');
       }
 
-      // 6. Multi-page A4 document slicing with jsPDF
+      // 7. Multi-page A4 document slicing with jsPDF
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -1164,17 +1214,43 @@ export default function NotebookNotesView({
       const canvasHeight = canvas.height;
 
       const mmPerPx = printableWidthMm / canvasWidth;
-      const pageSliceHeightPx = Math.floor(printableHeightMm / mmPerPx);
+      const maxPageHeightPx = Math.floor(printableHeightMm / mmPerPx);
 
-      const totalPages = Math.ceil(canvasHeight / pageSliceHeightPx);
+      // Pre-calculate clean non-intersecting slices using DOM element boundaries
+      // Zero text lines or element boxes are ever intersected across page breaks
+      const slices = [];
+      let currentY = 0;
+      while (currentY < canvasHeight) {
+        const targetY = currentY + maxPageHeightPx;
+        if (targetY >= canvasHeight) {
+          slices.push({ y: currentY, height: canvasHeight - currentY });
+          break;
+        }
+
+        // Look for natural boundary between 65% and 100% of maximum page height
+        const minAllowedY = currentY + Math.floor(maxPageHeightPx * 0.65);
+        let bestCutY = targetY;
+        for (let i = sortedTops.length - 1; i >= 0; i--) {
+          const t = sortedTops[i];
+          if (t <= targetY - 12 && t >= minAllowedY) {
+            bestCutY = t - 6; // Cut 6px before element begins in clean whitespace
+            break;
+          }
+        }
+
+        const sliceHeight = Math.max(20, bestCutY - currentY);
+        slices.push({ y: currentY, height: sliceHeight });
+        currentY += sliceHeight;
+      }
+
+      const totalPages = slices.length;
 
       for (let page = 0; page < totalPages; page++) {
         if (page > 0) {
           pdf.addPage('a4', 'portrait');
         }
 
-        const sliceY = page * pageSliceHeightPx;
-        const sliceHeight = Math.min(pageSliceHeightPx, canvasHeight - sliceY);
+        const { y: sliceY, height: sliceHeight } = slices[page];
 
         const pageCanvas = document.createElement('canvas');
         pageCanvas.width = canvasWidth;
@@ -1206,7 +1282,7 @@ export default function NotebookNotesView({
           'FAST'
         );
 
-        // Footer with page numbering
+        // Footer with accurate page numbering
         pdf.setFontSize(8);
         pdf.setTextColor(100, 116, 139);
         pdf.text(
@@ -1807,15 +1883,6 @@ export default function NotebookNotesView({
               <span>{copiedDocx ? 'Downloaded DOC!' : 'Download DOC'}</span>
             </button>
 
-            {/* Markdown (.md) Export Button */}
-            <button
-              onClick={() => handleDownloadMarkdown(note)}
-              className="px-3.5 py-2 rounded-xl border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs hover:shadow-sm active:scale-95 cursor-pointer"
-              title="Download Notes as clean Markdown (.md) file"
-            >
-              <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>Download MD</span>
-            </button>
 
             {/* Share Notes Modal Trigger Button */}
             <button
