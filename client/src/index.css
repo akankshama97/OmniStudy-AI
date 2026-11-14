@@ -77,6 +77,12 @@
     @apply transition-colors duration-150;
     box-sizing: border-box;
   }
+
+  html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
+  }
   
   body {
     @apply antialiased;
