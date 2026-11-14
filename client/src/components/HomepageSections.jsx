@@ -101,7 +101,7 @@ export function FeaturesGrid() {
   const features = [
     {
       title: 'Vector Blackboard Diagrams',
-      desc: 'Automatic extraction of board drawings, circuits, and flowcharts into crisp SVGs that stay sharp at any zoom level.',
+      desc: 'Automatic extraction of board drawings, circuits, and flowcharts into crisp SVGs. that stay sharp at any zoom level.',
       icon: FileText,
       color: 'text-indigo-600 dark:text-indigo-400',
       bg: 'bg-indigo-50 dark:bg-indigo-950/40',
@@ -134,7 +134,7 @@ export function FeaturesGrid() {
   ];
 
   return (
-    <section aria-labelledby="features-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-10">
+    <section aria-labelledby="features-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 mt-16 sm:mt-24 mb-10 pt-4 sm:pt-6">
       <div className="flex items-center gap-2 mb-2 justify-center">
         <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
         <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 font-mono">
@@ -182,10 +182,10 @@ export function FeaturesGrid() {
 ───────────────────────────────────────────── */
 export function TelegramBanner() {
   return (
-    <section aria-labelledby="telegram-banner-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-10">
-      <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-white to-slate-50/50 dark:from-[#131B2E] dark:to-[#0F1626] shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-        <div className="flex items-start gap-4">
-          <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-100 dark:border-sky-900/50" aria-hidden="true">
+    <section aria-labelledby="telegram-banner-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 mt-12 sm:mt-16 mb-10">
+      <div className="p-6 sm:p-7 md:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-white to-slate-50/50 dark:from-[#131B2E] dark:to-[#0F1626] shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-5 sm:gap-6">
+        <div className="flex items-start gap-4 flex-1">
+          <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-100 dark:border-sky-900/50 mt-0.5" aria-hidden="true">
             <Send className="w-5 h-5" />
           </div>
           <div>
@@ -208,7 +208,7 @@ export function TelegramBanner() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Open OmniStudy Telegram Bot (opens in new tab)"
-          className="group w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shrink-0 cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 min-h-[44px] font-sans"
+          className="group w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shrink-0 cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 min-h-[44px] font-sans whitespace-nowrap self-stretch sm:self-auto"
         >
           <span>Open Telegram Bot</span>
           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-200" aria-hidden="true" />
