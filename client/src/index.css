@@ -4,7 +4,7 @@
 
 /* ── Light Mode Color Tokens (WCAG AA Compliant >= 4.5:1) ── */
 :root {
-  --bg-main: #F8FAFC;
+  --bg-main: #FAFBFD;
   --bg-surface: #FFFFFF;
   --bg-surface-secondary: #F1F5F9;
   --border-color: #E2E8F0;
@@ -39,7 +39,7 @@
 
 /* ── Dark Mode Color Tokens (WCAG AA Compliant >= 4.5:1) ── */
 .dark, html.dark {
-  --bg-main: #0B0F17;
+  --bg-main: #0A0E17;
   --bg-surface: #131B2E;
   --bg-surface-secondary: #1B2640;
   --border-color: #23314F;
@@ -552,6 +552,23 @@ html, body {
 .diagram-container,
 .overflow-x-auto {
   -webkit-overflow-scrolling: touch;
+}
+
+/* ── Premium Modern Backgrounds ── */
+.app-bg-light {
+  background-color: #FAFBFD;
+  background-image: 
+    radial-gradient(ellipse 90% 55% at 50% -8%, rgba(99, 102, 241, 0.07), transparent 70%),
+    linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 38%, #F8FAFC 100%);
+  background-repeat: no-repeat;
+}
+
+.app-bg-dark {
+  background-color: #0A0E17;
+  background-image: 
+    radial-gradient(ellipse 90% 55% at 50% -8%, rgba(99, 102, 241, 0.14), transparent 70%),
+    linear-gradient(180deg, #0B0F17 0%, #0D1322 50%, #0B0F17 100%);
+  background-repeat: no-repeat;
 }
 
 /* ── Premium Hero Gradient Text ── */

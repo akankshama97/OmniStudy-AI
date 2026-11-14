@@ -180,7 +180,7 @@ export default function App() {
     }
   }, []);
 
-  const bg   = isDark ? 'bg-[#0B0F17]' : 'bg-[#F8FAFC]';
+  const bg   = isDark ? 'app-bg-dark' : 'app-bg-light';
   const text = isDark ? 'text-[#F8FAFC]' : 'text-[#0F172A]';
 
   return (
