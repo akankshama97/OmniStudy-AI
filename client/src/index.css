@@ -554,6 +554,34 @@ html, body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* ── Premium Hero Gradient Text ── */
+.hero-gradient-text {
+  background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 50%, #7C3AED 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Premium Card Hover Effect ── */
+.card-premium {
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.card-premium:hover {
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.12);
+  transform: translateY(-2px);
+}
+
+/* ── Smooth all interactive element transitions ── */
+button, a, input, select {
+  transition-duration: 200ms;
+}
+
+/* ── Focus ring global polish ── */
+:focus-visible {
+  outline: 2px solid #4F46E5;
+  outline-offset: 2px;
+}
+
 /* Smooth touch scrolling for horizontal pill bars */
 .scrollbar-none {
   -ms-overflow-style: none;

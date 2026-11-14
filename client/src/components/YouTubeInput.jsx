@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import {
-  ArrowRight, Loader2, Clipboard, AlertCircle, Sparkles, Youtube, Check, ChevronDown
+  ArrowRight, Loader2, Clipboard, AlertCircle, Sparkles, Youtube, Check, ChevronDown, Clock
 } from 'lucide-react';
 
 const PRESET_VIDEOS = [
@@ -15,6 +15,9 @@ const PRESET_VIDEOS = [
     channel: "Gate Smashers",
     highlights: ["Blackboard SVGs", "Solved PYQs"],
     url: 'https://www.youtube.com/watch?v=coa-unit-1',
+    color: 'from-blue-500 to-indigo-600',
+    bgLight: 'bg-blue-50',
+    textAccent: 'text-blue-700',
   },
   {
     id: 'kKKM8Y-u7ds',
@@ -27,6 +30,9 @@ const PRESET_VIDEOS = [
     channel: "Physics Galaxy",
     highlights: ["Free Body Diagrams", "Core Formulas"],
     url: 'https://www.youtube.com/watch?v=kKKM8Y-u7ds',
+    color: 'from-purple-500 to-violet-600',
+    bgLight: 'bg-purple-50',
+    textAccent: 'text-purple-700',
   },
   {
     id: 'RBSGKlAoi3w',
@@ -39,6 +45,9 @@ const PRESET_VIDEOS = [
     channel: "Striver",
     highlights: ["Visual Tree Nodes", "Top 20 MCQs"],
     url: 'https://www.youtube.com/watch?v=RBSGKlAoi3w',
+    color: 'from-emerald-500 to-teal-600',
+    bgLight: 'bg-emerald-50',
+    textAccent: 'text-emerald-700',
   },
   {
     id: 'dstl-full-playlist-ebook',
@@ -51,6 +60,9 @@ const PRESET_VIDEOS = [
     channel: "Full Subject Series",
     highlights: ["All 5 Units", "Formula Hub"],
     url: 'https://www.youtube.com/playlist?list=PLdstl-units-1-to-5-full-subject-ebook',
+    color: 'from-pink-500 to-rose-600',
+    bgLight: 'bg-pink-50',
+    textAccent: 'text-pink-700',
   }
 ];
 
@@ -155,33 +167,40 @@ export default function YouTubeInput({
   const isPlaylist = inputMode === 'playlist' || url.includes('list=');
 
   return (
-    <div className="max-w-4xl mx-auto my-4 sm:my-8 px-3 sm:px-4 w-full">
+    <div className="max-w-4xl mx-auto my-4 sm:my-10 px-3 sm:px-4 w-full">
 
       {/* ── Hero ── */}
-      <div className="text-center mb-5 sm:mb-7">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans'] tracking-tight leading-tight">
-          YouTube Lecture to Student Copy Notes
+      <div className="text-center mb-8 sm:mb-10 relative">
+        {/* Soft radial glow behind hero */}
+        <div className="absolute inset-0 -top-8 flex items-center justify-center pointer-events-none" aria-hidden="true">
+          <div className="w-[600px] h-[200px] bg-indigo-400/10 dark:bg-indigo-500/8 rounded-full blur-3xl" />
+        </div>
+        <h1 className="relative text-3xl sm:text-5xl md:text-[3.5rem] font-extrabold text-[#0F172A] dark:text-[#F8FAFC] font-['Plus_Jakarta_Sans'] tracking-tight leading-[1.1] mb-4">
+          YouTube Lecture to{' '}
+          <span className="bg-gradient-to-r from-indigo-600 via-blue-500 to-violet-600 bg-clip-text text-transparent">
+            Student Copy Notes
+          </span>
         </h1>
-        <p className="text-sm sm:text-base text-[#475569] dark:text-[#94A3B8] font-normal leading-relaxed mt-2 max-w-xl mx-auto">
+        <p className="relative text-sm sm:text-base text-[#475569] dark:text-[#94A3B8] font-normal leading-relaxed max-w-xl mx-auto">
           Paste any YouTube lecture or playlist to auto-extract blackboard notes, diagrams, formulas &amp; solved PYQs.
         </p>
       </div>
 
       {/* ── Main Input Command Card ── */}
-      <div className="bg-white dark:bg-[#131B2E] p-4 sm:p-5 rounded-2xl border border-[#E2E8F0] dark:border-[#23314F] shadow-sm relative transition-all">
+      <div className="bg-white dark:bg-[#131B2E] p-5 sm:p-7 rounded-[20px] border border-[#E5E7EB] dark:border-[#23314F] shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative transition-all">
 
-        <form onSubmit={handleSubmit} className="space-y-3.5">
+        <form onSubmit={handleSubmit} className="space-y-4">
 
-          {/* Mode Switcher */}
-          <div className="flex items-center gap-2 flex-wrap pb-0.5" role="group" aria-label="Input mode">
+          {/* Mode Switcher — segmented control */}
+          <div className="flex items-center bg-[#F1F5F9] dark:bg-[#0B0F17] rounded-xl p-1 gap-1 border border-[#E2E8F0] dark:border-[#23314F] w-fit" role="group" aria-label="Input mode">
             <button
               type="button"
               onClick={() => setInputMode('lecture')}
               aria-pressed={inputMode === 'lecture' && !url.includes('list=')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 cursor-pointer min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                 inputMode === 'lecture' && !url.includes('list=')
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'bg-[#F1F5F9] dark:bg-[#1B2640] text-[#334155] dark:text-[#CBD5E1] hover:text-[#0F172A] dark:hover:text-white border border-[#E2E8F0] dark:border-[#23314F]'
+                  ? 'bg-white dark:bg-[#1B2640] text-[#0F172A] dark:text-[#F8FAFC] shadow-sm border border-slate-200/80 dark:border-slate-700'
+                  : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
               }`}
             >
               <span>🎬 Single Lecture</span>
@@ -196,21 +215,21 @@ export default function YouTubeInput({
                 }
               }}
               aria-pressed={inputMode === 'playlist' || url.includes('list=')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 cursor-pointer min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                 inputMode === 'playlist' || url.includes('list=')
-                  ? 'bg-slate-900 dark:bg-indigo-600 text-white shadow-sm'
-                  : 'bg-[#F1F5F9] dark:bg-[#1B2640] text-[#334155] dark:text-[#CBD5E1] hover:text-[#0F172A] dark:hover:text-white border border-[#E2E8F0] dark:border-[#23314F]'
+                  ? 'bg-white dark:bg-[#1B2640] text-[#0F172A] dark:text-[#F8FAFC] shadow-sm border border-slate-200/80 dark:border-slate-700'
+                  : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
               }`}
             >
               <span>📑 Full Playlist / E-Book</span>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold leading-none">5 Units</span>
+              <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 font-bold leading-none border border-amber-200 dark:border-amber-800">NEW</span>
             </button>
           </div>
 
-          {/* URL Input Bar — stacks vertically on mobile (360px), row on sm+ */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-1.5 rounded-xl border border-[#CBD5E1] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
-            
-            <div className="flex items-center gap-2 flex-1 px-3 py-1.5 min-h-[44px]">
+          {/* URL Input Bar — stacks vertically on mobile, row on sm+ */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-1.5 rounded-[14px] border border-[#CBD5E1] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] focus-within:bg-white dark:focus-within:bg-[#0B0F17] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/25 transition-all duration-200">
+
+            <div className="flex items-center gap-2 flex-1 px-3 py-1.5 min-h-[52px]">
               <Youtube className="w-5 h-5 text-red-500 shrink-0" aria-hidden="true" />
               <input
                 type="url"
@@ -222,7 +241,7 @@ export default function YouTubeInput({
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 aria-label={isPlaylist ? "YouTube playlist URL" : "YouTube video URL"}
-                className="w-full bg-transparent text-xs sm:text-sm text-[#0F172A] dark:text-[#F8FAFC] placeholder-[#94A3B8] dark:placeholder-slate-500 focus:outline-none min-h-[36px]"
+                className="w-full bg-transparent text-xs sm:text-sm text-[#0F172A] dark:text-[#F8FAFC] placeholder-[#94A3B8] dark:placeholder-slate-500 focus:outline-none min-h-[40px]"
                 disabled={isLoading}
               />
 
@@ -231,7 +250,7 @@ export default function YouTubeInput({
                 type="button"
                 onClick={handlePaste}
                 aria-label="Paste URL from clipboard"
-                className="px-3 py-2 rounded-lg text-xs font-semibold text-[#334155] dark:text-[#CBD5E1] hover:text-[#0F172A] dark:hover:text-white hover:bg-white dark:hover:bg-[#1B2640] border border-slate-200 dark:border-slate-700 transition-all shrink-0 flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="px-3 py-2 rounded-lg text-xs font-semibold text-[#334155] dark:text-[#CBD5E1] hover:text-[#0F172A] dark:hover:text-white hover:bg-white dark:hover:bg-[#1B2640] border border-slate-200 dark:border-slate-700 transition-all duration-200 shrink-0 flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 title="Paste from clipboard"
               >
                 {copiedPaste ? <Check className="w-4 h-4 text-emerald-500" aria-hidden="true" /> : <Clipboard className="w-4 h-4 text-slate-500 dark:text-slate-400" aria-hidden="true" />}
@@ -239,12 +258,12 @@ export default function YouTubeInput({
               </button>
             </div>
 
-            {/* Primary CTA: Create Copy Notes (Always Primary Button) */}
+            {/* Primary CTA: Create Copy Notes */}
             <button
               type="submit"
               disabled={isLoading || !url.trim()}
               aria-label={isLoading ? 'Generating notes, please wait' : isPlaylist ? 'Compile E-Book' : 'Create Copy Notes'}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus-visible:ring-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#131B2E] min-h-[44px]"
+              className="group w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-violet-600 dark:from-indigo-500 dark:to-indigo-600 dark:hover:from-indigo-400 dark:hover:to-violet-500 focus-visible:ring-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-md transition-all duration-200 whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#131B2E] min-h-[48px]"
             >
               {isLoading ? (
                 <>
@@ -254,19 +273,19 @@ export default function YouTubeInput({
               ) : (
                 <>
                   <span>{isPlaylist ? 'Compile E-Book' : 'Create Copy Notes'}</span>
-                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" aria-hidden="true" />
                 </>
               )}
             </button>
           </div>
 
-          {/* ── Exam Selector: 5 visible chips + "More" dropdown — wrap & 44px tap targets ── */}
+          {/* ── Exam Selector: 5 visible chips + "More" dropdown ── */}
           <div className="flex items-center gap-2 flex-wrap pt-1" role="group" aria-label="Select target exam">
-            <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 mr-0.5 shrink-0 font-sans">
+            <span className="text-xs sm:text-[13px] font-bold text-slate-700 dark:text-slate-300 mr-0.5 shrink-0 font-sans">
               Target Exam:
             </span>
 
-            {/* Primary chips — first 5 visible & clearly highlighted when selected */}
+            {/* Primary chips */}
             {EXAM_OPTIONS_PRIMARY.map(exam => {
               const isSelected = selectedExam === exam;
               return (
@@ -275,10 +294,10 @@ export default function YouTubeInput({
                   type="button"
                   onClick={() => { setSelectedExam(exam); setMoreOpen(false); }}
                   aria-pressed={isSelected}
-                  className={`px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer min-h-[44px] inline-flex items-center justify-center font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer min-h-[36px] inline-flex items-center justify-center font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                     isSelected
-                      ? 'bg-indigo-600 text-white shadow-md font-bold ring-2 ring-indigo-500/30'
-                      : 'bg-[#F1F5F9] dark:bg-[#1B2640] text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-slate-700 hover:border-indigo-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/60'
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20 font-bold ring-2 ring-indigo-500/20'
+                      : 'bg-white dark:bg-[#1B2640] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30'
                   }`}
                 >
                   {exam}
@@ -295,14 +314,14 @@ export default function YouTubeInput({
                 aria-haspopup="listbox"
                 aria-expanded={moreOpen}
                 aria-label="More exam options"
-                className={`px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 min-h-[44px] font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5 min-h-[36px] font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                   EXAM_OPTIONS_MORE.includes(selectedExam)
-                    ? 'bg-indigo-600 text-white shadow-md font-bold ring-2 ring-indigo-500/30'
-                    : 'bg-[#F1F5F9] dark:bg-[#1B2640] text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-slate-700 hover:border-indigo-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/60'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20 font-bold ring-2 ring-indigo-500/20'
+                    : 'bg-white dark:bg-[#1B2640] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30'
                 }`}
               >
                 <span>{EXAM_OPTIONS_MORE.includes(selectedExam) ? selectedExam : 'More'}</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${moreOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
               </button>
 
               {moreOpen && (
@@ -320,7 +339,7 @@ export default function YouTubeInput({
                         role="option"
                         aria-selected={isSelected}
                         onClick={() => { setSelectedExam(exam); setMoreOpen(false); }}
-                        className={`w-full text-left px-4 py-2.5 text-xs font-sans transition-colors min-h-[44px] flex items-center focus-visible:outline-none focus-visible:bg-indigo-50 dark:focus-visible:bg-indigo-900/30 ${
+                        className={`w-full text-left px-4 py-2.5 text-xs font-sans transition-colors duration-150 min-h-[40px] flex items-center focus-visible:outline-none focus-visible:bg-indigo-50 dark:focus-visible:bg-indigo-900/30 ${
                           isSelected
                             ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-bold'
                             : 'text-slate-700 dark:text-slate-200 hover:bg-[#F1F5F9] dark:hover:bg-[#1B2640] font-medium'
@@ -345,7 +364,7 @@ export default function YouTubeInput({
                 placeholder="Type your exam / university (e.g. WBJEE, MHT-CET, CAT, State PSC...)"
                 value={otherExamText}
                 onChange={(e) => setOtherExamText(e.target.value)}
-                className="w-full border border-[#E2E8F0] dark:border-[#23314F] rounded-xl px-3.5 py-2.5 text-xs text-[#0F172A] dark:text-[#F8FAFC] bg-[#F8FAFC] dark:bg-[#0B0F17] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all min-h-[44px]"
+                className="w-full border border-[#E2E8F0] dark:border-[#23314F] rounded-xl px-3.5 py-2.5 text-xs text-[#0F172A] dark:text-[#F8FAFC] bg-[#F8FAFC] dark:bg-[#0B0F17] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 min-h-[44px]"
               />
             </div>
           )}
@@ -354,7 +373,7 @@ export default function YouTubeInput({
 
         {/* ── Stepper Progress Notification ── */}
         {isLoading && (
-          <div className="mt-4 p-4 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] animate-fade-slide-up space-y-2.5" role="status" aria-live="polite">
+          <div className="mt-5 p-4 rounded-xl border border-[#E2E8F0] dark:border-[#23314F] bg-[#F8FAFC] dark:bg-[#0B0F17] animate-fade-slide-up space-y-2.5" role="status" aria-live="polite">
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-ping" aria-hidden="true" />
@@ -367,9 +386,9 @@ export default function YouTubeInput({
               </span>
             </div>
 
-            <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-indigo-600 dark:bg-indigo-500 transition-all duration-500 rounded-full"
+                className="h-full bg-gradient-to-r from-indigo-600 to-violet-500 transition-all duration-500 rounded-full"
                 style={{ width: `${((stepIdx + 1) / PROGRESS_STEPS.length) * 100}%` }}
                 role="progressbar"
                 aria-valuenow={stepIdx + 1}
@@ -398,21 +417,21 @@ export default function YouTubeInput({
       </div>
 
       {/* ── Quick Start Sample Cards Section ── */}
-      <div className="mt-8 pt-6 border-t border-slate-200/80 dark:border-slate-800">
-        <div className="flex items-center justify-between mb-4 px-1">
+      <div className="mt-10 pt-8 border-t border-slate-200/60 dark:border-slate-800/60">
+        <div className="flex items-center justify-between mb-5 px-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-            <h2 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider font-sans">
-              Sample Lectures &amp; E-Books — 1-Click Preview
+            <Sparkles className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+            <h2 className="text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest font-sans">
+              Try Sample Lectures — 1-Click Preview
             </h2>
           </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium font-sans hidden sm:inline">
-            Select any lecture to instantly open notes
+          <span className="text-xs text-slate-400 dark:text-slate-500 font-medium font-sans hidden sm:inline">
+            Click any card to view notes
           </span>
         </div>
 
-        {/* 4 Cards Grid — consistent height, clean cards, zero rainbow clutter */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 items-stretch">
+        {/* 4 Cards Grid — consistent height, premium cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
           {PRESET_VIDEOS.map((preset) => (
             <button
               key={preset.id}
@@ -420,35 +439,41 @@ export default function YouTubeInput({
               onClick={() => handlePresetSelect(preset)}
               title={preset.title}
               aria-label={`Load sample notes for: ${preset.title}`}
-              className="bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 hover:border-indigo-500 dark:hover:border-indigo-400 shadow-xs hover:shadow-md p-4 rounded-2xl cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] group flex flex-col justify-between text-left h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+              className="bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-sm hover:shadow-lg hover:shadow-indigo-500/10 p-0 rounded-2xl cursor-pointer transition-all duration-200 hover:-translate-y-1 active:translate-y-0 active:scale-[0.99] group flex flex-col text-left h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 overflow-hidden"
             >
-              <div>
+              {/* Gradient thumbnail strip */}
+              <div className={`w-full h-20 bg-gradient-to-br ${preset.color} flex items-center justify-center relative overflow-hidden shrink-0`} aria-hidden="true">
+                <span className="text-4xl filter drop-shadow-sm">{preset.icon}</span>
+                <div className="absolute inset-0 bg-black/10" />
+              </div>
+
+              <div className="flex flex-col flex-1 p-4">
                 {/* Subject Tag & Duration */}
                 <div className="flex items-center justify-between gap-1.5 mb-2.5">
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1 shrink-0 whitespace-nowrap font-sans">
-                    <span aria-hidden="true">{preset.icon || '📚'}</span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${preset.bgLight} dark:bg-slate-800 ${preset.textAccent} dark:text-slate-300 border border-slate-200/50 dark:border-slate-700 flex items-center gap-1 shrink-0 whitespace-nowrap font-sans`}>
                     <span>{preset.subject}</span>
                   </span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap shrink-0">
-                    ⏱ {preset.duration}
+                  <span className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 font-medium bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-full border border-slate-200/50 dark:border-slate-700/50 shrink-0 whitespace-nowrap">
+                    <Clock className="w-3 h-3 shrink-0" aria-hidden="true" />
+                    <span>{preset.duration}</span>
                   </span>
                 </div>
 
                 {/* Card Title — max 2 lines */}
                 <h3
-                  className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2 leading-snug mb-1.5 font-sans min-h-[2.5rem]"
+                  className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200 line-clamp-2 leading-snug mb-2 font-sans min-h-[2.5rem]"
                   title={preset.title}
                 >
                   {preset.title}
                 </h3>
 
                 {/* Target Exam Tag */}
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mb-2">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mb-2.5">
                   🎯 {preset.exam}
                 </p>
 
                 {/* Highlights */}
-                <div className="flex items-center gap-1 flex-wrap mb-2.5">
+                <div className="flex items-center gap-1 flex-wrap mb-3">
                   {(preset.highlights || []).map((h, i) => (
                     <span
                       key={i}
@@ -458,17 +483,17 @@ export default function YouTubeInput({
                     </span>
                   ))}
                 </div>
-              </div>
 
-              {/* Card Footer */}
-              <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs mt-2">
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium font-sans">
-                  Ready to view
-                </span>
-                <span className="text-indigo-600 dark:text-indigo-400 font-bold text-xs group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-sans">
-                  <span>Open Notes</span>
-                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                </span>
+                {/* Card Footer */}
+                <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs mt-auto">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium font-sans">
+                    Ready to view
+                  </span>
+                  <span className="text-indigo-600 dark:text-indigo-400 font-bold text-xs group-hover:translate-x-0.5 transition-transform duration-200 flex items-center gap-1 font-sans">
+                    <span>Open Notes</span>
+                    <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                  </span>
+                </div>
               </div>
             </button>
           ))}

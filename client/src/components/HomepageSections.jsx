@@ -23,26 +23,35 @@ export function HowItWorks() {
       icon: LinkIcon,
       title: 'Paste YouTube Lecture Link',
       desc: 'Paste any single YouTube lecture, long one-shot video, or entire playlist link in the input above.',
+      color: 'text-indigo-600 dark:text-indigo-400',
+      bg: 'bg-indigo-50 dark:bg-indigo-950/40',
+      border: 'border-indigo-100 dark:border-indigo-900/50',
     },
     {
       step: '02',
       icon: Zap,
       title: 'AI Synthesizes Topper Notes',
       desc: 'Blackboard writing, vector diagrams, derivations, math formulas, and exam PYQs are cleanly organized.',
+      color: 'text-violet-600 dark:text-violet-400',
+      bg: 'bg-violet-50 dark:bg-violet-950/40',
+      border: 'border-violet-100 dark:border-violet-900/50',
     },
     {
       step: '03',
       icon: Download,
       title: 'Study, Revise or Download PDF',
       desc: 'Read structured notes, practice MCQs, ask doubt questions in Hindi/Hinglish, or export clean PDFs.',
+      color: 'text-blue-600 dark:text-blue-400',
+      bg: 'bg-blue-50 dark:bg-blue-950/40',
+      border: 'border-blue-100 dark:border-blue-900/50',
     },
   ];
 
   return (
     <section aria-labelledby="how-it-works-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-10">
       <div className="flex items-center gap-2 mb-2 justify-center">
-        <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-        <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono">
+        <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
+        <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 font-mono">
           Simple 3-Step Process
         </span>
       </div>
@@ -59,16 +68,16 @@ export function HowItWorks() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {steps.map(({ step, icon: Icon, title, desc }) => (
+        {steps.map(({ step, icon: Icon, title, desc, color, bg, border }) => (
           <div
             key={step}
-            className="bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col items-start text-left shadow-xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200"
+            className="bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col items-start text-left shadow-sm hover:shadow-md hover:shadow-indigo-500/5 hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-200"
           >
             <div className="flex items-center justify-between w-full mb-4">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+              <div className={`w-10 h-10 rounded-xl ${bg} ${color} flex items-center justify-center border ${border}`}>
                 <Icon className="w-5 h-5" aria-hidden="true" />
               </div>
-              <span className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500">
+              <span className="text-xs font-mono font-bold text-slate-300 dark:text-slate-600">
                 {step}
               </span>
             </div>
@@ -94,29 +103,41 @@ export function FeaturesGrid() {
       title: 'Vector Blackboard Diagrams',
       desc: 'Automatic extraction of board drawings, circuits, and flowcharts into crisp SVGs that stay sharp at any zoom level.',
       icon: FileText,
+      color: 'text-indigo-600 dark:text-indigo-400',
+      bg: 'bg-indigo-50 dark:bg-indigo-950/40',
+      border: 'border-indigo-100 dark:border-indigo-900/50',
     },
     {
       title: 'Exam PYQs & Step-by-Step Solutions',
       desc: 'Curated previous year questions matching exam weightage with detailed derivations and elimination shortcuts.',
       icon: Award,
+      color: 'text-amber-600 dark:text-amber-400',
+      bg: 'bg-amber-50 dark:bg-amber-950/40',
+      border: 'border-amber-100 dark:border-amber-900/50',
     },
     {
       title: 'Multilingual Study & Explanations',
       desc: 'Read notes and resolve doubts in English, Hindi, or conversational Hinglish for deeper conceptual clarity.',
       icon: Globe2,
+      color: 'text-emerald-600 dark:text-emerald-400',
+      bg: 'bg-emerald-50 dark:bg-emerald-950/40',
+      border: 'border-emerald-100 dark:border-emerald-900/50',
     },
     {
       title: 'Export to PDF & Markdown',
       desc: 'Clean, print-friendly A4 PDF notes without conversion artifacts, plus clean Markdown export for personal knowledge bases.',
       icon: Download,
+      color: 'text-blue-600 dark:text-blue-400',
+      bg: 'bg-blue-50 dark:bg-blue-950/40',
+      border: 'border-blue-100 dark:border-blue-900/50',
     },
   ];
 
   return (
     <section aria-labelledby="features-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-10">
       <div className="flex items-center gap-2 mb-2 justify-center">
-        <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-        <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono">
+        <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
+        <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 font-mono">
           Academic Toolkit
         </span>
       </div>
@@ -133,12 +154,12 @@ export function FeaturesGrid() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {features.map(({ title, desc, icon: Icon }) => (
+        {features.map(({ title, desc, icon: Icon, color, bg, border }) => (
           <div
             key={title}
-            className="bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex gap-4 shadow-xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200"
+            className="bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex gap-4 shadow-sm hover:shadow-md hover:shadow-indigo-500/5 hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-200"
           >
-            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+            <div className={`w-10 h-10 rounded-xl ${bg} ${color} flex items-center justify-center shrink-0 border ${border}`}>
               <Icon className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
@@ -162,9 +183,9 @@ export function FeaturesGrid() {
 export function TelegramBanner() {
   return (
     <section aria-labelledby="telegram-banner-heading" className="w-full max-w-4xl mx-auto px-3 sm:px-4 my-10">
-      <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131B2E] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+      <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-white to-slate-50/50 dark:from-[#131B2E] dark:to-[#0F1626] shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
         <div className="flex items-start gap-4">
-          <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700" aria-hidden="true">
+          <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-100 dark:border-sky-900/50" aria-hidden="true">
             <Send className="w-5 h-5" />
           </div>
           <div>
@@ -172,7 +193,7 @@ export function TelegramBanner() {
               <h3 id="telegram-banner-heading" className="font-bold text-sm sm:text-base text-slate-900 dark:text-white font-['Plus_Jakarta_Sans']">
                 Revise on Your Phone with Telegram Bot
               </h3>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                 @omnistudy_notes_bot
               </span>
             </div>
@@ -187,10 +208,10 @@ export function TelegramBanner() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Open OmniStudy Telegram Bot (opens in new tab)"
-          className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer shadow-xs min-h-[44px] font-sans"
+          className="group w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shrink-0 cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 min-h-[44px] font-sans"
         >
           <span>Open Telegram Bot</span>
-          <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-200" aria-hidden="true" />
         </a>
       </div>
     </section>
