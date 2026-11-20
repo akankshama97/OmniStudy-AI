@@ -110,7 +110,7 @@ export default function SavedNotesList({ onSelectNote, onGoToGenerator, theme = 
             : 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'
         }`}>
           <span>{actionMessage.text}</span>
-          <button onClick={() => setActionMessage(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-4 font-bold">âœ•</button>
+          <button onClick={() => setActionMessage(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-4 font-bold">✕</button>
         </div>
       )}
 

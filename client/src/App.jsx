@@ -12,6 +12,24 @@ import { SAMPLE_NOTES, SAMPLE_NOTES_MAP, getSampleNote } from './services/sample
 import { Sparkles, RefreshCw, AlertTriangle, X, Shield, Info, Mail, ExternalLink } from 'lucide-react';
 import HomepageSections from './components/HomepageSections';
 
+// Routing Helpers for URL-synchronized multi-page navigation
+export const pathToTab = (pathname) => {
+  const p = (pathname || '').toLowerCase().replace(/\/$/, '') || '/';
+  if (p === '/pyq' || p.startsWith('/pyq/')) return 'pyq';
+  if (p === '/doubt-solver' || p === '/chatbot' || p === '/doubt') return 'chatbot';
+  if (p === '/saved' || p === '/library' || p === '/saved-notes') return 'saved';
+  if (p === '/login' || p === '/signup' || p === '/register' || p === '/auth') return 'login';
+  return 'generator';
+};
+
+export const tabToPath = (tab) => {
+  if (tab === 'pyq') return '/pyq';
+  if (tab === 'chatbot') return '/doubt-solver';
+  if (tab === 'saved') return '/saved';
+  if (tab === 'login') return '/login';
+  return '/notes';
+};
+
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -37,7 +55,7 @@ class ErrorBoundary extends Component {
             </p>
             <button
               onClick={() => { this.setState({ hasError: false, error: null }); window.location.reload(); }}
-              className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-sm inline-flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-sm inline-flex items-center gap-2 cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Reload App</span>
@@ -52,21 +70,80 @@ class ErrorBoundary extends Component {
 
 export default function App() {
   const { user, loading, logout, showAuthModal, setShowAuthModal } = useAuth();
-  const [activeTab,    setActiveTab]    = useState('generator');
+
+  // Multi-page routing state synchronized with browser URL
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return pathToTab(window.location.pathname);
+    }
+    return 'generator';
+  });
+
   const [selectedLang, setSelectedLang] = useState(() =>
     typeof window !== 'undefined' ? localStorage.getItem('omnistudy_selected_lang') || 'Hinglish' : 'Hinglish'
   );
-  const [theme,        setTheme]        = useState(() => localStorage.getItem('omni_theme') || 'system');
+  const [theme, setTheme] = useState(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('omni_theme') || 'system' : 'system'
+  );
   const [systemIsDark, setSystemIsDark] = useState(() =>
     typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false
   );
   
   // Default null so the rich homepage sections & sample cards are visible on landing
-  const [currentNote,  setCurrentNote]  = useState(null);
-  const [isLoading,    setIsLoading]    = useState(false);
-  const [error,        setError]        = useState(null);
+  const [currentNote, setCurrentNote] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [timestampTutorPrefill, setTimestampTutorPrefill] = useState(null);
   const [footerModal, setFooterModal] = useState(null); // 'about' | 'privacy' | 'contact' | null
+
+  // Centralized navigation handler that updates both tab and browser history URL
+  const navigate = (target) => {
+    let nextTab = 'generator';
+    let nextPath = '/notes';
+
+    if (typeof target === 'string') {
+      if (target.startsWith('/')) {
+        nextPath = target;
+        nextTab = pathToTab(target);
+      } else {
+        nextTab = target;
+        nextPath = tabToPath(target);
+      }
+    }
+
+    setActiveTab(nextTab);
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname !== nextPath) {
+        window.history.pushState({ tab: nextTab }, '', nextPath);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Browser Back/Forward navigation listener (popstate)
+  useEffect(() => {
+    const handlePopState = () => {
+      const tab = pathToTab(window.location.pathname);
+      setActiveTab(tab);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Dynamic document title based on current page and active note
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const titles = {
+      generator: currentNote
+        ? `${currentNote.chapter || currentNote.title || 'Notes'} - OmniStudy AI`
+        : 'OmniStudy AI - Smart YouTube Notes & Blackboard Extractor',
+      pyq: 'OmniStudy AI - Previous Year Questions (PYQs) & Formulas',
+      chatbot: 'OmniStudy AI - Multilingual AI Doubt Solver & Tutor',
+      saved: 'OmniStudy AI - Saved Notes Library',
+      login: user && !user.isGuest ? `OmniStudy AI - Profile (${user.name})` : 'OmniStudy AI - Student Login & Sign Up'
+    };
+    document.title = titles[activeTab] || 'OmniStudy AI';
+  }, [activeTab, currentNote, user]);
 
   // Close modals on Escape key
   useEffect(() => {
@@ -82,12 +159,12 @@ export default function App() {
 
   const handleOpenGeneralDoubt = () => {
     setTimestampTutorPrefill(null);
-    setActiveTab('chatbot');
+    navigate('chatbot');
   };
 
   const handleOpenTimestampTutor = (prefillData) => {
     setTimestampTutorPrefill(prefillData || { timestamp: '00:00', videoTitle: currentNote?.title || '' });
-    setActiveTab('chatbot');
+    navigate('chatbot');
   };
 
   // Listen to OS prefers-color-scheme changes
@@ -103,7 +180,9 @@ export default function App() {
 
   // Apply dark class to documentElement and body
   useEffect(() => {
-    localStorage.setItem('omni_theme', theme);
+    try {
+      localStorage.setItem('omni_theme', theme);
+    } catch (e) {}
     document.documentElement.classList.toggle('dark', isDark);
     document.body.className = isDark ? 'dark dark-mode' : 'light';
   }, [theme, isDark]);
@@ -150,6 +229,7 @@ export default function App() {
       const result = await processYouTubeVideo(videoUrl, selectedLang, selectedExam, maxMinutes);
       if (result.success && result.note) {
         setCurrentNote(result.note);
+        navigate('generator');
         return;
       }
       throw new Error(result.error || 'Failed to process YouTube video.');
@@ -160,6 +240,7 @@ export default function App() {
       if (matchedId) {
         setCurrentNote(getSampleNote(matchedId, selectedLang));
         setError(null);
+        navigate('generator');
       } else {
         const errMsg = err.response?.data?.error || err.message || 'Something went wrong while generating notes.';
         setError(errMsg);
@@ -188,19 +269,23 @@ export default function App() {
       <div className={`min-h-screen flex flex-col font-sans w-full max-w-full overflow-x-hidden ${bg} ${text}`}
            style={{ transition: 'background 0.2s, color 0.2s' }}>
 
-      {/* Navbar with Sun/Moon/System and Language Toggle (No API Key button/modal) */}
+      {/* Navbar with Sun/Moon/System and Language Toggle + Multi-Page Routing */}
       <Navbar
-        activeTab={activeTab}        setActiveTab={setActiveTab}
-        selectedLang={selectedLang}  setSelectedLang={handleChangeLanguage}
-        theme={theme}                setTheme={setTheme}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onNavigate={navigate}
+        selectedLang={selectedLang}
+        setSelectedLang={handleChangeLanguage}
+        theme={theme}
+        setTheme={setTheme}
         isDark={isDark}
         user={user}
         onLogout={logout}
-        onOpenAuth={() => setShowAuthModal(true)}
+        onOpenAuth={() => navigate('/login')}
       />
 
       <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 md:pb-0">
-        {/* Tab 1: Notes Generator & Classroom Copy (Persistent, Never Unmounts) */}
+        {/* ── Page 1: Notes Generator & Classroom Copy (Persistent, Never Unmounts) ── */}
         <div className={activeTab === 'generator' ? 'block animate-fade-slide-up w-full max-w-full overflow-x-hidden' : 'hidden'}>
           {currentNote ? (
             <div id="student-notes-section" className="relative animate-fade-slide-up">
@@ -253,7 +338,7 @@ export default function App() {
           )}
         </div>
 
-        {/* Tab 2: Multilingual Doubt Solver & Timestamp AI Tutor (Persistent) */}
+        {/* ── Page 2: Multilingual Doubt Solver & Timestamp AI Tutor ── */}
         <div className={activeTab === 'chatbot' ? 'block animate-fade-slide-up' : 'hidden'}>
           <MultilingualChatbot
             currentNote={currentNote}
@@ -266,7 +351,7 @@ export default function App() {
           />
         </div>
 
-        {/* Tab 3: PYQ Formula Hub (Persistent) */}
+        {/* ── Page 3: PYQ Formula Hub ── */}
         <div className={activeTab === 'pyq' ? 'block animate-fade-slide-up' : 'hidden'}>
           <PYQFormulaHub
             selectedLang={selectedLang}
@@ -276,14 +361,27 @@ export default function App() {
           />
         </div>
 
-        {/* Tab 4: Saved Notes (Persistent) */}
+        {/* ── Page 4: Saved Notes Library ── */}
         <div className={activeTab === 'saved' ? 'block animate-fade-slide-up' : 'hidden'}>
           <SavedNotesList
-            onSelectNote={(note) => { setCurrentNote(note); setActiveTab('generator'); }}
-            onGoToGenerator={() => setActiveTab('generator')}
+            onSelectNote={(note) => {
+              setCurrentNote(note);
+              navigate('generator');
+            }}
+            onGoToGenerator={() => navigate('generator')}
             theme={theme}
             isDark={isDark}
           />
+        </div>
+
+        {/* ── Page 5: Dedicated Login & Student Account Page ── */}
+        <div className={activeTab === 'login' ? 'block animate-fade-slide-up w-full max-w-5xl mx-auto px-3 sm:px-6 py-6 sm:py-10' : 'hidden'}>
+          <div className="rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0B0F17]">
+            <AuthPage
+              isDark={isDark}
+              onNavigate={navigate}
+            />
+          </div>
         </div>
       </main>
 
@@ -293,7 +391,14 @@ export default function App() {
       }`}>
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
           {/* Brand */}
-          <div className="flex items-center gap-2.5">
+          <a
+            href="/notes"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/notes');
+            }}
+            className="flex items-center gap-2.5 cursor-pointer text-decoration-none"
+          >
             <div className="w-7 h-7 rounded-lg bg-[#2563EB] text-white flex items-center justify-center shadow-xs shrink-0">
               <Sparkles className="w-4 h-4 fill-white" aria-hidden="true" />
             </div>
@@ -305,7 +410,7 @@ export default function App() {
                 YouTube Lecture to Student Copy Notes
               </span>
             </div>
-          </div>
+          </a>
 
           {/* Right: Accessible Links + Exam badges (Wraps gracefully on 360px mobile) */}
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 w-full sm:w-auto">
@@ -401,7 +506,7 @@ export default function App() {
                 type="button"
                 onClick={() => setFooterModal(null)}
                 aria-label="Close modal"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] cursor-pointer"
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>
@@ -504,11 +609,16 @@ export default function App() {
           </div>
         </div>
       )}
-      {/* Auth Modal Overlay when user clicks Login / Sign Up */}
-      {showAuthModal && (
+
+      {/* Auth Modal Overlay when opened via secondary triggers */}
+      {showAuthModal && activeTab !== 'login' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-sm animate-fade-in overflow-y-auto">
           <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl shadow-2xl border border-slate-700/50">
-            <AuthPage isDark={isDark} onClose={() => setShowAuthModal(false)} />
+            <AuthPage
+              isDark={isDark}
+              onClose={() => setShowAuthModal(false)}
+              onNavigate={navigate}
+            />
           </div>
         </div>
       )}
