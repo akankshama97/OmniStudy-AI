@@ -212,7 +212,7 @@ export default function Navbar({
                   handleNav('login', '/login');
                 }}
                 className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#F1F5F9] dark:bg-[#0B0F17] border border-[#E2E8F0] dark:border-[#23314F] hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors min-h-[38px] cursor-pointer text-decoration-none"
-                title={`Logged in as ${user.name} (${user.email}) - View Profile`}
+                title={`Logged in as ${user.name} - View Account`}
               >
                 <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-[10px] shrink-0" aria-hidden="true">
                   {user.name ? user.name.charAt(0).toUpperCase() : 'U'}

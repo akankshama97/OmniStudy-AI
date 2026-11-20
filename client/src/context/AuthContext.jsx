@@ -9,7 +9,7 @@ const API_BASE = import.meta.env.VITE_API_URL ? (import.meta.env.VITE_API_URL.re
 export const DEFAULT_GUEST_USER = {
   id: 'guest_student',
   name: 'Student',
-  email: 'student@omnistudy.ai',
+  email: '',
   isGuest: true
 };
 
