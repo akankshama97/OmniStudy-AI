@@ -574,7 +574,7 @@ export default function NotebookNotesView({
     const mistakes = Array.isArray(n.commonMistakes) ? n.commonMistakes : [];
 
     return `
-      <div style="font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; box-sizing: border-box; line-height: 1.65; color: #0F172A; width: 794px; max-width: 794px; margin: 0 auto; padding: 24px 28px; background: #FFFFFF;">
+      <div style="font-family: 'Noto Sans Devanagari', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; box-sizing: border-box; line-height: 1.65; color: #0F172A; width: 794px; max-width: 794px; margin: 0 auto; padding: 24px 28px; background: #FFFFFF;">
         
         <!-- ── 1. TOPPER COVER HEADER (Classic Blue & Black Pen Notebook Style) ── -->
         <!-- All rows use strict <table> to completely eliminate flexbox overlapping in html2canvas -->
@@ -1142,7 +1142,10 @@ export default function NotebookNotesView({
   // Direct 1-Click PDF Download (Reliable hidden-but-rendered container, multi-page A4 canvas slicing)
   const handleDownloadPDF = async () => {
     if (!note) return;
-    const cleanTitle = (note.title || note.chapter || 'Lecture_Notes').replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_');
+    const cleanTitle = (note.title || note.chapter || 'OmniStudy_Notes')
+      .replace(/[\\/:*?"<>|]/g, '')
+      .trim()
+      .replace(/\s+/g, '_') || 'OmniStudy_Notes';
     setIsExportingPDF(true);
 
     try {
@@ -1154,21 +1157,21 @@ export default function NotebookNotesView({
         import('jspdf')
       ]);
 
-      // 2. Dedicated off-screen hidden-but-rendered print container
-      // Strictly avoid display:none, opacity:0, or negative z-index which cause blank canvas snapshots in html2canvas
+      // 2. Dedicated hidden-but-rendered print container in viewport
+      // Rendered with high opacity in fixed position behind the main view for exact font & unicode glyph rendering
       const printContainer = document.createElement('div');
       printContainer.id = 'omnistudy-pdf-export-container';
       printContainer.className = 'omnistudy-pdf-container-root';
       printContainer.setAttribute('data-pdf-export', 'true');
-      printContainer.style.position = 'absolute';
-      printContainer.style.left = '-9999px';
+      printContainer.style.position = 'fixed';
+      printContainer.style.left = '0px';
       printContainer.style.top = '0px';
       printContainer.style.width = '794px'; // 210mm at 96 DPI
       printContainer.style.minHeight = '1123px'; // A4 height at 96 DPI
       printContainer.style.backgroundColor = '#FFFFFF';
       printContainer.style.color = '#0F172A';
-      printContainer.style.zIndex = '9999';
-      printContainer.style.opacity = '1';
+      printContainer.style.zIndex = '-99999';
+      printContainer.style.opacity = '0.01';
       printContainer.style.visibility = 'visible';
       printContainer.style.display = 'block';
       printContainer.style.pointerEvents = 'none';
@@ -1256,6 +1259,7 @@ export default function NotebookNotesView({
               el.style.top = '0px';
               el.style.margin = '0 auto';
               el.style.zIndex = '1';
+              el.style.opacity = '1';
             }
           }
         });
@@ -1409,7 +1413,7 @@ export default function NotebookNotesView({
 
   // Export to Microsoft Word Compatible Document (.doc) - Direct 1-click file download
   const handleExportDocx = () => {
-    const cleanTitle = (note.title || 'Lecture_Notes').replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_');
+    const cleanTitle = (note.title || note.chapter || 'OmniStudy_Notes').replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_') || 'OmniStudy_Notes';
     const docHeader = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
     <head><meta charset='utf-8'><title>${note.title || 'Notes'}</title></head><body>${getCleanNotesHtml(note)}</body></html>`;
 

@@ -97,7 +97,7 @@ export default function App() {
   const [footerModal, setFooterModal] = useState(null); // 'about' | 'privacy' | 'contact' | null
 
   // Centralized navigation handler that updates both tab and browser history URL
-  const navigate = (target) => {
+  const navigate = (target, options = {}) => {
     let nextTab = 'generator';
     let nextPath = '/notes';
 
@@ -111,12 +111,16 @@ export default function App() {
       }
     }
 
+    if (options.resetNotes) {
+      setCurrentNote(null);
+    }
+
     setActiveTab(nextTab);
     if (typeof window !== 'undefined') {
       if (window.location.pathname !== nextPath) {
         window.history.pushState({ tab: nextTab }, '', nextPath);
       }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0);
     }
   };
 
@@ -274,6 +278,10 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onNavigate={navigate}
+        onResetNotes={() => {
+          setCurrentNote(null);
+          navigate('/notes', { resetNotes: true });
+        }}
         selectedLang={selectedLang}
         setSelectedLang={handleChangeLanguage}
         theme={theme}
@@ -333,7 +341,7 @@ export default function App() {
                 selectedLang={selectedLang}
                 onChangeLanguage={handleChangeLanguage}
               />
-              <HomepageSections />
+              <HomepageSections onNavigate={navigate} />
             </>
           )}
         </div>

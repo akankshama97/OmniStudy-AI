@@ -10,7 +10,7 @@ import {
   ArrowRight,
   Sparkles,
   BookOpen,
-  CheckCircle2
+  ChevronRight,
 } from 'lucide-react';
 
 /* ─────────────────────────────────────────────
@@ -95,25 +95,27 @@ export function HowItWorks() {
 }
 
 /* ─────────────────────────────────────────────
-   2. FEATURES GRID – 4 Focused Cards
+   2. FEATURES GRID – 4 Focused Interactive Cards
 ───────────────────────────────────────────── */
-export function FeaturesGrid() {
+export function FeaturesGrid({ onNavigate }) {
   const features = [
     {
       title: 'Vector Blackboard Diagrams',
-      desc: 'Automatic extraction of board drawings, circuits, and flowcharts into crisp SVGs. that stay sharp at any zoom level.',
+      desc: 'Automatic extraction of board drawings, circuits, and flowcharts into crisp SVGs that stay sharp at any zoom level.',
       icon: FileText,
       color: 'text-indigo-600 dark:text-indigo-400',
       bg: 'bg-indigo-50 dark:bg-indigo-950/40',
       border: 'border-indigo-100 dark:border-indigo-900/50',
+      path: '/notes',
     },
     {
       title: 'Exam PYQs & Step-by-Step Solutions',
-      desc: 'Curated previous year questions matching exam weightage with detailed derivations and elimination shortcuts.',
+      desc: 'Curated 10-year previous questions matching exam weightage with detailed derivations and elimination shortcuts.',
       icon: Award,
       color: 'text-amber-600 dark:text-amber-400',
       bg: 'bg-amber-50 dark:bg-amber-950/40',
       border: 'border-amber-100 dark:border-amber-900/50',
+      path: '/pyq',
     },
     {
       title: 'Multilingual Study & Explanations',
@@ -122,14 +124,16 @@ export function FeaturesGrid() {
       color: 'text-emerald-600 dark:text-emerald-400',
       bg: 'bg-emerald-50 dark:bg-emerald-950/40',
       border: 'border-emerald-100 dark:border-emerald-900/50',
+      path: '/doubt-solver',
     },
     {
       title: 'Export to PDF & Markdown',
-      desc: 'Clean, print-friendly A4 PDF notes without conversion artifacts, plus clean Markdown export for personal knowledge bases.',
+      desc: 'Clean, print-friendly A4 PDF notes without conversion artifacts, plus clean Markdown export for personal study.',
       icon: Download,
       color: 'text-blue-600 dark:text-blue-400',
       bg: 'bg-blue-50 dark:bg-blue-950/40',
       border: 'border-blue-100 dark:border-blue-900/50',
+      path: '/notes',
     },
   ];
 
@@ -154,23 +158,33 @@ export function FeaturesGrid() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {features.map(({ title, desc, icon: Icon, color, bg, border }) => (
-          <div
+        {features.map(({ title, desc, icon: Icon, color, bg, border, path }) => (
+          <a
             key={title}
-            className="bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex gap-4 shadow-sm hover:shadow-md hover:shadow-indigo-500/5 hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-200"
+            href={path}
+            onClick={(e) => {
+              if (onNavigate) {
+                e.preventDefault();
+                onNavigate(path);
+              }
+            }}
+            className="bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex gap-4 shadow-sm hover:shadow-md hover:shadow-indigo-500/10 hover:border-indigo-400 dark:hover:border-indigo-500 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer text-decoration-none group"
           >
-            <div className={`w-10 h-10 rounded-xl ${bg} ${color} flex items-center justify-center shrink-0 border ${border}`}>
+            <div className={`w-10 h-10 rounded-xl ${bg} ${color} flex items-center justify-center shrink-0 border ${border} group-hover:scale-105 transition-transform`}>
               <Icon className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-1.5 font-['Plus_Jakarta_Sans']">
-                {title}
-              </h3>
+              <div className="flex items-center gap-1.5 mb-1">
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white font-['Plus_Jakarta_Sans'] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  {title}
+                </h3>
+                <span className="text-slate-400 group-hover:translate-x-0.5 transition-transform text-xs">→</span>
+              </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-sans">
                 {desc}
               </p>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </section>
@@ -202,7 +216,6 @@ export function TelegramBanner() {
             </p>
           </div>
         </div>
-
         <a
           href="https://t.me/omnistudy_notes_bot"
           target="_blank"
@@ -219,15 +232,15 @@ export function TelegramBanner() {
 }
 
 /* ─────────────────────────────────────────────
-   COMBINED EXPORT
+   4. ROOT HOMEPAGE WRAPPER
 ───────────────────────────────────────────── */
-export default function HomepageSections() {
+export default function HomepageSections({ onNavigate }) {
   return (
     <div className="space-y-4">
       {/* 1. How it works */}
       <HowItWorks />
-      {/* 2. Core Features */}
-      <FeaturesGrid />
+      {/* 2. Core Features with 1-click page navigation */}
+      <FeaturesGrid onNavigate={onNavigate} />
       {/* 3. Telegram Revision Bot */}
       <TelegramBanner />
       {/* Bottom spacer */}

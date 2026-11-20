@@ -14,6 +14,7 @@ export default function Navbar({
   activeTab,
   setActiveTab,
   onNavigate,
+  onResetNotes,
   selectedLang,
   setSelectedLang,
   theme,
@@ -24,6 +25,10 @@ export default function Navbar({
   onOpenAuth
 }) {
   const handleNav = (id, path) => {
+    if (id === 'generator' && activeTab === 'generator' && onResetNotes) {
+      onResetNotes();
+      return;
+    }
     if (onNavigate) {
       onNavigate(path);
     } else if (setActiveTab) {
@@ -44,7 +49,11 @@ export default function Navbar({
           aria-label="OmniStudy AI Homepage"
           onClick={(e) => {
             e.preventDefault();
-            handleNav('generator', '/notes');
+            if (onResetNotes) {
+              onResetNotes();
+            } else {
+              handleNav('generator', '/notes');
+            }
           }}
           className="flex items-center gap-2 sm:gap-2.5 cursor-pointer select-none group shrink-0 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg px-1 -ml-1 text-decoration-none"
         >
@@ -219,10 +228,10 @@ export default function Navbar({
                 onClick={onLogout}
                 aria-label="Logout"
                 title="Logout from your account"
-                className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 hover:border-rose-300 transition-all duration-200 min-h-[38px] cursor-pointer text-xs font-bold shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-all duration-200 min-h-[38px] cursor-pointer shadow-sm hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
               >
                 <LogOut className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                <span className="hidden xs:inline">Logout</span>
+                <span className="font-bold">Logout</span>
               </button>
             </div>
           )}

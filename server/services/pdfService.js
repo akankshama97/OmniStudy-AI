@@ -83,7 +83,7 @@ export async function generateNotePdfBuffer(note) {
       // Natural Mathematical cleaner - replaces LaTeX code markup and emojis with clean text for PDFKit
       function cleanMathText(str) {
         if (!str || typeof str !== 'string') return '';
-        return str
+        let s = str
           .replace(/⚡/g, '[*]')
           .replace(/📌/g, '[•]')
           .replace(/💡/g, '[TIP]')
@@ -120,6 +120,15 @@ export async function generateNotePdfBuffer(note) {
           .replace(/\^2/g, '^2')
           .replace(/\^3/g, '^3')
           .replace(/\\/g, '');
+
+        // Normalize typographical quotes and dashes for PDFKit WinAnsi
+        s = s
+          .replace(/[“”]/g, '"')
+          .replace(/[‘’]/g, "'")
+          .replace(/[—–]/g, '-')
+          .replace(/…/g, '...');
+
+        return s;
       }
 
       // Safe page break helper - allows natural flow up to 785 without premature empty gaps
