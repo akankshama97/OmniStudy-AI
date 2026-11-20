@@ -3,17 +3,49 @@ node_modules/
 client/node_modules/
 server/node_modules/
 
+# ── Local Databases & Storage Data (CRITICAL - Never expose user data/IDs) ──
+data/
+server/data/
+server/data/*
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.rdb
+*.dump
+*.sql
+mongodb_data/
+.mongo/
+
 # ── Environment Variables & Secret API Keys (CRITICAL!) ──
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-server/.env
-server/.env.local
-client/.env
-client/.env.local
+.env*
 *.env
+*.env.*
+server/.env
+server/.env*
+server/*.env
+client/.env
+client/.env*
+client/*.env
+!.env.example
+!server/.env.example
+
+# ── Certificates, Private Keys & Auth Tokens ──
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.id_rsa
+id_rsa*
+*.token
+token.json
+credentials.json
+serviceAccountKey*.json
+firebase-adminsdk*.json
+client_secret*.json
 
 # ── Production Build Outputs ──
 dist/
@@ -22,6 +54,14 @@ client/dist/
 build/
 client/build/
 *.local
+
+# ── Uploads & User Generated Files ──
+uploads/
+server/uploads/
+downloads/
+temp/
+tmp/
+.temp/
 
 # ── Logs & Debugging ──
 logs/
@@ -56,7 +96,5 @@ desktop.ini
 .cache/
 .parcel-cache/
 .eslintcache
-.temp/
-tmp/
 coverage/
 .nyc_output/

@@ -1,6 +1,41 @@
+# ── Dependencies ──
 node_modules/
+
+# ── Local Database & User Records ──
+data/
+data/*
+*.json.bak
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.rdb
+*.dump
+*.sql
+
+# ── Environment & Secrets ──
 .env
-.env.local
+.env*
+*.env
+*.env.*
+!.env.example
+
+# ── Certificates & Keys ──
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+credentials.json
+serviceAccountKey*.json
+firebase-adminsdk*.json
+
+# ── Logs & OS ──
 *.log
+logs/
+uploads/
+temp/
+tmp/
 .DS_Store
 Thumbs.db
