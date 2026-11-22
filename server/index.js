@@ -11,7 +11,6 @@ import { connectDB } from './config/db.js';
 import youtubeRoutes from './routes/youtubeRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import pyqRoutes from './routes/pyqRoutes.js';
-import authRoutes from './routes/authRoutes.js';
 import { initTelegramBot } from './services/telegramBot.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -56,7 +55,6 @@ connectDB();
 app.use('/api/youtube', youtubeRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/pyq', pyqRoutes);
-app.use('/api/auth', authRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

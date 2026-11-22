@@ -41,7 +41,7 @@ export const processVideo = async (req, res) => {
 
     if (videoDetails.isAgeRestricted) {
       return res.status(400).json({
-        error: 'This YouTube video is age-restricted and requires user login.'
+        error: 'This YouTube video is age-restricted and cannot be processed directly.'
       });
     }
 

@@ -98,3 +98,31 @@ desktop.ini
 .eslintcache
 coverage/
 .nyc_output/
+.vite/
+client/.vite/
+*.tsbuildinfo
+
+# ── Extension & Distribution Archives ──
+*.crx
+*.xpi
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# ── Local Generated PDFs & Exports ──
+*.pdf
+output/
+exports/
+
+# ── Secrets & Keystores ──
+*.secret
+*.secrets
+secrets/
+secrets*.json
+*.keystore
+*.jks
+*.p8
+service-account*.json
+google-services.json

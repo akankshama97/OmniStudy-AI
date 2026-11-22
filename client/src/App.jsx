@@ -5,8 +5,6 @@ import NotebookNotesView from './components/NotebookNotesView';
 import MultilingualChatbot from './components/MultilingualChatbot';
 import PYQFormulaHub from './components/PYQFormulaHub';
 import SavedNotesList from './components/SavedNotesList';
-import AuthPage from './components/AuthPage';
-import { useAuth } from './context/useAuth';
 import { processYouTubeVideo, translateNoteApi } from './services/api';
 import { SAMPLE_NOTES, SAMPLE_NOTES_MAP, getSampleNote } from './services/sampleNotes';
 import { Sparkles, RefreshCw, AlertTriangle, X, Shield, Info, Mail, ExternalLink } from 'lucide-react';
@@ -18,7 +16,6 @@ export const pathToTab = (pathname) => {
   if (p === '/pyq' || p.startsWith('/pyq/')) return 'pyq';
   if (p === '/doubt-solver' || p === '/chatbot' || p === '/doubt') return 'chatbot';
   if (p === '/saved' || p === '/library' || p === '/saved-notes') return 'saved';
-  if (p === '/login' || p === '/signup' || p === '/register' || p === '/auth') return 'login';
   return 'generator';
 };
 
@@ -26,7 +23,6 @@ export const tabToPath = (tab) => {
   if (tab === 'pyq') return '/pyq';
   if (tab === 'chatbot') return '/doubt-solver';
   if (tab === 'saved') return '/saved';
-  if (tab === 'login') return '/login';
   return '/notes';
 };
 
@@ -69,8 +65,6 @@ class ErrorBoundary extends Component {
 }
 
 export default function App() {
-  const { user, loading, logout, showAuthModal, setShowAuthModal } = useAuth();
-
   // Multi-page routing state synchronized with browser URL
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -143,23 +137,21 @@ export default function App() {
         : 'OmniStudy AI - Smart YouTube Notes & Blackboard Extractor',
       pyq: 'OmniStudy AI - Previous Year Questions (PYQs) & Formulas',
       chatbot: 'OmniStudy AI - Multilingual AI Doubt Solver & Tutor',
-      saved: 'OmniStudy AI - Saved Notes Library',
-      login: user && !user.isGuest ? `OmniStudy AI - Profile (${user.name})` : 'OmniStudy AI - Student Login & Sign Up'
+      saved: 'OmniStudy AI - Saved Notes Library'
     };
     document.title = titles[activeTab] || 'OmniStudy AI';
-  }, [activeTab, currentNote, user]);
+  }, [activeTab, currentNote]);
 
   // Close modals on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         if (footerModal) setFooterModal(null);
-        if (showAuthModal) setShowAuthModal(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [footerModal, showAuthModal, setShowAuthModal]);
+  }, [footerModal]);
 
   const handleOpenGeneralDoubt = () => {
     setTimestampTutorPrefill(null);
@@ -287,9 +279,6 @@ export default function App() {
         theme={theme}
         setTheme={setTheme}
         isDark={isDark}
-        user={user}
-        onLogout={logout}
-        onOpenAuth={() => navigate('/login')}
       />
 
       <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 md:pb-0">
@@ -380,16 +369,6 @@ export default function App() {
             theme={theme}
             isDark={isDark}
           />
-        </div>
-
-        {/* ── Page 5: Dedicated Login & Student Account Page ── */}
-        <div className={activeTab === 'login' ? 'block animate-fade-slide-up w-full max-w-5xl mx-auto px-3 sm:px-6 py-6 sm:py-10' : 'hidden'}>
-          <div className="rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0B0F17]">
-            <AuthPage
-              isDark={isDark}
-              onNavigate={navigate}
-            />
-          </div>
         </div>
       </main>
 
@@ -614,19 +593,6 @@ export default function App() {
                 Close
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Auth Modal Overlay when opened via secondary triggers */}
-      {showAuthModal && activeTab !== 'login' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-sm animate-fade-in overflow-y-auto">
-          <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl shadow-2xl border border-slate-700/50">
-            <AuthPage
-              isDark={isDark}
-              onClose={() => setShowAuthModal(false)}
-              onNavigate={navigate}
-            />
           </div>
         </div>
       )}
