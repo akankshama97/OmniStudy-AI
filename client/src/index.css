@@ -195,10 +195,12 @@
   .handwritten-mode,
   .handwritten-mode p,
   .handwritten-mode li,
+  .handwritten-mode span:not(.font-mono):not(.katex-render),
   .handwritten-mode .concept-point,
   .handwritten-mode .definition-text,
   .handwritten-mode .teacher-tip-box,
-  .handwritten-mode .common-mistake-box {
+  .handwritten-mode .common-mistake-box,
+  .handwritten-mode .solved-example-box {
     font-family: 'Kalam', 'Patrick Hand', cursive !important;
     letter-spacing: 0.3px;
     line-height: 1.85;
@@ -212,6 +214,12 @@
     font-family: 'Caveat', 'Kalam', cursive !important;
     font-weight: 700 !important;
     letter-spacing: 0.5px;
+  }
+
+  /* Authentic Royal Blue Pen Ink for student classroom handwriting in light mode */
+  .ruled-paper.handwritten-mode p,
+  .ruled-paper.handwritten-mode li {
+    color: #1E3A8A; /* Classic blue gel pen ink */
   }
 
   /* Ruled line text alignment so handwritten words sit naturally on the lines */
