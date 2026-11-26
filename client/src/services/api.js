@@ -4,12 +4,13 @@ const API_BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 180000, // 3 minutes timeout so long YouTube note synthesis never drops prematurely
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-export const processYouTubeVideo = async (videoUrl, language = 'Hinglish', selectedExam = 'Auto-detect', maxMinutes = null, forceRefresh = true) => {
+export const processYouTubeVideo = async (videoUrl, language = 'Hinglish', selectedExam = 'Auto-detect', maxMinutes = null, forceRefresh = false) => {
   const response = await api.post('/youtube/process', {
     videoUrl,
     language,
@@ -90,7 +91,6 @@ export const translateNoteApi = async (note, targetLanguage = 'Hindi') => {
   });
   return response.data;
 };
-
 
 export const downloadNotePdfApi = async (note) => {
   const response = await api.post('/youtube/export-pdf', { note }, { responseType: 'blob' });

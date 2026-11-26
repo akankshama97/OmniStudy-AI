@@ -92,6 +92,6 @@ app.get('/', (req, res) => {
 // Initialize Telegram Bot if configured
 initTelegramBot();
 
-app.listen(PORT, () => {
-  console.log(`🚀 OmniStudy AI Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 OmniStudy AI Server running on http://0.0.0.0:${PORT}`);
 });

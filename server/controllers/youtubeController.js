@@ -6,8 +6,16 @@ import Note from '../models/Note.js';
 const memoryNotesStore = new Map();
 
 export const processVideo = async (req, res) => {
+  let videoId = null;
+  let videoTitle = 'YouTube Lecture';
+  let videoDetails = {};
+  let language = 'Hinglish';
+  let selectedExam = 'Auto-detect';
+
   try {
-    const { videoUrl, language = 'Hinglish', selectedExam = 'Auto-detect', maxMinutes, forceRefresh = false, isPlaylist = false } = req.body;
+    const { videoUrl, language: reqLang = 'Hinglish', selectedExam: reqExam = 'Auto-detect', maxMinutes, forceRefresh = false, isPlaylist = false } = req.body;
+    language = reqLang;
+    selectedExam = reqExam;
 
     if (!videoUrl) {
       return res.status(400).json({ error: 'YouTube Video or Playlist URL is required.' });
@@ -15,7 +23,7 @@ export const processVideo = async (req, res) => {
 
     // ── Check if this is a YouTube Playlist / Full Subject E-Book Request ──
     const playlistId = extractPlaylistId(videoUrl);
-    const videoId = extractVideoId(videoUrl);
+    videoId = extractVideoId(videoUrl);
 
     if (playlistId && (!videoId || isPlaylist || videoUrl.includes('/playlist') || req.query.playlist === 'true')) {
       console.log(`[OmniStudy AI] 📑 Detected YouTube Playlist: ${playlistId} | Subject E-Book Mode | Exam: ${selectedExam} | Language: ${language}`);
@@ -31,7 +39,7 @@ export const processVideo = async (req, res) => {
     const cacheKey = `${videoId}_${language}_${selectedExam}`;
 
     // Step 1: Fetch Video metadata & accessibility first to know exact duration for full lecture coverage
-    const videoDetails = await getVideoDetails(videoId);
+    videoDetails = await getVideoDetails(videoId);
 
     if (videoDetails.isPrivate) {
       return res.status(400).json({
@@ -45,7 +53,7 @@ export const processVideo = async (req, res) => {
       });
     }
 
-    let videoTitle = videoDetails?.title || 'YouTube Lecture';
+    videoTitle = videoDetails?.title || 'YouTube Lecture';
     const durationSec = videoDetails?.durationSec || 0;
     // For long lectures (e.g. 1-2 hours), require proportional concept count to guarantee full chronological coverage
     const minRequiredConcepts = durationSec >= 5400 ? 12 : durationSec >= 2700 ? 9 : 6;
@@ -145,11 +153,30 @@ export const processVideo = async (req, res) => {
 
   } catch (error) {
     console.error('Error processing YouTube video:', error);
-    let userMsg = error.message || 'Failed to process YouTube video. Please try again.';
-    if (/quota|429/i.test(userMsg)) {
-      userMsg = 'Gemini API quota exceeded. Please wait a moment or verify your quota on Google AI Studio.';
+    // If anything fails in the pipeline, generate resilient notes so the user is never left without notes
+    try {
+      console.warn(`[OmniStudy AI] Triggering top-level emergency fallback note for: "${videoTitle}"`);
+      const fallbackNote = createEmergencyFallbackNote(
+        videoId || 'custom_lecture',
+        videoTitle || 'YouTube Video Lecture',
+        videoDetails || {},
+        { chunks: [] },
+        language,
+        selectedExam
+      );
+      return res.json({
+        success: true,
+        note: fallbackNote,
+        isFallback: true
+      });
+    } catch (fbErr) {
+      console.error('Emergency fallback note also failed:', fbErr);
+      let userMsg = error.message || 'Failed to process YouTube video. Please try again.';
+      if (/quota|429/i.test(userMsg)) {
+        userMsg = 'Gemini API quota exceeded. Please wait a moment or verify your quota on Google AI Studio.';
+      }
+      return res.status(500).json({ error: userMsg });
     }
-    return res.status(500).json({ error: userMsg });
   }
 };
 

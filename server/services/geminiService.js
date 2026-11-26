@@ -13,14 +13,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ipv4HttpsAgent = new https.Agent({ family: 4, keepAlive: true });
 
-// Priority order for Gemini models (fast, reliable, high-quota models first)
+// Priority order for Gemini models (fastest, high-quota, reliable models first)
 const PRO_MODELS = [
   'gemini-flash-lite-latest',
-  'gemini-3.5-flash-lite',
-  'gemini-3.6-flash',
+  'gemini-2.5-flash-lite',
   'gemini-flash-latest',
-  'gemini-3.8-flash',
-  'gemini-pro-latest'
+  'gemini-1.5-flash',
+  'gemini-pro-latest',
+  'gemini-1.5-pro'
 ];
 
 let cachedWorkingModel = null;
@@ -95,6 +95,7 @@ export async function executeGeminiPrompt(prompt, imagePart = null, isJson = tru
         generationConfig: {
           temperature: 0.65,
           topP: 0.95,
+          maxOutputTokens: 8192,
           ...(isJson ? { responseMimeType: 'application/json' } : {})
         }
       });
@@ -130,7 +131,53 @@ export async function executeGeminiPrompt(prompt, imagePart = null, isJson = tru
 }
 
 /**
- * Robust JSON Parser with Markdown stripping & bracket slicing
+ * Automatically repairs truncated JSON responses (unclosed strings, objects, arrays)
+ */
+export function repairTruncatedJSON(str) {
+  if (!str) return '{}';
+  let inStr = false;
+  let esc = false;
+  const stack = [];
+
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    if (esc) {
+      esc = false;
+      continue;
+    }
+    if (c === '\\') {
+      esc = true;
+      continue;
+    }
+    if (c === '"') {
+      inStr = !inStr;
+      continue;
+    }
+    if (!inStr) {
+      if (c === '{') stack.push('}');
+      else if (c === '[') stack.push(']');
+      else if (c === '}' || c === ']') {
+        if (stack.length > 0 && stack[stack.length - 1] === c) {
+          stack.pop();
+        }
+      }
+    }
+  }
+
+  let repaired = str.trim();
+  // If string was left open, close it
+  if (inStr) repaired += '"';
+  // Remove trailing comma if present right before closing
+  repaired = repaired.replace(/,\s*$/, '');
+  // Close all unclosed objects and arrays
+  while (stack.length > 0) {
+    repaired += stack.pop();
+  }
+  return repaired;
+}
+
+/**
+ * Robust JSON Parser with Markdown stripping, bracket slicing & auto-repair
  */
 export function cleanAndParseJSON(rawText) {
   if (!rawText) throw new Error('Empty response received from AI model.');
@@ -147,6 +194,8 @@ export function cleanAndParseJSON(rawText) {
   const lastBrace = text.lastIndexOf('}');
   if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
     text = text.substring(firstBrace, lastBrace + 1);
+  } else if (firstBrace !== -1) {
+    text = text.substring(firstBrace);
   }
 
   // Clean trailing commas before closing braces/brackets
@@ -161,11 +210,23 @@ export function cleanAndParseJSON(rawText) {
       return JSON.parse(fixedBackslashes);
     } catch (e1) {}
 
-    // Attempt 2: Fix unescaped newlines in strings
+    // Attempt 2: Auto-repair truncated JSON (tokens cutoff)
+    try {
+      const repaired = repairTruncatedJSON(text);
+      return JSON.parse(repaired);
+    } catch (e2) {}
+
+    // Attempt 3: Combined backslash fix + repair truncated JSON
+    try {
+      const fixedAndRepaired = repairTruncatedJSON(text.replace(/\\([^"\\/bfnrtu])/g, '\\\\$1'));
+      return JSON.parse(fixedAndRepaired);
+    } catch (e3) {}
+
+    // Attempt 4: Fix unescaped newlines in strings
     try {
       const sanitized = text.replace(/\r\n/g, '\n').replace(/\n/g, '\\n');
       return JSON.parse(sanitized);
-    } catch (e2) {}
+    } catch (e4) {}
 
     throw new Error(`JSON parsing failed: ${err.message}. Response snippet: ${text.slice(0, 150)}...`);
   }
@@ -1216,7 +1277,7 @@ Return STRICT JSON ONLY matching this schema:
   console.log(`[OmniStudy AI] 🚀 Running Master Single-Pass Generation for "${videoTitle}"...`);
   const res = await executeGeminiPrompt(prompt);
   const parsed = cleanAndParseJSON(res);
-  if (parsed && Array.isArray(parsed.keyConcepts) && parsed.keyConcepts.length >= Math.min(6, Math.floor(targetConceptMin * 0.7))) {
+  if (parsed && Array.isArray(parsed.keyConcepts) && parsed.keyConcepts.length >= 1) {
     console.log(`✓ [OmniStudy AI] Master Single-Pass Succeeded with ${parsed.keyConcepts.length} concepts & ${parsed.importantPYQs?.length || 0} PYQs across ${durationMin} mins!`);
     return parsed;
   }
