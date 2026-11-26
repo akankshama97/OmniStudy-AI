@@ -1,5 +1,5 @@
 import express from 'express';
-import { processVideo, getSavedNotes, getNoteById, translateNote, clearAllNotes, deleteNote, exportNoteToPdf } from '../controllers/youtubeController.js';
+import { processVideo, getSavedNotes, getNoteById, translateNote, clearAllNotes, deleteNote, exportNoteToPdf, updateNote } from '../controllers/youtubeController.js';
 
 const router = express.Router();
 
@@ -9,6 +9,7 @@ router.post('/export-pdf', exportNoteToPdf);
 router.get('/notes', getSavedNotes);
 router.delete('/notes', clearAllNotes);
 router.get('/note/:videoId', getNoteById);
+router.put('/note', updateNote);
 router.delete('/note/:id', deleteNote);
 
 export default router;

@@ -5,11 +5,12 @@ import {
   Sparkles, Layers, Award, BrainCircuit, ExternalLink, ChevronDown, ChevronUp,
   Palette, Eye, CheckCircle2, Bookmark, Languages, FileDown, Clock, AlertTriangle, Lightbulb,
   XCircle, Target, BarChart3, Filter, Search, Flame, Shield, Trophy, Zap, Sliders,
-  Type, ArrowRight, ArrowLeft, CheckSquare, Square, Share2, Compass, Users, Link2, Printer
+  Type, ArrowRight, ArrowLeft, CheckSquare, Square, Share2, Compass, Users, Link2, Printer,
+  Edit3, Save, Plus, Trash2, Undo
 } from 'lucide-react';
 import DiagramRenderer from './DiagramRenderer';
 import MindMapViewer from './MindMapViewer';
-import { downloadNotePdfApi } from '../services/api';
+import { downloadNotePdfApi, updateNoteApi } from '../services/api';
 import { cleanMathSymbols, cleanNoteText, cleanNoteHtml, FormattedText } from '../utils/formatText';
 
 /**
@@ -291,6 +292,7 @@ export default function NotebookNotesView({
   onChangeLanguage,
   onAskDoubtAboutTopic,
   onAskTimestampTutor,
+  onUpdateNote,
   theme = 'system',
   isDark = false
 }) {
@@ -303,24 +305,266 @@ export default function NotebookNotesView({
   }
 
   const notebookRef = useRef(null);
-  const [noteFormat, setNoteFormat] = useState('detailed'); // 'detailed' | 'rapid' | 'pyq' | 'cornell'
-  const [activeTab, setActiveTab] = useState('notes'); // 'notes' | 'lmr' | 'formulas' | 'mindmap' | 'pyqs' | 'mcqs' | 'mocktest' | 'dashboard'
-  const [paperStyle, setPaperStyle] = useState('ruled'); // 'ruled' | 'grid' | 'parchment' | 'dark'
-  const [fontSize, setFontSize] = useState('normal'); // 'small' | 'normal' | 'large'
-  const [handwritingStyle, setHandwritingStyle] = useState('handwritten'); // 'clean' | 'handwritten'
-  const [searchQuery, setSearchQuery] = useState('');
-  const [formulaSearch, setFormulaSearch] = useState('');
-  const [copiedFormulaName, setCopiedFormulaName] = useState(null);
-  const [isExporting, setIsExporting] = useState(false);
-  const [isExportingPDF, setIsExportingPDF] = useState(false);
-  const [isExportingReport, setIsExportingReport] = useState(false);
-  const activeDark = isExportingPDF ? false : isDark;
-  const [copiedDocx, setCopiedDocx] = useState(false);
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [isCopiedShareLink, setIsCopiedShareLink] = useState(false);
-  const [isTOCCollapsed, setIsTOCCollapsed] = useState(false);
-  const [selectedUnit, setSelectedUnit] = useState('all'); // 'all' | 1 | 2 | 3 | 4 | 5 (For Subject Master E-Booklets)
-  
+  const [isEditing, setIsEditing] = useState(false);
+  const [editableNote, setEditableNote] = useState(() => JSON.parse(JSON.stringify(note || {})));
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState(null);
+
+  // Keep editableNote updated whenever note changes from outside and not currently editing
+  useEffect(() => {
+    if (!isEditing && note) {
+      setEditableNote(JSON.parse(JSON.stringify(note)));
+    }
+  }, [note, isEditing]);
+
+  const activeNote = isEditing ? editableNote : note;
+
+  const handleStartEditing = () => {
+    setEditableNote(JSON.parse(JSON.stringify(note)));
+    setIsEditing(true);
+    setActiveTab('notes');
+  };
+
+  const handleCancelEditing = () => {
+    setEditableNote(JSON.parse(JSON.stringify(note)));
+    setIsEditing(false);
+  };
+
+  const handleSaveEditing = async () => {
+    try {
+      const updated = {
+        ...editableNote,
+        updatedAt: new Date()
+      };
+      if (onUpdateNote) {
+        onUpdateNote(updated);
+      }
+      try {
+        await updateNoteApi(updated);
+      } catch (e) {
+        console.warn('Backend note update notice:', e.message);
+      }
+      setIsEditing(false);
+      setSaveSuccessMsg('✅ Notes successfully updated and saved! (आपके सभी बदलाव सुरक्षित हो गए हैं)');
+      setTimeout(() => setSaveSuccessMsg(null), 5000);
+    } catch (err) {
+      console.error('Save editing error:', err);
+      alert('Failed to save changes: ' + err.message);
+    }
+  };
+
+  const updateChapterTitle = (val) => {
+    setEditableNote(prev => ({
+      ...prev,
+      title: val,
+      chapter: val
+    }));
+  };
+
+  const updateOverview = (val) => {
+    setEditableNote(prev => ({
+      ...prev,
+      overview: val
+    }));
+  };
+
+  const updateConceptField = (cIdx, field, val) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], [field]: val };
+      return copy;
+    });
+  };
+
+  const updateConceptPoint = (cIdx, pIdx, val) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const pts = [...(copy.keyConcepts[cIdx].points || [])];
+      pts[pIdx] = val;
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], points: pts };
+      return copy;
+    });
+  };
+
+  const addConceptPoint = (cIdx) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const pts = [...(copy.keyConcepts[cIdx].points || [])];
+      pts.push('New key concept point or blackboard derivation step...');
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], points: pts };
+      return copy;
+    });
+  };
+
+  const removeConceptPoint = (cIdx, pIdx) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const pts = [...(copy.keyConcepts[cIdx].points || [])];
+      pts.splice(pIdx, 1);
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], points: pts };
+      return copy;
+    });
+  };
+
+  const updateConceptDefinition = (cIdx, dIdx, val) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const defs = [...(copy.keyConcepts[cIdx].definitions || [])];
+      defs[dIdx] = val;
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], definitions: defs };
+      return copy;
+    });
+  };
+
+  const addConceptDefinition = (cIdx) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const defs = [...(copy.keyConcepts[cIdx].definitions || [])];
+      defs.push('Key core definition dictates governing relationship...');
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], definitions: defs };
+      return copy;
+    });
+  };
+
+  const removeConceptDefinition = (cIdx, dIdx) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const defs = [...(copy.keyConcepts[cIdx].definitions || [])];
+      defs.splice(dIdx, 1);
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], definitions: defs };
+      return copy;
+    });
+  };
+
+  const updateConceptFormula = (cIdx, fIdx, field, val) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const forms = [...(copy.keyConcepts[cIdx].formulas || [])];
+      forms[fIdx] = { ...forms[fIdx], [field]: val };
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], formulas: forms };
+      return copy;
+    });
+  };
+
+  const addConceptFormula = (cIdx) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const forms = [...(copy.keyConcepts[cIdx].formulas || [])];
+      forms.push({
+        name: 'New Governing Formula',
+        formula: 'F = m * a',
+        variables: 'F = Force, m = Mass, a = Acceleration',
+        conditions: 'Applicable in inertial frames of reference'
+      });
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], formulas: forms };
+      return copy;
+    });
+  };
+
+  const removeConceptFormula = (cIdx, fIdx) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const forms = [...(copy.keyConcepts[cIdx].formulas || [])];
+      forms.splice(fIdx, 1);
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], formulas: forms };
+      return copy;
+    });
+  };
+
+  const updateConceptTip = (cIdx, tIdx, val) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const tips = [...(copy.keyConcepts[cIdx].teacher_tips || [])];
+      tips[tIdx] = val;
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], teacher_tips: tips };
+      return copy;
+    });
+  };
+
+  const addConceptTip = (cIdx) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const tips = [...(copy.keyConcepts[cIdx].teacher_tips || [])];
+      tips.push('Teacher memory trick: Exam me standard notation dhyan se likhein.');
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], teacher_tips: tips };
+      return copy;
+    });
+  };
+
+  const removeConceptTip = (cIdx, tIdx) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const tips = [...(copy.keyConcepts[cIdx].teacher_tips || [])];
+      tips.splice(tIdx, 1);
+      copy.keyConcepts[cIdx] = { ...copy.keyConcepts[cIdx], teacher_tips: tips };
+      return copy;
+    });
+  };
+
+  const updateCommonMistake = (cIdx, field, val) => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      const cur = copy.keyConcepts[cIdx].common_mistake || {};
+      copy.keyConcepts[cIdx] = {
+        ...copy.keyConcepts[cIdx],
+        common_mistake: { ...cur, [field]: val }
+      };
+      return copy;
+    });
+  };
+
+  const removeConcept = (cIdx) => {
+    if (window.confirm && !window.confirm(`Delete concept ${cIdx + 1}?`)) return;
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      copy.keyConcepts = [...(copy.keyConcepts || [])];
+      copy.keyConcepts.splice(cIdx, 1);
+      return copy;
+    });
+  };
+
+  const addNewConcept = () => {
+    setEditableNote(prev => {
+      const copy = { ...prev };
+      const currentList = copy.keyConcepts || [];
+      const newIdx = currentList.length + 1;
+      const newC = {
+        heading: `New Topic ${newIdx}: Core Theoretical Concept`,
+        subheading: 'Blackboard analysis & key classroom derivations',
+        timestamp_start: `0${(newIdx - 1) * 8}:00`,
+        timestamp_end: `0${newIdx * 8}:00`,
+        definitions: ['Foundational definition explained by the educator.'],
+        points: [
+          'Educator explained foundational relations and theoretical principles on the board.',
+          'Standard equations and operational parameters were derived step-by-step.',
+          'Important scoring criteria and university exam patterns were highlighted.'
+        ],
+        formulas: [],
+        teacher_tips: ['Teacher Exam Tip: Always state boundary conditions clearly.'],
+        common_mistake: {
+          mistake: 'Skipping intermediate derivation steps.',
+          whyWrong: 'Examiners cut step-marking marks.',
+          correction: 'Write each step clearly with proper units.'
+        }
+      };
+      copy.keyConcepts = [...currentList, newC];
+      return copy;
+    });
+  };
+
   // ── 🎴 Smart AI Flashcards & Spaced Repetition (Active Recall Mode) ──
   const [currentFlashcardIdx, setCurrentFlashcardIdx] = useState(0);
   const [isCardFlipped, setIsCardFlipped] = useState(false);
@@ -1930,8 +2174,22 @@ export default function NotebookNotesView({
             </button>
           </div>
 
-          {/* Export & Share Options (PDF, DOC, Share) */}
+          {/* Export & Share Options (PDF, DOC, Share, Edit) */}
           <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            {/* Edit Notes Button */}
+            <button
+              onClick={() => isEditing ? handleCancelEditing() : handleStartEditing()}
+              className={`px-3.5 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs hover:shadow-sm active:scale-95 cursor-pointer ${
+                isEditing
+                  ? 'bg-amber-600 hover:bg-amber-700 text-white border border-amber-700'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-700'
+              }`}
+              title="Edit notes to correct mistakes, modify definitions, formulas, or headings"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>{isEditing ? 'Cancel Edit' : '✏️ Edit Notes'}</span>
+            </button>
+
             {/* PDF Download Button */}
             <button
               onClick={handleDownloadPDF}
@@ -2118,6 +2376,69 @@ export default function NotebookNotesView({
 
       {/* ── TAB 1: AUTHENTIC STUDENT COPY NOTES ── */}
       {activeTab === 'notes' && (
+        <>
+          {/* Save Success Alert Banner */}
+          {saveSuccessMsg && (
+            <div className="mb-4 p-3.5 rounded-2xl bg-emerald-500/20 border-2 border-emerald-500 text-emerald-800 dark:text-emerald-200 text-xs sm:text-sm font-bold flex items-center justify-between gap-2 shadow-lg animate-fade-in">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                <span>{saveSuccessMsg}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSaveSuccessMsg(null)}
+                className="text-slate-400 hover:text-slate-600 font-mono text-xs cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {/* Note Editing Sticky Action Bar */}
+          {isEditing && (
+            <div className="sticky top-14 sm:top-16 z-30 mb-5 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/25 via-amber-600/20 to-orange-500/25 border-2 border-amber-500/80 shadow-2xl backdrop-blur-lg flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2.5">
+                <span className="text-2xl animate-bounce">✏️</span>
+                <div>
+                  <h4 className="font-extrabold text-xs sm:text-sm text-amber-950 dark:text-amber-100 flex items-center gap-1.5">
+                    <span>Note Editing Mode Active • सम्पादन मोड चालू है</span>
+                    <span className="text-[10px] font-mono font-bold bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full">
+                      LIVE
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-amber-900/90 dark:text-amber-200/90">
+                    Click and edit any heading, definition, point, or formula to fix errors directly.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={addNewConcept}
+                  className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1 shadow-sm transition-all cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Add New Topic</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveEditing}
+                  className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black flex items-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Save Changes (सेव करें)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancelEditing}
+                  className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
         <div
           ref={notebookRef}
           data-fontsize={fontSize}
@@ -2153,25 +2474,40 @@ export default function NotebookNotesView({
               {/* Row 2: Subject, Educator & Target Exam */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 text-xs font-mono pt-1">
                 <div className="font-bold text-red-600 dark:text-red-400 tracking-wide text-[11px] sm:text-xs">
-                  <span>SUBJECT: <strong className="text-slate-800 dark:text-slate-200">{note.subject || 'Computer Science & Engineering'}</strong></span>
+                  <span>SUBJECT: <strong className="text-slate-800 dark:text-slate-200">{activeNote.subject || 'Computer Science & Engineering'}</strong></span>
                   <span className="mx-1.5 text-slate-400">•</span>
                   <span>NOTES TYPE: <strong className="text-slate-800 dark:text-slate-200">CLASSROOM TOPPER COPY</strong></span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0 flex-wrap">
                   <span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-800 dark:text-amber-300 font-bold text-[10px] sm:text-[11px]">
-                    🎯 {note.targetExam || 'EXAM READY'}
+                    🎯 {activeNote.targetExam || 'EXAM READY'}
                   </span>
                   <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                    DATE: {new Date(note.createdAt || Date.now()).toLocaleDateString()}
+                    DATE: {new Date(activeNote.createdAt || Date.now()).toLocaleDateString()}
                   </span>
                 </div>
               </div>
 
               {/* Row 3: Chapter Title */}
               <div className="pt-2">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight font-['Plus_Jakarta_Sans']">
-                  <FormattedText text={note.chapter || note.title} />
-                </h1>
+                {isEditing ? (
+                  <div>
+                    <label className="text-[10px] font-mono font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide block mb-1">
+                      ✏️ Edit Lecture / Chapter Title:
+                    </label>
+                    <input
+                      type="text"
+                      value={activeNote.chapter || activeNote.title || ''}
+                      onChange={(e) => updateChapterTitle(e.target.value)}
+                      className="w-full text-lg sm:text-2xl font-bold p-2 sm:p-2.5 rounded-xl border-2 border-amber-400 bg-amber-50/50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none"
+                      placeholder="Lecture / Chapter Title"
+                    />
+                  </div>
+                ) : (
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight font-['Plus_Jakarta_Sans']">
+                    <FormattedText text={activeNote.chapter || activeNote.title} />
+                  </h1>
+                )}
               </div>
             </div>
 
@@ -2233,18 +2569,33 @@ export default function NotebookNotesView({
               <div className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 font-mono">
                 01. LECTURE OVERVIEW &amp; CONTEXT
               </div>
-              <p className="text-sm md:text-base leading-relaxed break-words text-slate-800 dark:text-slate-100">
-                <FormattedText text={note.overview} />
-              </p>
+              {isEditing ? (
+                <div>
+                  <label className="text-[10px] font-mono font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide block mb-1">
+                    ✏️ Edit Overview &amp; Context:
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={activeNote.overview || ''}
+                    onChange={(e) => updateOverview(e.target.value)}
+                    className="w-full p-3 rounded-xl border-2 border-amber-400 bg-amber-50/40 dark:bg-slate-900 text-sm md:text-base leading-relaxed text-slate-900 dark:text-white focus:outline-none font-kalam"
+                    placeholder="Lecture Overview..."
+                  />
+                </div>
+              ) : (
+                <p className="text-sm md:text-base leading-relaxed break-words text-slate-800 dark:text-slate-100">
+                  <FormattedText text={activeNote.overview} />
+                </p>
+              )}
 
               {/* High-yield highlights list */}
-              {note.quickSummary && note.quickSummary.length > 0 && (
+              {activeNote.quickSummary && activeNote.quickSummary.length > 0 && (
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 my-2">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2 font-mono flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-amber-500" /> High-Yield Key Takeaways
                   </h4>
                   <ul className="space-y-1.5">
-                    {note.quickSummary.map((item, idx) => (
+                    {activeNote.quickSummary.map((item, idx) => (
                       <li key={idx} className="text-xs md:text-sm flex items-start gap-2 break-words text-slate-800 dark:text-slate-100">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
                         <span className="flex-1 min-w-0"><FormattedText text={item} /></span>
@@ -2357,17 +2708,63 @@ export default function NotebookNotesView({
                     </div>
 
                     {/* Topic Heading */}
-                    <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
-                      <h3 className="text-xl md:text-2xl font-bold break-words flex-1 min-w-0 text-slate-900 dark:text-white">
-                        <FormattedText text={concept.heading} />
-                      </h3>
-                    </div>
-
-                    {/* Sub-heading */}
-                    {concept.subheading && (
-                      <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-2 italic">
-                        ▶ <FormattedText text={concept.subheading} />
+                    {isEditing ? (
+                      <div className="mb-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/40 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                            ✏️ Concept Heading {idx + 1}:
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => removeConcept(idx)}
+                            className="text-xs px-2.5 py-1 rounded-lg bg-red-500/15 hover:bg-red-500 text-red-600 hover:text-white font-bold flex items-center gap-1 transition-all cursor-pointer"
+                            title="Delete this entire topic"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Delete Topic</span>
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={concept.heading || ''}
+                          onChange={(e) => updateConceptField(idx, 'heading', e.target.value)}
+                          className="w-full p-2.5 rounded-lg border-2 border-amber-400 bg-white dark:bg-slate-900 font-bold text-base sm:text-lg text-slate-900 dark:text-white focus:outline-none font-kalam"
+                          placeholder="Topic Heading"
+                        />
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono text-slate-500 shrink-0">Subheading:</span>
+                          <input
+                            type="text"
+                            value={concept.subheading || ''}
+                            onChange={(e) => updateConceptField(idx, 'subheading', e.target.value)}
+                            className="w-full p-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs italic text-slate-700 dark:text-slate-300 focus:outline-none"
+                            placeholder="Subheading / Context"
+                          />
+                        </div>
                       </div>
+                    ) : (
+                      <>
+                        <div className="flex items-start justify-between gap-3 mb-2 flex-wrap group">
+                          <h3 className="text-xl md:text-2xl font-bold break-words flex-1 min-w-0 text-slate-900 dark:text-white font-kalam">
+                            <FormattedText text={concept.heading} />
+                          </h3>
+                          <button
+                            type="button"
+                            onClick={() => handleStartEditing()}
+                            className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer px-2 py-0.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800"
+                            title="Edit this concept"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+                        </div>
+
+                        {concept.subheading && (
+                          <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-2 italic">
+                            ▶ <FormattedText text={concept.subheading} />
+                          </div>
+                        )}
+                      </>
                     )}
 
                     {/* Concept Connections (Prerequisite & Next Steps in Syllabus) */}
@@ -2381,27 +2778,98 @@ export default function NotebookNotesView({
                     </div>
 
                     {/* Red Pen Definitions */}
-                    {concept.definitions && concept.definitions.length > 0 && (
-                      <div className="my-3 space-y-1.5">
-                        {concept.definitions.map((def, dIdx) => (
-                          <div key={dIdx} className="p-3 rounded-xl bg-red-500/5 border-l-4 border-red-500 text-xs sm:text-sm font-bold text-[#B91C1C] dark:text-[#FCA5A5] flex items-start gap-1.5">
-                            <span>📌</span>
-                            <MathText text={def} className="flex-1" />
+                    {isEditing ? (
+                      <div className="my-3 p-3 rounded-xl bg-red-500/5 border border-red-500/30 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-mono font-bold uppercase text-red-600 dark:text-red-400 flex items-center gap-1">
+                            <span>📌 Definitions</span>
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => addConceptDefinition(idx)}
+                            className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 cursor-pointer"
+                          >
+                            <Plus className="w-3 h-3" /> Add Definition
+                          </button>
+                        </div>
+                        {(concept.definitions || []).map((def, dIdx) => (
+                          <div key={dIdx} className="flex items-center gap-1.5">
+                            <input
+                              type="text"
+                              value={def}
+                              onChange={(e) => updateConceptDefinition(idx, dIdx, e.target.value)}
+                              className="flex-1 p-2 rounded-lg border border-red-300 dark:border-red-900 bg-white dark:bg-slate-900 text-xs font-semibold text-red-700 dark:text-red-300 focus:outline-none font-kalam"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeConceptDefinition(idx, dIdx)}
+                              className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
+                              title="Delete definition"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         ))}
                       </div>
+                    ) : (
+                      concept.definitions && concept.definitions.length > 0 && (
+                        <div className="my-3 space-y-1.5">
+                          {concept.definitions.map((def, dIdx) => (
+                            <div key={dIdx} className="p-3 rounded-xl bg-red-500/5 border-l-4 border-red-500 text-xs sm:text-sm font-bold text-[#B91C1C] dark:text-[#FCA5A5] flex items-start gap-1.5 font-kalam">
+                              <span>📌</span>
+                              <MathText text={def} className="flex-1" />
+                            </div>
+                          ))}
+                        </div>
+                      )
                     )}
 
                   {/* Bulleted Concept Points */}
-                  {concept.points && concept.points.length > 0 && (
-                    <ul className="space-y-2 my-3 pl-2">
-                      {concept.points.map((pt, pIdx) => (
-                        <li key={pIdx} className="text-sm md:text-base flex items-start gap-2.5 text-slate-800 dark:text-slate-100">
-                          <span className="text-indigo-500 font-bold">•</span>
-                          <MathText text={pt} className="flex-1 min-w-0 leading-relaxed" />
-                        </li>
+                  {isEditing ? (
+                    <div className="my-3 p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/30 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-mono font-bold uppercase text-indigo-600 dark:text-indigo-400">
+                          📝 Classroom Points &amp; Derivations
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => addConceptPoint(idx)}
+                          className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3" /> Add Point
+                        </button>
+                      </div>
+                      {(concept.points || []).map((pt, pIdx) => (
+                        <div key={pIdx} className="flex items-start gap-2">
+                          <span className="text-indigo-500 font-bold mt-2 text-xs">•</span>
+                          <textarea
+                            rows={2}
+                            value={pt}
+                            onChange={(e) => updateConceptPoint(idx, pIdx, e.target.value)}
+                            className="flex-1 p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:outline-none font-kalam leading-relaxed"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeConceptPoint(idx, pIdx)}
+                            className="text-slate-400 hover:text-red-500 p-1.5 mt-1 cursor-pointer"
+                            title="Delete point"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
+                  ) : (
+                    concept.points && concept.points.length > 0 && (
+                      <ul className="space-y-2 my-3 pl-2">
+                        {concept.points.map((pt, pIdx) => (
+                          <li key={pIdx} className="text-sm md:text-base flex items-start gap-2.5 text-slate-800 dark:text-slate-100 font-kalam">
+                            <span className="text-indigo-500 font-bold">•</span>
+                            <MathText text={pt} className="flex-1 min-w-0 leading-relaxed" />
+                          </li>
+                        ))}
+                      </ul>
+                    )
                   )}
 
                   {/* Comparison Table if Present */}
@@ -2444,15 +2912,50 @@ export default function NotebookNotesView({
                   )}
 
                   {/* Orange Pen Teacher's Tips / Speed Tricks */}
-                  {concept.teacher_tips && concept.teacher_tips.length > 0 && (
-                    <div className="my-3 space-y-1.5 teacher-tip-box">
-                      {concept.teacher_tips.map((tip, tIdx) => (
-                        <div key={tIdx} className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/30 text-xs sm:text-sm font-semibold text-[#C2410C] dark:text-[#FDBA74] handwritten-font flex items-start gap-2">
-                          <Lightbulb className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                          <MathText text={tip} className="flex-1" />
+                  {isEditing ? (
+                    <div className="my-3 p-3 rounded-xl bg-orange-500/5 border border-orange-500/30 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-mono font-bold uppercase text-orange-600 dark:text-orange-400">
+                          💡 Teacher's Memory Tips &amp; Traps
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => addConceptTip(idx)}
+                          className="text-[11px] font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1 cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3" /> Add Tip
+                        </button>
+                      </div>
+                      {(concept.teacher_tips || []).map((tip, tIdx) => (
+                        <div key={tIdx} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={tip}
+                            onChange={(e) => updateConceptTip(idx, tIdx, e.target.value)}
+                            className="flex-1 p-2 rounded-lg border border-orange-300 dark:border-orange-800 bg-white dark:bg-slate-900 text-xs sm:text-sm font-semibold text-orange-900 dark:text-orange-300 focus:outline-none font-kalam"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeConceptTip(idx, tIdx)}
+                            className="text-orange-400 hover:text-red-500 p-1 cursor-pointer"
+                            title="Delete tip"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       ))}
                     </div>
+                  ) : (
+                    concept.teacher_tips && concept.teacher_tips.length > 0 && (
+                      <div className="my-3 space-y-1.5 teacher-tip-box">
+                        {concept.teacher_tips.map((tip, tIdx) => (
+                          <div key={tIdx} className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/30 text-xs sm:text-sm font-semibold text-[#C2410C] dark:text-[#FDBA74] handwritten-font flex items-start gap-2">
+                            <Lightbulb className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                            <MathText text={tip} className="flex-1" />
+                          </div>
+                        ))}
+                      </div>
+                    )
                   )}
 
                   {/* Common Student Mistake / Blunder Box */}
@@ -2462,15 +2965,49 @@ export default function NotebookNotesView({
                         <AlertTriangle className="w-4 h-4" />
                         <span>Common Student Exam Mistake / Blunder:</span>
                       </div>
-                      <p className="text-slate-700 dark:text-slate-300 font-sans">
-                        <strong>Mistake:</strong> <FormattedText text={concept.common_mistake.mistake} />
-                      </p>
-                      <p className="text-red-600 dark:text-red-400 font-sans mt-0.5">
-                        <strong>Why it loses marks:</strong> <FormattedText text={concept.common_mistake.whyWrong} />
-                      </p>
-                      <p className="text-emerald-700 dark:text-emerald-400 font-bold font-sans mt-1">
-                        ✓ <strong>Correct Approach:</strong> <FormattedText text={concept.common_mistake.correction} />
-                      </p>
+                      {isEditing ? (
+                        <div className="space-y-1.5 mt-2">
+                          <div>
+                            <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 block">Mistake:</span>
+                            <input
+                              type="text"
+                              value={concept.common_mistake.mistake || ''}
+                              onChange={(e) => updateCommonMistake(idx, 'mistake', e.target.value)}
+                              className="w-full p-1.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200"
+                            />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold text-red-600 block">Why it loses marks:</span>
+                            <input
+                              type="text"
+                              value={concept.common_mistake.whyWrong || ''}
+                              onChange={(e) => updateCommonMistake(idx, 'whyWrong', e.target.value)}
+                              className="w-full p-1.5 rounded border border-red-300 dark:border-red-900 bg-white dark:bg-slate-900 text-xs text-red-700 dark:text-red-300"
+                            />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold text-emerald-600 block">Correct Approach:</span>
+                            <input
+                              type="text"
+                              value={concept.common_mistake.correction || ''}
+                              onChange={(e) => updateCommonMistake(idx, 'correction', e.target.value)}
+                              className="w-full p-1.5 rounded border border-emerald-300 dark:border-emerald-900 bg-white dark:bg-slate-900 text-xs text-emerald-700 dark:text-emerald-300"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-slate-700 dark:text-slate-300 font-sans">
+                            <strong>Mistake:</strong> <FormattedText text={concept.common_mistake.mistake} />
+                          </p>
+                          <p className="text-red-600 dark:text-red-400 font-sans mt-0.5">
+                            <strong>Why it loses marks:</strong> <FormattedText text={concept.common_mistake.whyWrong} />
+                          </p>
+                          <p className="text-emerald-700 dark:text-emerald-400 font-bold font-sans mt-1">
+                            ✓ <strong>Correct Approach:</strong> <FormattedText text={concept.common_mistake.correction} />
+                          </p>
+                        </>
+                      )}
                     </div>
                   )}
 
@@ -2548,6 +3085,28 @@ export default function NotebookNotesView({
               </div>
             </div>
 
+            {/* Add New Concept Button in Edit Mode */}
+            {isEditing && (
+              <div className="pt-6 pb-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={addNewConcept}
+                  className="px-6 py-3 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm flex items-center gap-2 shadow-lg transition-all cursor-pointer active:scale-95"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>➕ Add New Topic / Concept (नया टॉपिक जोड़ें)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveEditing}
+                  className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm flex items-center gap-2 shadow-lg transition-all cursor-pointer active:scale-95"
+                >
+                  <Save className="w-5 h-5" />
+                  <span>💾 Save All Changes (बदलाव सेव करें)</span>
+                </button>
+              </div>
+            )}
+
             {/* Official Notebook Signature & Watermark Footer (Solid Dark Bar) */}
             <div className="print-signature-footer mt-8 p-3.5 sm:p-4 rounded-2xl bg-[#0F172A] text-white border-2 border-[#1E293B] shadow-xl flex flex-col sm:flex-row items-center justify-between gap-2.5 w-full">
               <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wide text-white flex-wrap">
@@ -2563,15 +3122,16 @@ export default function NotebookNotesView({
 
           </div>
         </div>
+        </>
       )}
 
       {/* ── TAB 2: INTERACTIVE MIND MAP CANVAS ── */}
       {activeTab === 'mindmap' && (
         <MindMapViewer
-          nodes={note.mindMapNodes || []}
-          title={note.chapter || note.title}
-          keyConcepts={note.keyConcepts || []}
-          formulas={note.formulas || []}
+          nodes={activeNote.mindMapNodes || []}
+          title={activeNote.chapter || activeNote.title}
+          keyConcepts={activeNote.keyConcepts || []}
+          formulas={activeNote.formulas || []}
           isDark={isDark}
           onSelectTopic={(topicName) => {
             setActiveTab('notes');
@@ -3136,7 +3696,7 @@ export default function NotebookNotesView({
                 EXAM SE 10 MINUTE PEHLE REVISION
               </div>
               <h3 className="text-2xl font-bold font-['Plus_Jakarta_Sans'] mt-0.5">
-                ⚡ 1-Page LMR Cheat Sheet: {note.chapter || note.title}
+                ⚡ 1-Page LMR Cheat Sheet: {activeNote.chapter || activeNote.title}
               </h3>
               <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1">
                 Zero filler, 100% high-yield recall. Key laws, formulas, primary diagram, and examiner traps on a single condensed sheet.
@@ -3155,7 +3715,7 @@ export default function NotebookNotesView({
 
           {/* ── 🎴 SMART AI FLASHCARDS & SPACED REPETITION (ACTIVE RECALL MODE) ── */}
           {(() => {
-            const allCards = deriveNoteFlashcards(note);
+            const allCards = deriveNoteFlashcards(activeNote);
             const cards = allCards.filter(c => {
               if (flashcardFilter === 'all') return true;
               return c.category === flashcardFilter;
@@ -3574,7 +4134,7 @@ export default function NotebookNotesView({
                 CONSOLIDATED FORMULA MASTER SHEET
               </div>
               <h3 className="text-2xl font-bold font-['Plus_Jakarta_Sans'] mt-0.5">
-                Formula Sheet: {note.chapter || note.title}
+                Formula Sheet: {activeNote.chapter || activeNote.title}
               </h3>
               <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1">
                 Every governing equation, law, variable definition, and examiner shortcut on one searchable page.
@@ -3596,8 +4156,8 @@ export default function NotebookNotesView({
 
           {/* Formulas Grid */}
           {(() => {
-            const isCSLecture = /computer|discrete|dstl|coa|architecture|dbms|operating|compiler|network|software|data structure/i.test((note.title || '') + ' ' + (note.subject || ''));
-            const safeFormulas = (note.formulas || []).filter(f => {
+            const isCSLecture = /computer|discrete|dstl|coa|architecture|dbms|operating|compiler|network|software|data structure/i.test((activeNote.title || '') + ' ' + (activeNote.subject || ''));
+            const safeFormulas = (activeNote.formulas || []).filter(f => {
               if (!f || !f.name || !f.formula) return false;
               if (selectedUnit !== 'all' && f.unitNumber && Number(f.unitNumber) !== Number(selectedUnit)) {
                 return false;

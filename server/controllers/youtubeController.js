@@ -333,6 +333,43 @@ export const deleteNote = async (req, res) => {
   }
 };
 
+export const updateNote = async (req, res) => {
+  try {
+    const { note } = req.body;
+    if (!note || (!note._id && !note.videoId)) {
+      return res.status(400).json({ error: 'Valid note object with ID or videoId is required.' });
+    }
+    const id = note._id;
+    const videoId = note.videoId;
+    let updated = null;
+
+    try {
+      if (id && String(id).match(/^[0-9a-fA-F]{24}$/)) {
+        updated = await Note.findByIdAndUpdate(id, { ...note, updatedAt: new Date() }, { new: true });
+      } else if (videoId) {
+        updated = await Note.findOneAndUpdate({ videoId }, { ...note, updatedAt: new Date() }, { new: true });
+      }
+    } catch (dbErr) {
+      console.warn('DB update note fallback:', dbErr.message);
+    }
+
+    if (videoId) {
+      const cacheKey = `${videoId}_${note.language || 'Hinglish'}`;
+      memoryNotesStore.set(cacheKey, { ...note, updatedAt: new Date() });
+      memoryNotesStore.set(videoId, { ...note, updatedAt: new Date() });
+    }
+
+    return res.json({
+      success: true,
+      note: updated || note,
+      message: 'Note updated successfully.'
+    });
+  } catch (error) {
+    console.error('Update note error:', error);
+    return res.status(500).json({ error: error.message || 'Failed to update note.' });
+  }
+};
+
 // Preset sample data for fallback resilience
 const PRESET_SAMPLE_DATA = {};
 

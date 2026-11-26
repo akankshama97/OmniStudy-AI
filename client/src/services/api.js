@@ -36,6 +36,11 @@ export const deleteSavedNote = async (id) => {
   return response.data;
 };
 
+export const updateNoteApi = async (note) => {
+  const response = await api.put('/youtube/note', { note });
+  return response.data;
+};
+
 export const solveDoubt = async (question, videoContext = null, language = 'Hinglish', imageBase64 = null, imageMimeType = 'image/jpeg') => {
   const response = await api.post('/chat/doubt', {
     question,

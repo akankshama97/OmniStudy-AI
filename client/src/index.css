@@ -191,6 +191,37 @@
   .handwritten-title { font-family: 'Caveat', cursive; }
   .handwritten-clean { font-family: 'Patrick Hand', cursive; }
 
+  /* ── Full Handwritten Classroom Notebook Styling ── */
+  .handwritten-mode,
+  .handwritten-mode p,
+  .handwritten-mode li,
+  .handwritten-mode .concept-point,
+  .handwritten-mode .definition-text,
+  .handwritten-mode .teacher-tip-box,
+  .handwritten-mode .common-mistake-box {
+    font-family: 'Kalam', 'Patrick Hand', cursive !important;
+    letter-spacing: 0.3px;
+    line-height: 1.85;
+  }
+
+  .handwritten-mode h1,
+  .handwritten-mode h2,
+  .handwritten-mode h3,
+  .handwritten-mode h4,
+  .handwritten-mode .concept-heading {
+    font-family: 'Caveat', 'Kalam', cursive !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+  }
+
+  /* Ruled line text alignment so handwritten words sit naturally on the lines */
+  .ruled-paper.handwritten-mode p,
+  .ruled-paper.handwritten-mode li,
+  .dark-ruled-paper.handwritten-mode p,
+  .dark-ruled-paper.handwritten-mode li {
+    line-height: 2.2rem;
+  }
+
   /* Formula boxes */
   .formula-card-light {
     background: #F0FDFA;

@@ -218,6 +218,19 @@ export default function App() {
     }
   };
 
+  const handleUpdateNote = (updatedNote) => {
+    if (!updatedNote) return;
+    setCurrentNote(updatedNote);
+    try {
+      if (updatedNote.videoId) {
+        localStorage.setItem(`omnistudy_edited_note_${updatedNote.videoId}`, JSON.stringify(updatedNote));
+      }
+      localStorage.setItem('omnistudy_current_active_note', JSON.stringify(updatedNote));
+    } catch (e) {
+      console.warn('LocalStorage save error:', e);
+    }
+  };
+
   const handleProcessVideo = async (videoUrl, selectedExam = 'Auto-detect', noteStyle = 'detailed', maxMinutes = null) => {
     setIsLoading(true);
     setError(null);
@@ -328,6 +341,7 @@ export default function App() {
                 onChangeLanguage={handleChangeLanguage}
                 onAskDoubtAboutTopic={handleOpenGeneralDoubt}
                 onAskTimestampTutor={handleOpenTimestampTutor}
+                onUpdateNote={handleUpdateNote}
                 theme={theme}
                 isDark={isDark}
                 isLoading={isLoading}
