@@ -305,6 +305,24 @@ export default function NotebookNotesView({
   }
 
   const notebookRef = useRef(null);
+  const [noteFormat, setNoteFormat] = useState('detailed'); // 'detailed' | 'rapid' | 'pyq' | 'cornell'
+  const [activeTab, setActiveTab] = useState('notes'); // 'notes' | 'lmr' | 'formulas' | 'mindmap' | 'pyqs' | 'mcqs' | 'mocktest' | 'dashboard'
+  const [paperStyle, setPaperStyle] = useState('ruled'); // 'ruled' | 'grid' | 'parchment' | 'dark'
+  const [fontSize, setFontSize] = useState('normal'); // 'small' | 'normal' | 'large'
+  const [handwritingStyle, setHandwritingStyle] = useState('handwritten'); // 'clean' | 'handwritten'
+  const [searchQuery, setSearchQuery] = useState('');
+  const [formulaSearch, setFormulaSearch] = useState('');
+  const [copiedFormulaName, setCopiedFormulaName] = useState(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [isExportingReport, setIsExportingReport] = useState(false);
+  const activeDark = isExportingPDF ? false : isDark;
+  const [copiedDocx, setCopiedDocx] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isCopiedShareLink, setIsCopiedShareLink] = useState(false);
+  const [isTOCCollapsed, setIsTOCCollapsed] = useState(false);
+  const [selectedUnit, setSelectedUnit] = useState('all'); // 'all' | 1 | 2 | 3 | 4 | 5 (For Subject Master E-Booklets)
+
   const [isEditing, setIsEditing] = useState(false);
   const [editableNote, setEditableNote] = useState(() => JSON.parse(JSON.stringify(note || {})));
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(null);
@@ -1991,7 +2009,7 @@ export default function NotebookNotesView({
   };
 
   // Search & Unit filtering in notes
-  const filteredConcepts = (note?.keyConcepts || []).filter(c => {
+  const filteredConcepts = (activeNote?.keyConcepts || note?.keyConcepts || []).filter(c => {
     // If filtering by unit in E-Book / Playlist mode
     if (selectedUnit !== 'all' && c.unitNumber && Number(c.unitNumber) !== Number(selectedUnit)) {
       return false;
